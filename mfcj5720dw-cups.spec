@@ -13,6 +13,7 @@ Version:        0.1.0
 Release:        2%{?dist}
 Summary:        Direct CUPS Raster driver for the Brother MFC-J5720DW
 License:        GPL-3.0-or-later AND GPL-2.0-or-later AND LicenseRef-Brother-Data
+URL:            https://github.com/vivier/mfcj5720dw_cups
 Source0:        %{name}-%{version}.tar.gz
 # The encoder currently retains x86 floating-point and data-layout assumptions.
 ExclusiveArch:  x86_64 %{ix86}

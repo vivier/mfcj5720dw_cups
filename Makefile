@@ -28,8 +28,9 @@ RPMBUILD ?= rpmbuild
 RPMSPEC ?= rpmspec
 RPM_SPEC = mfcj5720dw-cups.spec
 RPM_TOPDIR = $(abspath $(BUILD)/rpm)
+RPM_SRPMDIR = $(RPM_TOPDIR)/SRPMS
 DIST_FILES = .gitattributes .gitignore COPYRIGHT LICENSE PROVENANCE.md README.md \
-	Makefile $(RPM_SPEC) $(wildcard *.c *.h *.1 *.drv) \
+	Makefile .copr/Makefile $(RPM_SPEC) $(wildcard *.c *.h *.1 *.drv) \
 	$(wildcard encoder/*.c encoder/*.h) \
 	lut/Makefile lut/.gitignore $(wildcard lut/*.py lut/*.xml)
 
@@ -93,10 +94,12 @@ rpm-sources:
 	install -m644 $(RPM_SPEC) "$(RPM_TOPDIR)/SPECS/$(RPM_SPEC)"
 
 rpm: rpm-sources
-	+$(RPMBUILD) -ba --define '_topdir $(RPM_TOPDIR)' "$(RPM_TOPDIR)/SPECS/$(RPM_SPEC)"
+	+$(RPMBUILD) -ba --define '_topdir $(RPM_TOPDIR)' \
+		--define '_srcrpmdir $(RPM_SRPMDIR)' "$(RPM_TOPDIR)/SPECS/$(RPM_SPEC)"
 
 srpm: rpm-sources
-	$(RPMBUILD) -bs --define '_topdir $(RPM_TOPDIR)' "$(RPM_TOPDIR)/SPECS/$(RPM_SPEC)"
+	$(RPMBUILD) -bs --define '_topdir $(RPM_TOPDIR)' \
+		--define '_srcrpmdir $(RPM_SRPMDIR)' "$(RPM_TOPDIR)/SPECS/$(RPM_SPEC)"
 
 clean:
 	$(RM) -r -- "$(BUILD)" ppd

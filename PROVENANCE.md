@@ -57,6 +57,12 @@ These Brother data retain their existing notices and terms. The project GPL
 notice does not relicense them. The RPM uses `LicenseRef-Brother-Data` to
 identify this exception, not to claim that Brother granted a new license.
 
+The original RPM's [download page](https://support.brother.com/g/b/downloadend.aspx?c=us&lang=en&prod=mfcj5720dw_us_eu_as&os=127&dlid=dlf101184_000&flang=4&type3=558)
+links to Brother's [LPR license agreement](https://support.brother.com/g/s/agreement/English_lpr/agree.html)
+(checked on 2026-11-13). That agreement permits reproduction, distribution,
+modification and distribution of derivatives, while retaining Brother's
+copyright. Acceptance of these terms for Fedora COPR has not been established.
+
 ## System libraries and build tools
 
 The driver dynamically links against system CUPS and libjpeg. The recommended
