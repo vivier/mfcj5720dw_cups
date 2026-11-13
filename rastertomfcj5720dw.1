@@ -1,0 +1,57 @@
+.TH RASTERTOMFCJ5720DW 1 "November 2026" "MFC-J5720DW driver" "User Commands"
+.SH NAME
+rastertomfcj5720dw \- convert CUPS Raster to Brother MFC-J5720DW printer data
+.SH SYNOPSIS
+.B rastertomfcj5720dw
+.I job-id user title copies options
+.RI [ file ]
+.br
+.B rastertomfcj5720dw
+.BR \-h " | " \-\-help
+.SH DESCRIPTION
+Read CUPS Raster from the named file or standard input and write the printer
+stream to standard output. Diagnostics, page accounting and ink levels go to
+standard error. The encoder is linked into the filter; no LPR command,
+printconf program, shell wrapper, Ghostscript subprocess or RC file is used.
+.PP
+CUPS performs PDF/PostScript rendering, layout, page selection, software copies,
+reverse ordering and odd-page duplex padding upstream. Pages are encoded in
+the order received. The filter does not add another duplex blank page.
+.PP
+The initial implementation accepts uniform-size pages at 150 dpi for PlainFast
+or 600 dpi for other quality settings, with chunked 8-bit RGB or white-based
+grayscale. It checks the page dimensions and duplex settings against the PPD.
+The inherited renderer consumes a complete RGB page for rotation and enhancement.
+Small dimension differences from Brother's paper tables are cropped or padded
+with white at the right and bottom edges, without rescaling.
+.PP
+JPEG transfer modes use libjpeg-turbo through the libjpeg API. The filter
+retains Brother framing and baseline YCbCr 4:2:2 compression parameters.
+JPEG bytes and decoded pixels can differ slightly from the legacy compressor
+because the library performs color conversion, chroma sampling and DCT.
+The non-JPEG renderer is unchanged.
+.SH ENVIRONMENT
+.TP
+.B PPD
+Required path to the direct raster driver's PPD, normally supplied by CUPS.
+.TP
+.B DEVICE_URI
+When present, request ink levels through the CUPS backend's side channel.
+An unavailable ink reading does not prevent printing.
+.TP
+.B MFCJ5720DW_PROFILE_DIR
+Override the color-profile directory for isolated tests. The installation
+default is /usr/share/mfcj5720dw/lut.
+.SH LIMITATIONS
+This is an experimental integration of the reconstructed encoder. Mixed page
+sizes, raster formats other than those listed, and raster headers requesting
+multiple copies are rejected. CUPS must expand copies before this filter.
+The build still uses the shared encoder sources and verified non-executable
+tables extracted from Brother's binary; color profiles remain Brother data.
+.SH EXIT STATUS
+Zero means success, cancellation or help. One means a configuration, input or
+rendering error. Two indicates an invalid invocation.
+.SH SEE ALSO
+.BR mfcj5720dw_ink (1),
+.BR cupsfilter (8),
+.BR lp (1)

@@ -1,0 +1,60 @@
+.TH MFCJ5720DW_INK 1 "November 2026" "MFC-J5720DW driver" "User Commands"
+.SH NAME
+mfcj5720dw_ink \- report Brother ink estimates to CUPS
+.SH SYNOPSIS
+.B mfcj5720dw_ink
+.B \-\-report-levels
+.br
+.B mfcj5720dw_ink
+.I job-id user title copies options
+.RI [ file ]
+.br
+.B mfcj5720dw_ink
+.BR \-h " | " \-\-help
+.SH DESCRIPTION
+This native CUPS filter queries the MFC-J5720DW maintenance OID through
+the CUPS side channel on file descriptor 4. The network backend performs
+the read-only SNMP GET using its configured community.
+No SNMP SET, printer command or document data is sent by this filter.
+.PP
+The four ink estimates are reported to the scheduler as marker attributes
+on stderr, in black, cyan, magenta, yellow order. Values are rounded to whole
+percentages; a nonzero estimate smaller than one percent is shown as one.
+Low-ink status is reported at five percent or less, empty only at exactly zero.
+These values are printer estimates, not measured ink volumes.
+The supply type is ink, recognized by CUPS clients including GNOME 50.
+.PP
+The raster filter calls the shared reporting function before rendering each job.
+Updates can also be requested without printing through a CUPS command job.
+The PPD advertises only ReportLevels and disables generic SNMP supply polling
+because this printer's standard Printer-MIB does not return usable percentages.
+.SH COMMAND FILE
+With the CUPS positional arguments, read the named file or stdin.
+The first line must be #CUPS-COMMAND. Only ReportLevels is supported;
+command names are case insensitive. Blank lines and comments are accepted.
+The entire file is validated before issuing one query.
+.PP
+Example, submitting a status request to an existing queue:
+.nf
+printf '#CUPS-COMMAND\enReportLevels\en' | \e
+  lp -d PRINTER -t 'Ink levels' -o document-format=application/vnd.cups-command
+.fi
+.SH AVAILABILITY
+The CUPS network backend must support side-channel SNMP queries.
+LPD is validated for this model. USB and backends without this capability
+cannot provide levels through this filter.
+Without a valid reply, no marker values are emitted: CUPS retains its last
+successful reading. The raster filter ignores query failures.
+.PP
+The query timeout is three seconds for each side-channel read or write.
+There is no background polling while the queue is idle; use ReportLevels
+after changing a cartridge to refresh without printing.
+.SH EXIT STATUS
+Zero means success or help. One means a failed query, invalid response or
+invalid command file. Two indicates an invalid invocation.
+Normal reporting never writes to stdout.
+.SH FILES
+.I /usr/lib/cups/filter/mfcj5720dw_ink
+.SH SEE ALSO
+.BR rastertomfcj5720dw (1),
+.BR lp (1)

@@ -1,0 +1,612 @@
+// Brother MFC-J5720DW description for the direct CUPS Raster filter.
+#define NoPostScript "          "
+
+{
+	Manufacturer "Brother"
+	ModelName "MFC-J5720DW"
+	FileName "mfcj5720dw.ppd"
+	PCFileName "MFC5720R.PPD"
+	Version "4.0.4"
+	DriverType ps
+	ModelNumber 17
+	ManualCopies Yes
+	ColorDevice Yes
+	Throughput 12
+	Attribute "NickName" "" "Brother MFC-J5720DW CUPS"
+	Attribute "ShortNickName" "" "MFC-J5720DW"
+	Attribute "Product" "" "(MFC-J5720DW)"
+	Attribute "1284DeviceID" "" "MFG:Brother;MDL:MFC-J5720DW"
+	Attribute "PSVersion" "" "(3010.106) 3"
+	Attribute "ISOCountryCode" "" "JP"
+	Attribute "LanguageLevel" "" "3"
+	Attribute "DefaultColorSpace" "" "RGB"
+	Attribute "FileSystem" "" "False"
+	Attribute "TTRasterizer" "" "Type42"
+	Attribute "FreeVM" "" "1700000"
+	Attribute "DefaultOutputOrder" "" "Reverse"
+
+	// The original omits LandscapeOrientation: CUPS then uses Minus90.
+	// ppdc would otherwise generate Plus90 and reverse landscape rotation.
+	Attribute "LandscapeOrientation" "" "Minus90"
+	Attribute "VariablePaperSize" "" "False"
+	Attribute "cupsVersion" "" "1.4"
+	// The encoder handles the printer-specific duplex rotation.
+	Attribute "cupsBackSide" "" "Normal"
+	// Brother's private maintenance OID provides the actual ink estimates.
+	// Disable generic polling so Printer-MIB sentinels cannot overwrite them.
+	Attribute "cupsSNMPSupplies" "" "False"
+	Attribute "cupsCommands" "" "ReportLevels"
+
+	// CUPS performs PDF/PostScript rendering and page management upstream.
+	Filter "application/vnd.cups-raster 0 rastertomfcj5720dw"
+	Filter "application/vnd.cups-command 0 mfcj5720dw_ink"
+
+	// Width, height and margins in PostScript points (1/72 inch).
+	// Preserve Brother's rounded dimensions instead of generic media.defs.
+	// Arguments: name width height left bottom right top size-code region-code.
+	CustomMedia "A3/A3" 842 1191 9 9 9 9 "<</PageSize[842 1191]/ImagingBBox null>>setpagedevice" "<</PageSize[842 1191]/ImagingBBox null>>setpagedevice"
+	CustomMedia "BrA3_B_S/A3 (Borderless)" 842 1191 0 0 0 0 "<</PageSize[842 1191]/ImagingBBox null>>setpagedevice" "<</PageSize[842 1191]/ImagingBBox null>>setpagedevice"
+	CustomMedia "B4_S/JB4" 729 1032 9 9 9 9 "<</PageSize[729 1032]/ImagingBBox null>>setpagedevice" "<</PageSize[729 1032]/ImagingBBox null>>setpagedevice"
+	CustomMedia "Tabloid_S/Tabloid" 792 1224 9 9 9 9 "<</PageSize[792 1224]/ImagingBBox null>>setpagedevice" "<</PageSize[792 1224]/ImagingBBox null>>setpagedevice"
+	CustomMedia "BrLedger_B_B/Tabloid (Borderless)" 792 1224 0 0 0 0 "<</PageSize[792 1224]/ImagingBBox null>>setpagedevice" "<</PageSize[792 1224]/ImagingBBox null>>setpagedevice"
+	CustomMedia "A4/A4" 595 842 9 9 9 9 "<</PageSize[595 842]/ImagingBBox null>>setpagedevice" "<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+	CustomMedia "BrA4_B/A4 (Borderless)" 595 842 0 0 0 0 "<</PageSize[595 842]/ImagingBBox null>>setpagedevice" "<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+	*CustomMedia "Letter/Letter" 612 792 9 9 9 9 "<</PageSize[612 792]/ImagingBBox null>>setpagedevice" "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+	CustomMedia "BrLetter_B/Letter (Borderless)" 612 792 0 0 0 0 "<</PageSize[612 792]/ImagingBBox null>>setpagedevice" "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+	CustomMedia "Legal/Legal" 612 1008 9 9 9 9 "<</PageSize[612 1008]/ImagingBBox null>>setpagedevice" "<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+	CustomMedia "Folio/Folio" 612 936 9 9 9 9 "<</PageSize[612 936]/ImagingBBox null>>setpagedevice" "<</PageSize[612 936]/ImagingBBox null>>setpagedevice"
+	CustomMedia "Executive/Executive" 522 756 9 9 9 9 "<</PageSize[522 756]/ImagingBBox null>>setpagedevice" "<</PageSize[522 756]/ImagingBBox null>>setpagedevice"
+	CustomMedia "B5/JIS B5" 516 729 9 9 9 9 "<</PageSize[516 729]/ImagingBBox null>>setpagedevice" "<</PageSize[516 729]/ImagingBBox null>>setpagedevice"
+	CustomMedia "A5/A5" 420 595 9 9 9 9 "<</PageSize[420 595]/ImagingBBox null>>setpagedevice" "<</PageSize[420 595]/ImagingBBox null>>setpagedevice"
+	CustomMedia "A6/A6" 297 420 9 9 9 9 "<</PageSize[297 420]/ImagingBBox null>>setpagedevice" "<</PageSize[297 420]/ImagingBBox null>>setpagedevice"
+	CustomMedia "BrA6_B/A6 (Borderless)" 297 420 0 0 0 0 "<</PageSize[297 420]/ImagingBBox null>>setpagedevice" "<</PageSize[297 420]/ImagingBBox null>>setpagedevice"
+	CustomMedia "BrPostC4x6_S/4 x 6 in" 288 432 9 9 9 9 "<</PageSize[288 432]/ImagingBBox null>>setpagedevice" "<</PageSize[288 432]/ImagingBBox null>>setpagedevice"
+	CustomMedia "BrPostC4x6_B/4 x 6 in (Borderless)" 288 432 0 0 0 0 "<</PageSize[288 432]/ImagingBBox null>>setpagedevice" "<</PageSize[288 432]/ImagingBBox null>>setpagedevice"
+	CustomMedia "BrIndexC5x8_S/5 x 8 in" 360 576 9 9 9 9 "<</PageSize[360 576]/ImagingBBox null>>setpagedevice" "<</PageSize[360 576]/ImagingBBox null>>setpagedevice"
+	CustomMedia "BrIndexC5x8_B/5 x 8 in (Borderless)" 360 576 0 0 0 0 "<</PageSize[360 576]/ImagingBBox null>>setpagedevice" "<</PageSize[360 576]/ImagingBBox null>>setpagedevice"
+	CustomMedia "BrPhotoL_S/3.5 x 5 in" 252 360 9 9 9 9 "<</PageSize[252 360]/ImagingBBox null>>setpagedevice" "<</PageSize[252 360]/ImagingBBox null>>setpagedevice"
+	CustomMedia "BrPhotoL_B/3.5 x 5 in (Borderless)" 252 360 0 0 0 0 "<</PageSize[252 360]/ImagingBBox null>>setpagedevice" "<</PageSize[252 360]/ImagingBBox null>>setpagedevice"
+	CustomMedia "BrPhoto2L_S/5 x 7 in" 359 505 9 9 9 9 "<</PageSize[359 505]/ImagingBBox null>>setpagedevice" "<</PageSize[359 505]/ImagingBBox null>>setpagedevice"
+	CustomMedia "BrPhoto2L_B/5 x 7 in (Borderless)" 359 505 0 0 0 0 "<</PageSize[359 505]/ImagingBBox null>>setpagedevice" "<</PageSize[359 505]/ImagingBBox null>>setpagedevice"
+	CustomMedia "Postcard/Postcard 1" 284 419 9 9 9 9 "<</PageSize[284 419]/ImagingBBox null>>setpagedevice" "<</PageSize[284 419]/ImagingBBox null>>setpagedevice"
+	CustomMedia "BrHagaki_B/Postcard 1 (Borderless)" 284 419 0 0 0 0 "<</PageSize[284 419]/ImagingBBox null>>setpagedevice" "<</PageSize[284 419]/ImagingBBox null>>setpagedevice"
+	CustomMedia "DoublePostcardRotated/Postcard 2 (Double)" 420 567 9 9 9 9 "<</PageSize[420 567]/ImagingBBox null>>setpagedevice" "<</PageSize[420 567]/ImagingBBox null>>setpagedevice"
+	CustomMedia "EnvC5/C5 Envelope" 459 649 9 62 9 34 "<</PageSize[459 649]/ImagingBBox null>>setpagedevice" "<</PageSize[459 649]/ImagingBBox null>>setpagedevice"
+	CustomMedia "EnvDL/DL Envelope" 312 624 9 62 9 34 "<</PageSize[312 624]/ImagingBBox null>>setpagedevice" "<</PageSize[312 624]/ImagingBBox null>>setpagedevice"
+	CustomMedia "Env10/Com-10" 297 684 9 62 9 34 "<</PageSize[297 684]/ImagingBBox null>>setpagedevice" "<</PageSize[297 684]/ImagingBBox null>>setpagedevice"
+	CustomMedia "EnvMonarch/Monarch" 279 540 9 62 9 34 "<</PageSize[279 540]/ImagingBBox null>>setpagedevice" "<</PageSize[279 540]/ImagingBBox null>>setpagedevice"
+	CustomMedia "EnvC6/C6 Envelope" 323 459 9 62 9 34 "<</PageSize[323 459]/ImagingBBox null>>setpagedevice" "<</PageSize[323 459]/ImagingBBox null>>setpagedevice"
+	CustomMedia "EnvYou4/Y4 Envelope" 298 666 9 62 9 34 "<</PageSize[298 666]/ImagingBBox null>>setpagedevice" "<</PageSize[298 666]/ImagingBBox null>>setpagedevice"
+
+	// Printer controls and their presentation in the CUPS options dialog.
+
+	Group "General/General"
+
+		// Standard Duplex lets CUPS pad odd reversed jobs before rasterization.
+		Option "Duplex/Two-Sided" PickOne AnySetup 25
+			Choice "DuplexTumble/Short-Edge Binding" "<</Duplex true/Tumble true>>setpagedevice"
+			Choice "DuplexNoTumble/Long-Edge Binding" "<</Duplex true/Tumble false>>setpagedevice"
+			*Choice "None/Off" "<</Duplex false/Tumble false>>setpagedevice"
+
+		Option "BRInputSlot/Paper Source" PickOne AnySetup 13
+			*Choice "AutoSelect/Auto Select" $NoPostScript
+			Choice "Tray1/Tray1" $NoPostScript
+			Choice "Tray2/Tray2" $NoPostScript
+			Choice "MPTray/MP Tray" $NoPostScript
+
+		Option "BRResolution/Print Quality" PickOne AnySetup 14
+			Choice "PlainFast/Plain Fast" "<</HWResolution[150 150]/cupsBitsPerColor 8/cupsColorSpace 1/cupsColorOrder 0>>setpagedevice"
+			*Choice "PlainNormal/Plain Normal" "<</HWResolution[600 600]/cupsBitsPerColor 8/cupsColorSpace 1/cupsColorOrder 0>>setpagedevice"
+			Choice "Fast/Fast" "<</HWResolution[600 600]/cupsBitsPerColor 8/cupsColorSpace 1/cupsColorOrder 0>>setpagedevice"
+			Choice "Normal/Normal" "<</HWResolution[600 600]/cupsBitsPerColor 8/cupsColorSpace 1/cupsColorOrder 0>>setpagedevice"
+			Choice "Photo/Photo" "<</HWResolution[600 600]/cupsBitsPerColor 8/cupsColorSpace 1/cupsColorOrder 0>>setpagedevice"
+			Choice "Best/Best" "<</HWResolution[600 600]/cupsBitsPerColor 8/cupsColorSpace 1/cupsColorOrder 0>>setpagedevice"
+
+		Option "BRMonoColor/Color / Grayscale" PickOne AnySetup 15
+			*Choice "Color/Color" $NoPostScript
+			Choice "Mono/Grayscale" $NoPostScript
+
+		Option "BRSlowDrying/Slow Drying Paper" PickOne AnySetup 31
+			*Choice "OFF/Off" $NoPostScript
+			Choice "ON/On" $NoPostScript
+
+		Option "BRMediaType/Media Type" PickOne AnySetup 16
+			Choice "PlainDuplex/Plain Duplex Paper" $NoPostScript
+			*Choice "Plain/Plain Paper" $NoPostScript
+			Choice "Inkjet/Inkjet Paper" $NoPostScript
+			Choice "BrotherGlossyR/Brother BP71 Photo Paper" $NoPostScript
+			Choice "BrotherBP60Matte/Brother BP60 Matte Paper" $NoPostScript
+			Choice "Glossy/Other Photo Paper" $NoPostScript
+			Choice "HagakiAtena/HagakiAtena" $NoPostScript
+			Choice "HagakiUra/HagakiUra" $NoPostScript
+
+		Option "BRColorPaperThick/Paper Thickness" PickOne AnySetup 17
+			*Choice "Regular/Regular" $NoPostScript
+			Choice "Thick/Thick" $NoPostScript
+			Choice "Env/Envelope" $NoPostScript
+
+		Option "BRBiDir/Bi-Directional Printing" PickOne AnySetup 18
+			Choice "OFF/Off" $NoPostScript
+			*Choice "ON/On" $NoPostScript
+
+		Option "BRColorMatching/Color Mode" PickOne AnySetup 21
+			Choice "Natural/Natural" $NoPostScript
+			*Choice "Vivid/Vivid" $NoPostScript
+			Choice "None/None" $NoPostScript
+
+		Option "BRJpeg/Change Data Transfer Mode" PickOne AnySetup 22
+			*Choice "Recommended/Recommended Setting" $NoPostScript
+			Choice "QualityPrior/Improved Print Quality" $NoPostScript
+			Choice "SpeedPrior/Improved Print Speed" $NoPostScript
+
+		Option "BRDuplexMode/Advanced Two-Sided Settings" PickOne AnySetup 32
+			*Choice "Normal/Normal" $NoPostScript
+			Choice "Duplex1/Two-Sided 1 (Slower print speed)" $NoPostScript
+			Choice "Duplex2/Two-Sided 2 (Slower print speed & less ink)" $NoPostScript
+
+	Group "Vertical Line Alignment/Vertical Line Alignment"
+
+		Option "BRVertLineAlignA3B4Ledger/Vertical Line Alignment A3, JIS B4, Ledger" PickOne AnySetup 32
+			*Choice "OFF/Off" $NoPostScript
+			Choice "ON/On" $NoPostScript
+
+		Option "BRVertLineAlignA4Letter/Vertical Line Alignment A4, Letter" PickOne AnySetup 33
+			*Choice "OFF/Off" $NoPostScript
+			Choice "ON/On" $NoPostScript
+
+		Option "BRVertLineAlignOther/Vertical Line Alignment Other Sizes" PickOne AnySetup 34
+			*Choice "OFF/Off" $NoPostScript
+			Choice "ON/On" $NoPostScript
+
+	Group "Color Settings (Advanced)/Color Settings (Advanced)"
+
+		Option "BRHalfTonePattern/Halftone Pattern" PickOne AnySetup 23
+			Choice "Diffusion/Diffusion" $NoPostScript
+			*Choice "Dither/Dither" $NoPostScript
+
+		Option "BRColorEnhancement/Color Enhancement" PickOne AnySetup 24
+			*Choice "OFF/Off" $NoPostScript
+			Choice "ON/On" $NoPostScript
+
+		Option "BRBrightness/Brightness" PickOne AnySetup 25
+			Choice "-20/-20" $NoPostScript
+			Choice "-19/-19" $NoPostScript
+			Choice "-18/-18" $NoPostScript
+			Choice "-17/-17" $NoPostScript
+			Choice "-16/-16" $NoPostScript
+			Choice "-15/-15" $NoPostScript
+			Choice "-14/-14" $NoPostScript
+			Choice "-13/-13" $NoPostScript
+			Choice "-12/-12" $NoPostScript
+			Choice "-11/-11" $NoPostScript
+			Choice "-10/-10" $NoPostScript
+			Choice "-9/-9" $NoPostScript
+			Choice "-8/-8" $NoPostScript
+			Choice "-7/-7" $NoPostScript
+			Choice "-6/-6" $NoPostScript
+			Choice "-5/-5" $NoPostScript
+			Choice "-4/-4" $NoPostScript
+			Choice "-3/-3" $NoPostScript
+			Choice "-2/-2" $NoPostScript
+			Choice "-1/-1" $NoPostScript
+			*Choice "0/0" $NoPostScript
+			Choice "1/1" $NoPostScript
+			Choice "2/2" $NoPostScript
+			Choice "3/3" $NoPostScript
+			Choice "4/4" $NoPostScript
+			Choice "5/5" $NoPostScript
+			Choice "6/6" $NoPostScript
+			Choice "7/7" $NoPostScript
+			Choice "8/8" $NoPostScript
+			Choice "9/9" $NoPostScript
+			Choice "10/10" $NoPostScript
+			Choice "11/11" $NoPostScript
+			Choice "12/12" $NoPostScript
+			Choice "13/13" $NoPostScript
+			Choice "14/14" $NoPostScript
+			Choice "15/15" $NoPostScript
+			Choice "16/16" $NoPostScript
+			Choice "17/17" $NoPostScript
+			Choice "18/18" $NoPostScript
+			Choice "19/19" $NoPostScript
+			Choice "20/20" $NoPostScript
+
+		Option "BRContrast/Contrast" PickOne AnySetup 26
+			Choice "-20/-20" $NoPostScript
+			Choice "-19/-19" $NoPostScript
+			Choice "-18/-18" $NoPostScript
+			Choice "-17/-17" $NoPostScript
+			Choice "-16/-16" $NoPostScript
+			Choice "-15/-15" $NoPostScript
+			Choice "-14/-14" $NoPostScript
+			Choice "-13/-13" $NoPostScript
+			Choice "-12/-12" $NoPostScript
+			Choice "-11/-11" $NoPostScript
+			Choice "-10/-10" $NoPostScript
+			Choice "-9/-9" $NoPostScript
+			Choice "-8/-8" $NoPostScript
+			Choice "-7/-7" $NoPostScript
+			Choice "-6/-6" $NoPostScript
+			Choice "-5/-5" $NoPostScript
+			Choice "-4/-4" $NoPostScript
+			Choice "-3/-3" $NoPostScript
+			Choice "-2/-2" $NoPostScript
+			Choice "-1/-1" $NoPostScript
+			*Choice "0/0" $NoPostScript
+			Choice "1/1" $NoPostScript
+			Choice "2/2" $NoPostScript
+			Choice "3/3" $NoPostScript
+			Choice "4/4" $NoPostScript
+			Choice "5/5" $NoPostScript
+			Choice "6/6" $NoPostScript
+			Choice "7/7" $NoPostScript
+			Choice "8/8" $NoPostScript
+			Choice "9/9" $NoPostScript
+			Choice "10/10" $NoPostScript
+			Choice "11/11" $NoPostScript
+			Choice "12/12" $NoPostScript
+			Choice "13/13" $NoPostScript
+			Choice "14/14" $NoPostScript
+			Choice "15/15" $NoPostScript
+			Choice "16/16" $NoPostScript
+			Choice "17/17" $NoPostScript
+			Choice "18/18" $NoPostScript
+			Choice "19/19" $NoPostScript
+			Choice "20/20" $NoPostScript
+
+		Option "BRRed/Red" PickOne AnySetup 27
+			Choice "-20/-20" $NoPostScript
+			Choice "-19/-19" $NoPostScript
+			Choice "-18/-18" $NoPostScript
+			Choice "-17/-17" $NoPostScript
+			Choice "-16/-16" $NoPostScript
+			Choice "-15/-15" $NoPostScript
+			Choice "-14/-14" $NoPostScript
+			Choice "-13/-13" $NoPostScript
+			Choice "-12/-12" $NoPostScript
+			Choice "-11/-11" $NoPostScript
+			Choice "-10/-10" $NoPostScript
+			Choice "-9/-9" $NoPostScript
+			Choice "-8/-8" $NoPostScript
+			Choice "-7/-7" $NoPostScript
+			Choice "-6/-6" $NoPostScript
+			Choice "-5/-5" $NoPostScript
+			Choice "-4/-4" $NoPostScript
+			Choice "-3/-3" $NoPostScript
+			Choice "-2/-2" $NoPostScript
+			Choice "-1/-1" $NoPostScript
+			*Choice "0/0" $NoPostScript
+			Choice "1/1" $NoPostScript
+			Choice "2/2" $NoPostScript
+			Choice "3/3" $NoPostScript
+			Choice "4/4" $NoPostScript
+			Choice "5/5" $NoPostScript
+			Choice "6/6" $NoPostScript
+			Choice "7/7" $NoPostScript
+			Choice "8/8" $NoPostScript
+			Choice "9/9" $NoPostScript
+			Choice "10/10" $NoPostScript
+			Choice "11/11" $NoPostScript
+			Choice "12/12" $NoPostScript
+			Choice "13/13" $NoPostScript
+			Choice "14/14" $NoPostScript
+			Choice "15/15" $NoPostScript
+			Choice "16/16" $NoPostScript
+			Choice "17/17" $NoPostScript
+			Choice "18/18" $NoPostScript
+			Choice "19/19" $NoPostScript
+			Choice "20/20" $NoPostScript
+
+		Option "BRGreen/Green" PickOne AnySetup 28
+			Choice "-20/-20" $NoPostScript
+			Choice "-19/-19" $NoPostScript
+			Choice "-18/-18" $NoPostScript
+			Choice "-17/-17" $NoPostScript
+			Choice "-16/-16" $NoPostScript
+			Choice "-15/-15" $NoPostScript
+			Choice "-14/-14" $NoPostScript
+			Choice "-13/-13" $NoPostScript
+			Choice "-12/-12" $NoPostScript
+			Choice "-11/-11" $NoPostScript
+			Choice "-10/-10" $NoPostScript
+			Choice "-9/-9" $NoPostScript
+			Choice "-8/-8" $NoPostScript
+			Choice "-7/-7" $NoPostScript
+			Choice "-6/-6" $NoPostScript
+			Choice "-5/-5" $NoPostScript
+			Choice "-4/-4" $NoPostScript
+			Choice "-3/-3" $NoPostScript
+			Choice "-2/-2" $NoPostScript
+			Choice "-1/-1" $NoPostScript
+			*Choice "0/0" $NoPostScript
+			Choice "1/1" $NoPostScript
+			Choice "2/2" $NoPostScript
+			Choice "3/3" $NoPostScript
+			Choice "4/4" $NoPostScript
+			Choice "5/5" $NoPostScript
+			Choice "6/6" $NoPostScript
+			Choice "7/7" $NoPostScript
+			Choice "8/8" $NoPostScript
+			Choice "9/9" $NoPostScript
+			Choice "10/10" $NoPostScript
+			Choice "11/11" $NoPostScript
+			Choice "12/12" $NoPostScript
+			Choice "13/13" $NoPostScript
+			Choice "14/14" $NoPostScript
+			Choice "15/15" $NoPostScript
+			Choice "16/16" $NoPostScript
+			Choice "17/17" $NoPostScript
+			Choice "18/18" $NoPostScript
+			Choice "19/19" $NoPostScript
+			Choice "20/20" $NoPostScript
+
+		Option "BRBlue/Blue" PickOne AnySetup 29
+			Choice "-20/-20" $NoPostScript
+			Choice "-19/-19" $NoPostScript
+			Choice "-18/-18" $NoPostScript
+			Choice "-17/-17" $NoPostScript
+			Choice "-16/-16" $NoPostScript
+			Choice "-15/-15" $NoPostScript
+			Choice "-14/-14" $NoPostScript
+			Choice "-13/-13" $NoPostScript
+			Choice "-12/-12" $NoPostScript
+			Choice "-11/-11" $NoPostScript
+			Choice "-10/-10" $NoPostScript
+			Choice "-9/-9" $NoPostScript
+			Choice "-8/-8" $NoPostScript
+			Choice "-7/-7" $NoPostScript
+			Choice "-6/-6" $NoPostScript
+			Choice "-5/-5" $NoPostScript
+			Choice "-4/-4" $NoPostScript
+			Choice "-3/-3" $NoPostScript
+			Choice "-2/-2" $NoPostScript
+			Choice "-1/-1" $NoPostScript
+			*Choice "0/0" $NoPostScript
+			Choice "1/1" $NoPostScript
+			Choice "2/2" $NoPostScript
+			Choice "3/3" $NoPostScript
+			Choice "4/4" $NoPostScript
+			Choice "5/5" $NoPostScript
+			Choice "6/6" $NoPostScript
+			Choice "7/7" $NoPostScript
+			Choice "8/8" $NoPostScript
+			Choice "9/9" $NoPostScript
+			Choice "10/10" $NoPostScript
+			Choice "11/11" $NoPostScript
+			Choice "12/12" $NoPostScript
+			Choice "13/13" $NoPostScript
+			Choice "14/14" $NoPostScript
+			Choice "15/15" $NoPostScript
+			Choice "16/16" $NoPostScript
+			Choice "17/17" $NoPostScript
+			Choice "18/18" $NoPostScript
+			Choice "19/19" $NoPostScript
+			Choice "20/20" $NoPostScript
+
+	// Invalid combinations, enforced by CUPS and printer setup tools.
+	// ppdc emits both directions of each constraint.
+	UIConstraints "*PageSize Folio *BRInputSlot Tray1"
+	UIConstraints "*PageSize EnvC5 *BRInputSlot Tray2"
+	UIConstraints "*PageSize Executive *BRInputSlot Tray2"
+	UIConstraints "*PageSize Folio *BRInputSlot Tray2"
+	UIConstraints "*PageSize B5 *BRInputSlot Tray2"
+	UIConstraints "*PageSize A5 *BRInputSlot Tray2"
+	UIConstraints "*PageSize A6 *BRInputSlot Tray2"
+	UIConstraints "*PageSize BrA6_B *BRInputSlot Tray2"
+	UIConstraints "*PageSize BrPostC4x6_S *BRInputSlot Tray2"
+	UIConstraints "*PageSize BrPostC4x6_B *BRInputSlot Tray2"
+	UIConstraints "*PageSize BrIndexC5x8_S *BRInputSlot Tray2"
+	UIConstraints "*PageSize BrIndexC5x8_B *BRInputSlot Tray2"
+	UIConstraints "*PageSize BrPhotoL_S *BRInputSlot Tray2"
+	UIConstraints "*PageSize BrPhotoL_B *BRInputSlot Tray2"
+	UIConstraints "*PageSize BrPhoto2L_S *BRInputSlot Tray2"
+	UIConstraints "*PageSize BrPhoto2L_B *BRInputSlot Tray2"
+	UIConstraints "*PageSize BrHagaki_B *BRInputSlot Tray2"
+	UIConstraints "*PageSize DoublePostcardRotated *BRInputSlot Tray2"
+	UIConstraints "*PageSize EnvDL *BRInputSlot Tray2"
+	UIConstraints "*PageSize Env10 *BRInputSlot Tray2"
+	UIConstraints "*PageSize EnvMonarch *BRInputSlot Tray2"
+	UIConstraints "*PageSize EnvC6 *BRInputSlot Tray2"
+	UIConstraints "*PageSize EnvYou4 *BRInputSlot Tray2"
+	UIConstraints "*PageSize Postcard *BRInputSlot Tray2"
+	UIConstraints "*BRMediaType Inkjet *BRInputSlot Tray2"
+	UIConstraints "*BRMediaType Glossy *BRInputSlot Tray2"
+	UIConstraints "*BRMediaType BrotherGlossyR *BRInputSlot Tray2"
+	UIConstraints "*BRMediaType BrotherBP60Matte *BRInputSlot Tray2"
+	UIConstraints "*BRMediaType HagakiAtena *BRInputSlot Tray2"
+	UIConstraints "*BRMediaType HagakiUra *BRInputSlot Tray2"
+	UIConstraints "*Duplex DuplexTumble *PageSize A3"
+	UIConstraints "*Duplex DuplexTumble *PageSize BrA3_B_S"
+	UIConstraints "*Duplex DuplexTumble *PageSize B4_S"
+	UIConstraints "*Duplex DuplexTumble *PageSize Tabloid_S"
+	UIConstraints "*Duplex DuplexTumble *PageSize BrLedger_B_B"
+	UIConstraints "*Duplex DuplexTumble *PageSize BrA4_B"
+	UIConstraints "*Duplex DuplexTumble *PageSize BrLetter_B"
+	UIConstraints "*Duplex DuplexTumble *PageSize Legal"
+	UIConstraints "*Duplex DuplexTumble *PageSize Folio"
+	UIConstraints "*Duplex DuplexTumble *PageSize A6"
+	UIConstraints "*Duplex DuplexTumble *PageSize BrA6_B"
+	UIConstraints "*Duplex DuplexTumble *PageSize BrPostC4x6_S"
+	UIConstraints "*Duplex DuplexTumble *PageSize BrPostC4x6_B"
+	UIConstraints "*Duplex DuplexTumble *PageSize BrIndexC5x8_S"
+	UIConstraints "*Duplex DuplexTumble *PageSize BrIndexC5x8_B"
+	UIConstraints "*Duplex DuplexTumble *PageSize BrPhotoL_S"
+	UIConstraints "*Duplex DuplexTumble *PageSize BrPhotoL_B"
+	UIConstraints "*Duplex DuplexTumble *PageSize BrPhoto2L_S"
+	UIConstraints "*Duplex DuplexTumble *PageSize BrPhoto2L_B"
+	UIConstraints "*Duplex DuplexTumble *PageSize DoublePostcardRotated"
+	UIConstraints "*Duplex DuplexTumble *PageSize EnvC5"
+	UIConstraints "*Duplex DuplexTumble *PageSize EnvDL"
+	UIConstraints "*Duplex DuplexTumble *PageSize Env10"
+	UIConstraints "*Duplex DuplexTumble *PageSize EnvMonarch"
+	UIConstraints "*Duplex DuplexTumble *PageSize EnvC6"
+	UIConstraints "*Duplex DuplexTumble *PageSize EnvYou4"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize A3"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize BrA3_B_S"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize B4_S"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize Tabloid_S"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize BrLedger_B_B"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize BrA4_B"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize BrLetter_B"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize Legal"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize Folio"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize A6"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize BrA6_B"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize BrPostC4x6_S"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize BrPostC4x6_B"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize BrIndexC5x8_S"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize BrIndexC5x8_B"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize BrPhotoL_S"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize BrPhotoL_B"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize BrPhoto2L_S"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize BrPhoto2L_B"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize DoublePostcardRotated"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize EnvC5"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize EnvDL"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize Env10"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize EnvMonarch"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize EnvC6"
+	UIConstraints "*Duplex DuplexNoTumble *PageSize EnvYou4"
+	UIConstraints "*PageSize BrA3_B_S *BRResolution PlainFast"
+	UIConstraints "*PageSize BrLedger_B_B *BRResolution PlainFast"
+	UIConstraints "*PageSize BrA4_B *BRResolution PlainFast"
+	UIConstraints "*PageSize BrLetter_B *BRResolution PlainFast"
+	UIConstraints "*PageSize BrA6_B *BRResolution PlainFast"
+	UIConstraints "*PageSize BrPostC4x6_B *BRResolution PlainFast"
+	UIConstraints "*PageSize BrIndexC5x8_B *BRResolution PlainFast"
+	UIConstraints "*PageSize BrPhotoL_B *BRResolution PlainFast"
+	UIConstraints "*PageSize BrPhoto2L_B *BRResolution PlainFast"
+	UIConstraints "*PageSize BrHagaki_B *BRResolution PlainFast"
+	UIConstraints "*PageSize BrA3_B_S *BRResolution PlainNormal"
+	UIConstraints "*PageSize BrA3_B_S *BRResolution Fast"
+	UIConstraints "*PageSize BrLedger_B_B *BRResolution Fast"
+	UIConstraints "*PageSize BrA4_B *BRResolution Fast"
+	UIConstraints "*PageSize BrLetter_B *BRResolution Fast"
+	UIConstraints "*PageSize BrA6_B *BRResolution Fast"
+	UIConstraints "*PageSize BrPostC4x6_B *BRResolution Fast"
+	UIConstraints "*PageSize BrPhotoL_B *BRResolution Fast"
+	UIConstraints "*PageSize BrPhoto2L_B *BRResolution Fast"
+	UIConstraints "*PageSize BrHagaki_B *BRResolution Fast"
+	UIConstraints "*PageSize Postcard *BRBiDir ON"
+	UIConstraints "*PageSize BrHagaki_B *BRBiDir ON"
+	UIConstraints "*PageSize DoublePostcardRotated *BRBiDir ON"
+	UIConstraints "*PageSize EnvC5 *BRBiDir ON"
+	UIConstraints "*PageSize EnvDL *BRBiDir ON"
+	UIConstraints "*PageSize Env10 *BRBiDir ON"
+	UIConstraints "*PageSize EnvMonarch *BRBiDir ON"
+	UIConstraints "*PageSize EnvC6 *BRBiDir ON"
+	UIConstraints "*PageSize EnvYou4 *BRBiDir ON"
+	UIConstraints "*BRMediaType Inkjet *Duplex DuplexTumble"
+	UIConstraints "*BRMediaType BrotherGlossyR *Duplex DuplexTumble"
+	UIConstraints "*BRMediaType BrotherBP60Matte *Duplex DuplexTumble"
+	UIConstraints "*BRMediaType Glossy *Duplex DuplexTumble"
+	UIConstraints "*BRMediaType HagakiAtena *Duplex DuplexTumble"
+	UIConstraints "*BRMediaType HagakiUra *Duplex DuplexTumble"
+	UIConstraints "*BRMediaType Inkjet *Duplex DuplexNoTumble"
+	UIConstraints "*BRMediaType BrotherGlossyR *Duplex DuplexNoTumble"
+	UIConstraints "*BRMediaType BrotherBP60Matte *Duplex DuplexNoTumble"
+	UIConstraints "*BRMediaType Glossy *Duplex DuplexNoTumble"
+	UIConstraints "*BRMediaType HagakiAtena *Duplex DuplexNoTumble"
+	UIConstraints "*BRMediaType HagakiUra *Duplex DuplexNoTumble"
+	UIConstraints "*BRResolution Fast *BRMediaType PlainDuplex"
+	UIConstraints "*BRResolution Normal *BRMediaType PlainDuplex"
+	UIConstraints "*BRResolution Photo *BRMediaType PlainDuplex"
+	UIConstraints "*BRResolution Fast *BRMediaType Plain"
+	UIConstraints "*BRResolution Normal *BRMediaType Plain"
+	UIConstraints "*BRResolution Photo *BRMediaType Plain"
+	UIConstraints "*BRResolution PlainFast *BRMediaType Inkjet"
+	UIConstraints "*BRResolution PlainNormal *BRMediaType Inkjet"
+	UIConstraints "*BRResolution Fast *BRMediaType Inkjet"
+	UIConstraints "*BRResolution Best *BRMediaType Inkjet"
+	UIConstraints "*BRResolution PlainFast *BRMediaType BrotherGlossyR"
+	UIConstraints "*BRResolution PlainNormal *BRMediaType BrotherGlossyR"
+	UIConstraints "*BRResolution Normal *BRMediaType BrotherGlossyR"
+	UIConstraints "*BRResolution PlainFast *BRMediaType BrotherBP60Matte"
+	UIConstraints "*BRResolution PlainNormal *BRMediaType BrotherBP60Matte"
+	UIConstraints "*BRResolution Fast *BRMediaType BrotherBP60Matte"
+	UIConstraints "*BRResolution Best *BRMediaType BrotherBP60Matte"
+	UIConstraints "*BRResolution PlainFast *BRMediaType Glossy"
+	UIConstraints "*BRResolution PlainNormal *BRMediaType Glossy"
+	UIConstraints "*BRResolution Normal *BRMediaType Glossy"
+	UIConstraints "*BRResolution Fast *BRMediaType HagakiAtena"
+	UIConstraints "*BRResolution Normal *BRMediaType HagakiAtena"
+	UIConstraints "*BRResolution Photo *BRMediaType HagakiAtena"
+	UIConstraints "*BRResolution PlainFast *BRMediaType HagakiUra"
+	UIConstraints "*BRResolution PlainNormal *BRMediaType HagakiUra"
+	UIConstraints "*BRResolution Normal *BRMediaType HagakiUra"
+	UIConstraints "*BRMediaType Inkjet *BRSlowDrying ON"
+	UIConstraints "*BRMediaType BrotherGlossyR *BRSlowDrying ON"
+	UIConstraints "*BRMediaType BrotherBP60Matte *BRSlowDrying ON"
+	UIConstraints "*BRMediaType Glossy *BRSlowDrying ON"
+	UIConstraints "*BRMediaType HagakiUra *BRSlowDrying ON"
+	UIConstraints "*BRMediaType Inkjet *BRBiDir ON"
+	UIConstraints "*BRMediaType BrotherBP60Matte *BRBiDir ON"
+
+	// Font declarations retained from the original PostScript description.
+	Font "AvantGarde-Book" "Standard" "(001.006S)" "Standard" ROM
+	Font "AvantGarde-BookOblique" "Standard" "(001.006S)" "Standard" ROM
+	Font "AvantGarde-Demi" "Standard" "(001.007S)" "Standard" ROM
+	Font "AvantGarde-DemiOblique" "Standard" "(001.007S)" "Standard" ROM
+	Font "Bookman-Demi" "Standard" "(001.004S)" "Standard" ROM
+	Font "Bookman-DemiItalic" "Standard" "(001.004S)" "Standard" ROM
+	Font "Bookman-Light" "Standard" "(001.004S)" "Standard" ROM
+	Font "Bookman-LightItalic" "Standard" "(001.004S)" "Standard" ROM
+	*Font "Courier" "Standard" "(002.004S)" "Standard" ROM
+	Font "Courier-Bold" "Standard" "(002.004S)" "Standard" ROM
+	Font "Courier-BoldOblique" "Standard" "(002.004S)" "Standard" ROM
+	Font "Courier-Oblique" "Standard" "(002.004S)" "Standard" ROM
+	Font "Helvetica" "Standard" "(001.006S)" "Standard" ROM
+	Font "Helvetica-Bold" "Standard" "(001.007S)" "Standard" ROM
+	Font "Helvetica-BoldOblique" "Standard" "(001.007S)" "Standard" ROM
+	Font "Helvetica-Narrow" "Standard" "(001.006S)" "Standard" ROM
+	Font "Helvetica-Narrow-Bold" "Standard" "(001.007S)" "Standard" ROM
+	Font "Helvetica-Narrow-BoldOblique" "Standard" "(001.007S)" "Standard" ROM
+	Font "Helvetica-Narrow-Oblique" "Standard" "(001.006S)" "Standard" ROM
+	Font "Helvetica-Oblique" "Standard" "(001.006S)" "Standard" ROM
+	Font "NewCenturySchlbk-Bold" "Standard" "(001.009S)" "Standard" ROM
+	Font "NewCenturySchlbk-BoldItalic" "Standard" "(001.007S)" "Standard" ROM
+	Font "NewCenturySchlbk-Italic" "Standard" "(001.006S)" "Standard" ROM
+	Font "NewCenturySchlbk-Roman" "Standard" "(001.007S)" "Standard" ROM
+	Font "Palatino-Bold" "Standard" "(001.005S)" "Standard" ROM
+	Font "Palatino-BoldItalic" "Standard" "(001.005S)" "Standard" ROM
+	Font "Palatino-Italic" "Standard" "(001.005S)" "Standard" ROM
+	Font "Palatino-Roman" "Standard" "(001.005S)" "Standard" ROM
+	Font "Times-Bold" "Standard" "(001.007S)" "Standard" ROM
+	Font "Times-BoldItalic" "Standard" "(001.009S)" "Standard" ROM
+	Font "Times-Italic" "Standard" "(001.007S)" "Standard" ROM
+	Font "Times-Roman" "Standard" "(001.007S)" "Standard" ROM
+	Font "ZapfChancery-MediumItalic" "Standard" "(001.007S)" "Standard" ROM
+	Font "ZapfDingbats" "Special" "(001.004S)" "Special" ROM
+	Font "Symbol" "Special" "(001.007S)" "Special" ROM
+	Font "Alaska" "Standard" "(001.005)" "Standard" ROM
+	Font "AlaskaExtrabold" "Standard" "(001.005)" "Standard" ROM
+	Font "AntiqueOakland" "Standard" "(001.005)" "Standard" ROM
+	Font "AntiqueOakland-Bold" "Standard" "(001.005)" "Standard" ROM
+	Font "AntiqueOakland-Oblique" "Standard" "(001.005)" "Standard" ROM
+	Font "ClevelandCondensed" "Standard" "(001.005)" "Standard" ROM
+	Font "Connecticut" "Standard" "(001.005)" "Standard" ROM
+	Font "Guatemala-Antique" "Standard" "(001.005)" "Standard" ROM
+	Font "Guatemala-Bold" "Standard" "(001.005)" "Standard" ROM
+	Font "Guatemala-Italic" "Standard" "(001.005)" "Standard" ROM
+	Font "Guatemala-BoldItalic" "Standard" "(001.005)" "Standard" ROM
+	Font "LetterGothic" "Standard" "(001.005)" "Standard" ROM
+	Font "LetterGothic-Bold" "Standard" "(001.005)" "Standard" ROM
+	Font "LetterGothic-Oblique" "Standard" "(001.005)" "Standard" ROM
+	Font "Maryland" "Standard" "(001.005)" "Standard" ROM
+	Font "Oklahoma" "Standard" "(001.005)" "Standard" ROM
+	Font "Oklahoma-Bold" "Standard" "(001.005)" "Standard" ROM
+	Font "Oklahoma-Oblique" "Standard" "(001.005)" "Standard" ROM
+	Font "Oklahoma-BoldOblique" "Standard" "(001.005)" "Standard" ROM
+	Font "Utah" "Standard" "(001.005)" "Standard" ROM
+	Font "Utah-Bold" "Standard" "(001.005)" "Standard" ROM
+	Font "Utah-Oblique" "Standard" "(001.005)" "Standard" ROM
+	Font "Utah-BoldOblique" "Standard" "(001.005)" "Standard" ROM
+	Font "UtahCondensed" "Standard" "(001.005)" "Standard" ROM
+	Font "UtahCondensed-Bold" "Standard" "(001.005)" "Standard" ROM
+	Font "UtahCondensed-Oblique" "Standard" "(001.004)" "Standard" ROM
+	Font "UtahCondensed-BoldOblique" "Standard" "(001.005)" "Standard" ROM
+	Font "BermudaScript" "Standard" "(001.005)" "Standard" ROM
+	Font "Germany" "Standard" "(001.005)" "Standard" ROM
+	Font "SanDiego" "Standard" "(001.005)" "Standard" ROM
+	Font "US-Roman" "Standard" "(001.005)" "Standard" ROM
+}
