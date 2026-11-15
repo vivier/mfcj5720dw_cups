@@ -128,6 +128,11 @@ label the coordinates; the order of the numbers defines the data. Other
 blocks expose named curves, halftone parameters and correction factors.
 The unedited XML sources reconstruct the original BCM files byte for byte.
 
+The converter generates the fixed bytes shared by the original profiles;
+they no longer appear as `bcm:Opaque` elements in XML. Importing a BCM file
+with different fixed bytes or nonzero reserved header bytes fails explicitly.
+Older XML descriptions containing `bcm:Opaque` are no longer accepted.
+
 ## Clean
 
 ```sh

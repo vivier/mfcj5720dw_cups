@@ -23,7 +23,6 @@
     </copyrightTag>
     <PrivateTag TagSignature="00008624h">
       <bcm:CubeType>
-        <bcm:Opaque Offset="0">01 00 00 00 00 00 00 00 ff ff 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</bcm:Opaque>
         <!-- RGB grid indices: 0..16; B varies fastest. CMYK samples: uint16. -->
         <Channels InputChannels="3" OutputChannels="4" />
         <CLUT GridGranularity="17">
@@ -4947,7 +4946,6 @@
     </PrivateTag>
     <PrivateTag TagSignature="00008614h">
       <bcm:CubeType>
-        <bcm:Opaque Offset="0">01 00 00 00 00 00 00 00 ff ff 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</bcm:Opaque>
         <!-- RGB grid indices: 0..16; B varies fastest. CMYK samples: uint16. -->
         <Channels InputChannels="3" OutputChannels="4" />
         <CLUT GridGranularity="17">
@@ -9871,7 +9869,6 @@
     </PrivateTag>
     <PrivateTag TagSignature="00008604h">
       <bcm:CubeType>
-        <bcm:Opaque Offset="0">01 00 00 00 00 00 00 00 ff ff 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</bcm:Opaque>
         <!-- RGB grid indices: 0..16; B varies fastest. CMYK samples: uint16. -->
         <Channels InputChannels="3" OutputChannels="4" />
         <CLUT GridGranularity="17">
@@ -14795,8 +14792,6 @@
     </PrivateTag>
     <PrivateTag TagSignature="0000C624h">
       <bcm:CurvesType>
-        <bcm:Opaque Offset="0">01 00 00 00 00 00 00 00 ff ff 00 00</bcm:Opaque>
-        <bcm:Opaque Offset="16">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</bcm:Opaque>
         <bcm:InkLimit>920</bcm:InkLimit>
         <bcm:Curve Name="cyan_transfer">
              0    102    205    308    410    513    615    717    819    921   1023   1124   1225   1325   1426   1526
@@ -14967,20 +14962,6 @@
     <PrivateTag TagSignature="0000E624h">
       <bcm:HalftoneType>
         <bcm:Signature>edpm</bcm:Signature>
-        <bcm:Opaque Offset="0">01 00 00 00</bcm:Opaque>
-        <bcm:Opaque Offset="10">00 00</bcm:Opaque>
-        <bcm:Opaque Offset="14">00 00</bcm:Opaque>
-        <bcm:Opaque Offset="18">00 00</bcm:Opaque>
-        <bcm:Opaque Offset="22">00 00 04 00 00 00 03 00 04 00</bcm:Opaque>
-        <bcm:Opaque Offset="34">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</bcm:Opaque>
-        <bcm:Opaque Offset="136">00 00 00 00 00 00</bcm:Opaque>
-        <bcm:Opaque Offset="152">00 00 00 00 00 00</bcm:Opaque>
-        <bcm:Opaque Offset="168">00 00 00 00 00 00</bcm:Opaque>
-        <bcm:Opaque Offset="184">00 00 00 00 00 00</bcm:Opaque>
-        <bcm:Opaque Offset="200">00 00 00 00 00 00</bcm:Opaque>
-        <bcm:Opaque Offset="216">00 00 00 00 00 00</bcm:Opaque>
-        <bcm:Opaque Offset="232">00 00 00 00 00 00</bcm:Opaque>
-        <bcm:Opaque Offset="248">00 00 00 00 00 00</bcm:Opaque>
         <bcm:NoiseThreshold>80</bcm:NoiseThreshold>
         <bcm:NoiseOffset>128</bcm:NoiseOffset>
         <bcm:NoiseFloor>2</bcm:NoiseFloor>

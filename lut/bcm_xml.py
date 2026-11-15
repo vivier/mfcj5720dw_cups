@@ -207,20 +207,6 @@ def write_after(parent, block):
         add(parent, EXT + 'After', block['after'])
 
 
-def write_opaque(parent, spans, omit_zero=False):
-    for span in spans:
-        if not omit_zero or any(bcm.octets(span['bytes'])):
-            add(parent, EXT + 'Opaque', span['bytes'], Offset=span['offset'])
-
-
-def read_opaque(elements):
-    spans = []
-    for element in elements:
-        value = leaf(element, required=['Offset'])
-        spans.append({'offset': number(element.get('Offset')), 'bytes': value})
-    return spans
-
-
 def float_text(value):
     bits = bcm.float_bytes(value)
     for digits in range(1, 10):
@@ -243,7 +229,6 @@ def write_block(parent, block):
     else:
         if kind in bcm.SIGNATURE_KINDS:
             add_text(parent, EXT + 'Signature', block['signature'])
-        write_opaque(parent, block.get('opaque', []))
         for name in INTEGER_FIELDS[kind]:
             add(parent, field_name(name), block[name])
         if kind == 'cube':
@@ -303,11 +288,8 @@ def read_block(element, kind, tag):
             required.append(EXT + 'Signature')
         required += {'cube': ['Channels', 'CLUT'], 'halftone': [EXT + 'Thresholds', EXT + 'Drops'],
                      'correction': [EXT + 'Factors'], 'raw': ['HexData']}.get(kind, [])
-        repeated = [EXT + 'Opaque'] if kind != 'raw' else []
-        if kind == 'curves':
-            repeated.append(EXT + 'Curve')
+        repeated = [EXT + 'Curve'] if kind == 'curves' else []
         fields = children(element, required, [EXT + 'After'], repeated)
-        block['opaque'] = read_opaque(fields.get(EXT + 'Opaque', []))
         if kind in bcm.SIGNATURE_KINDS:
             block['signature'] = read_text(fields[EXT + 'Signature'])
         for name in INTEGER_FIELDS[kind]:
@@ -360,7 +342,6 @@ def read_block(element, kind, tag):
                 else:
                     block['factors'][name] = float(value)
         elif kind == 'raw':
-            block.pop('opaque')
             block['data'] = leaf(fields['HexData'])
     if EXT + 'After' in fields:
         block['after'] = leaf(fields[EXT + 'After'])
@@ -388,13 +369,12 @@ class ProfileTreeBuilder(ET.TreeBuilder):
 
 def read_header(element):
     attributes(element)
-    fields = children(element, HEADER_NAMES.values(), [EXT + 'DirectoryPadding'], [EXT + 'Opaque'])
+    fields = children(element, HEADER_NAMES.values(), [EXT + 'DirectoryPadding'])
     header = {name: read_text(fields[tag]) for name, tag in HEADER_NAMES.items()}
     stamp = re.fullmatch(r'([0-9]{4,5})-([0-9]{2,5})-([0-9]{2,5})T'
                          r'([0-9]{2,5}):([0-9]{2,5}):([0-9]{2,5})', header['created'])
     bcm.require(stamp is not None, 'expected CreationDateTime as YYYY-MM-DDTHH:MM:SS')
     header['created'] = bcm.creation_text(tuple(bcm.integer(int(n), 16) for n in stamp.groups()))
-    header['opaque'] = read_opaque(fields.get(EXT + 'Opaque', []))
     pad = fields.get(EXT + 'DirectoryPadding')
     return header, leaf(pad) if pad is not None else ''
 
@@ -482,7 +462,6 @@ def dumps(document):
             year, month, day, hour, minute, second = bcm.creation_stamp(value)
             value = f'{year:04d}-{month:02d}-{day:02d}T{hour:02d}:{minute:02d}:{second:02d}'
         add_text(header, tag, value)
-    write_opaque(header, document['header'].get('opaque', []), omit_zero=True)
     if document.get('directory_padding'):
         add(header, EXT + 'DirectoryPadding', document['directory_padding'])
     tags = add(root, 'Tags')

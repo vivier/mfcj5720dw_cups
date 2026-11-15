@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Lossless BCM binary model; bcm_xml.py handles the IccXML representation."""
+"""BCM binary model for supported layouts; bcm_xml.py handles IccXML."""
 import math
 from pathlib import Path
 import re
@@ -15,6 +15,35 @@ MAX_TAGS = 4096
 DESCRIPTION = int.from_bytes(b"desc", "big")
 COPYRIGHT = int.from_bytes(b"cprt", "big")
 COPYRIGHT_HEADER = b"text\0\0\0\0"
+# Common cube/curve prefix; curves store their ink limit separately at byte 12.
+TABLE_HEADER = struct.pack("<8I", 1, 0, 0xffff, 0, 0, 0, 0, 0)
+# The density block's leading word is distinct from its editable signature.
+DENSITY_PREFIX = struct.pack("<I", 1)
+# Uninterpreted spans shared by all 28 original halftone blocks.
+HALFTONE_DEFAULTS = (
+    (0, struct.pack("<I", 1)),
+    (10, b"\0" * 2),
+    (14, b"\0" * 2),
+    (18, b"\0" * 2),
+    (22, struct.pack("<5H", 0, 4, 0, 3, 4)),
+    (34, b"\0" * 94),
+    # Each threshold/drop channel has six unused bytes before its error limit.
+    *((offset, b"\0" * 6) for offset in range(136, 256, 16)),
+)
+# Uninterpreted spans shared by the three original correction blocks.
+CORRECTION_DEFAULTS = (
+    (0, struct.pack("<I", 1)),
+    (10, b"\0" * 2),
+    (14, b"\0" * 2),
+    (40, b"\0" * 88),
+)
+BLOCK_CONSTANTS = {
+    "cube": ((0, TABLE_HEADER),),
+    "curves": ((0, TABLE_HEADER[:12]), (16, TABLE_HEADER[16:])),
+    "halftone": HALFTONE_DEFAULTS,
+    "correction": CORRECTION_DEFAULTS,
+    "density": ((0, DENSITY_PREFIX), (16, b"\0" * 112)),
+}
 SIZES = {"cube": 39336, "curves": 4640, "halftone": 256,
          "correction": 128, "density": 128}
 FAMILIES = {8: "cube", 12: "curves", 14: "halftone", 11: "correction", 5: "density"}
@@ -140,7 +169,7 @@ def read_float(data):
 
 
 class Record:
-    """Keep opaque byte spans disjoint from interpreted fields."""
+    """Read or write disjoint fields and validate reserved bytes."""
     def __init__(self, size, data=None):
         self.data = bytearray(size) if data is None else bytearray(data)
         require(len(self.data) == size, f"expected a {size}-byte record")
@@ -149,7 +178,7 @@ class Record:
     def claim(self, offset, size):
         require(0 <= offset <= len(self.data) and 0 <= size <= len(self.data) - offset,
                 "byte span extends outside its record")
-        require(not any(self.used[offset:offset + size]), "overlapping fields or opaque spans")
+        require(not any(self.used[offset:offset + size]), "overlapping fields")
         self.used[offset:offset + size] = b"\1" * size
 
     def read(self, offset, size):
@@ -167,25 +196,11 @@ class Record:
         bits = {"H": 16, "h": 16, "I": 32}[fmt]
         self.write(offset, struct.pack("<" + fmt, integer(value, bits, fmt == "h")))
 
-    def opaque(self):
-        spans = []
-        offset = 0
-        while offset < len(self.data):
-            if self.used[offset]:
-                offset += 1
-                continue
-            end = offset + 1
-            while end < len(self.data) and not self.used[end]:
-                end += 1
-            spans.append({"offset": offset, "bytes": self.data[offset:end].hex(" ")})
-            offset = end
-        return spans
-
-    def fill_opaque(self, spans):
-        for span in sequence(spans):
-            keys(span, ["offset", "bytes"])
-            self.write(integer(span["offset"]), octets(span["bytes"]))
-        return bytes(self.data)
+    def check_reserved(self):
+        for offset, (value, used) in enumerate(zip(self.data, self.used)):
+            if not used:
+                require(value == 0,
+                        f"unsupported nonzero reserved byte at record offset 0x{offset:x}")
 
 
 def decode_header(data):
@@ -193,15 +208,16 @@ def decode_header(data):
     record.read(0, 4)  # The size is derived when writing.
     version = record.read(8, 4)
     require(version == VERSION_BYTES, "unsupported BCM version marker")
-    return {"version": VERSION,
+    result = {"version": VERSION,
             "created": creation_text(struct.unpack(">6H", record.read(24, 12))),
             "manufacturer": record.read(48, 4).decode("latin1"),
-            "model": record.read(52, 4).decode("latin1"),
-            "opaque": record.opaque()}
+            "model": record.read(52, 4).decode("latin1")}
+    record.check_reserved()
+    return result
 
 
 def encode_header(header):
-    keys(header, ["version", "created", "manufacturer", "model"], ["opaque"])
+    keys(header, ["version", "created", "manufacturer", "model"])
     record = Record(128)
     record.write(0, b"\0" * 4)
     require(header["version"] == VERSION, 'supported BCM version is "2.0"')
@@ -210,7 +226,7 @@ def encode_header(header):
     record.write(24, struct.pack(">6H", *stamp))
     record.write(48, latin1(header["manufacturer"], 4))
     record.write(52, latin1(header["model"], 4))
-    return record.fill_opaque(header.get("opaque", []))
+    return bytes(record.data)
 
 
 def decode_block(kind, data):
@@ -233,6 +249,9 @@ def decode_block(kind, data):
             require(data[:8] == COPYRIGHT_HEADER, "unsupported nonzero copyright reserved bytes")
         return result
     record = Record(SIZES[kind], data)
+    for offset, constant in BLOCK_CONSTANTS[kind]:
+        require(record.read(offset, len(constant)) == constant,
+                f"unsupported fixed bytes at block offset 0x{offset:x}")
     result = {}
     if kind in SIGNATURE_KINDS:
         result["signature"] = record.read(4, 4).decode("latin1")
@@ -258,7 +277,7 @@ def decode_block(kind, data):
     elif kind == "density":
         result["lower_percent"] = record.number(8, "I")
         result["upper_percent"] = record.number(12, "I")
-    result["opaque"] = record.opaque()
+    record.check_reserved()
     return result
 
 
@@ -294,8 +313,10 @@ def encode_block(block):
                 "halftone": [*NOISE, "head_mode", "thresholds", "drops"],
                 "correction": [*CORRECTION, "factors"], "density": ["lower_percent", "upper_percent"]}
     signature_fields = ["signature"] if kind in SIGNATURE_KINDS else []
-    keys(block, common + required[kind] + signature_fields, optional + ["opaque"])
+    keys(block, common + required[kind] + signature_fields, optional)
     record = Record(SIZES[kind])
+    for offset, constant in BLOCK_CONSTANTS[kind]:
+        record.write(offset, constant)
     if kind in SIGNATURE_KINDS:
         record.write(4, latin1(block["signature"], 4))
     if kind == "cube":
@@ -334,7 +355,7 @@ def encode_block(block):
     elif kind == "density":
         record.put_number(8, "I", block["lower_percent"])
         record.put_number(12, "I", block["upper_percent"])
-    return record.fill_opaque(block.get("opaque", []))
+    return bytes(record.data)
 
 
 def decode(data):
