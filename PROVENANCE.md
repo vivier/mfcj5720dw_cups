@@ -41,8 +41,9 @@ The original RPM metadata declares:
 2003-2014 Brother Industries, Ltd. All Rights Reserved
 ```
 
-The eleven `lut/*.xml` files are lossless textual transcriptions of Brother's
-BCM profiles. The XML-to-BCM compiler generates the profiles used at runtime.
+The eleven `lut/*.xml` profiles and shared tables in `lut/cubes/*.xml` and
+`lut/curves/*.xml` are lossless textual transcriptions of Brother's BCM
+profiles. The XML-to-BCM compiler generates the profiles used at runtime.
 Embedded copyright strings, calibration values and uninterpreted bytes are
 retained. XML storage does not create new ownership of the underlying data.
 

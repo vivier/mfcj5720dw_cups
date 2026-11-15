@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """IccXML structure with explicit BCM extensions and lossless binary storage."""
+from pathlib import Path
 import re
 import struct
 import xml.etree.ElementTree as ET
@@ -249,6 +250,9 @@ def write_block(parent, block):
         elif kind == 'curves':
             for name in bcm.CURVES:
                 values = block['curves'][name]
+                if all(value == values[0] for value in values):
+                    add(parent, EXT + 'Curve', Name=name, Constant=values[0])
+                    continue
                 text = '\n' + '\n'.join('        ' + ' '.join(f'{n:6d}' for n in values[i:i + 16])
                                           for i in range(0, 256, 16)) + '\n      '
                 add(parent, EXT + 'Curve', text, Name=name)
@@ -272,13 +276,37 @@ def write_block(parent, block):
     write_after(parent, block)
 
 
-def read_block(element, kind, tag):
+def read_shared_source(source, source_directory, kind):
+    """Load one shared table; references never change the BCM block layout."""
+    bcm.require(source_directory is not None, f'{kind} Source requires a source directory')
+    bcm.require(re.fullmatch(rf'{kind}s/[A-Za-z0-9][A-Za-z0-9_.-]*\.xml', source) is not None,
+                f'{kind} Source must be {kind}s/<name>.xml')
+    directory = Path(source_directory).resolve()
+    path = (directory / source).resolve()
+    bcm.require(path.is_relative_to(directory), f'{kind} Source escapes the source directory')
+    try:
+        root = parse_xml(bcm.read_limited(path).decode('utf-8'))
+        expected = 'CubeType' if kind == 'cube' else 'Curve'
+        bcm.require(root.tag == EXT + expected, f'shared {kind} must have a bcm:{expected} root')
+        bcm.require('Source' not in root.attrib, f'nested {kind} Source is not supported')
+        bcm.require(root.find(EXT + 'After') is None, f'shared {kind} must not contain After')
+        if kind == 'cube':
+            return read_block(root, 'cube', 0)['nodes']
+        return bcm.sequence([number(n) for n in leaf(root).split()], 256)
+    except (OSError, ValueError) as error:
+        raise bcm.FormatError(f'{source}: {error}') from error
+
+
+def read_block(element, kind, tag, source_directory=None):
     block = {'name': f'{kind}_{tag:08x}', 'kind': kind}
-    attributes(element)
+    attributes(element, optional=['Source'] if kind == 'cube' else [])
     if kind == 'description':
         read_description(element, block)
         return block
-    if kind == 'copyright':
+    if kind == 'cube' and 'Source' in element.attrib:
+        fields = children(element, optional=[EXT + 'After'])
+        block['nodes'] = read_shared_source(element.get('Source'), source_directory, 'cube')
+    elif kind == 'copyright':
         fields = children(element, optional=['TextData', 'HexTextData', EXT + 'TextPadding', EXT + 'After'])
         data = padded_text(fields, primary_text(fields), 'TextPadding')
         block.update(bcm.decode_block(kind, bcm.COPYRIGHT_HEADER + data))
@@ -310,10 +338,19 @@ def read_block(element, kind, tag):
         elif kind == 'curves':
             block['curves'] = {}
             for curve in fields.get(EXT + 'Curve', []):
-                values = leaf(curve, ['Name'])
+                values = leaf(curve, ['Name'], ['Source', 'Constant'])
                 name = curve.get('Name')
                 bcm.require(name in bcm.CURVES and name not in block['curves'], 'unknown or duplicate curve')
-                block['curves'][name] = [number(n) for n in values.split()]
+                bcm.require(not ('Source' in curve.attrib and 'Constant' in curve.attrib),
+                            'curve Source and Constant are mutually exclusive')
+                if 'Source' in curve.attrib or 'Constant' in curve.attrib:
+                    bcm.require(not values.strip(), 'curve Source or Constant cannot also contain sample values')
+                if 'Constant' in curve.attrib:
+                    block['curves'][name] = [number(curve.get('Constant'))] * 256
+                elif 'Source' in curve.attrib:
+                    block['curves'][name] = read_shared_source(curve.get('Source'), source_directory, 'curve')
+                else:
+                    block['curves'][name] = [number(n) for n in values.split()]
         elif kind == 'halftone':
             for group in ('thresholds', 'drops'):
                 container = fields[field_name(group)]
@@ -349,7 +386,7 @@ def read_block(element, kind, tag):
 
 
 class ProfileTreeBuilder(ET.TreeBuilder):
-    """Profiles are self-contained XML; no DTDs or external data references."""
+    """Parse profiles and shared tables without DTDs or external entities."""
     def __init__(self):
         super().__init__()
         self.depth = 0
@@ -389,12 +426,16 @@ def tag_id(element):
     return known[element.tag]
 
 
-def parse_document(text):
+def parse_xml(text):
     bcm.require(len(text.encode('utf-8')) <= bcm.MAX_BYTES, 'description exceeds 64 MiB')
     try:
-        root = ET.fromstring(text, parser=ET.XMLParser(target=ProfileTreeBuilder()))
+        return ET.fromstring(text, parser=ET.XMLParser(target=ProfileTreeBuilder()))
     except (ET.ParseError, UnicodeError) as error:
         raise bcm.FormatError(str(error)) from error
+
+
+def parse_document(text, source_directory=None):
+    root = parse_xml(text)
     bcm.require(root.tag == 'IccProfile', 'expected IccProfile root')
     attributes(root)
     fields = children(root, ['Header', 'Tags'])
@@ -430,7 +471,7 @@ def parse_document(text):
             bcm.require(len(tag_element) == 1, 'expected exactly one tag type')
             children(tag_element, optional=types.keys())
             type_element = tag_element[0]
-            block = read_block(type_element, types[type_element.tag], tag)
+            block = read_block(type_element, types[type_element.tag], tag, source_directory)
             document['blocks'].append(block)
             name = block['name']
         names[tag] = name
@@ -439,9 +480,9 @@ def parse_document(text):
     return document
 
 
-def loads(text):
+def loads(text, source_directory=None):
     try:
-        return parse_document(text)
+        return parse_document(text, source_directory)
     except bcm.FormatError:
         raise
     except ValueError as error:
@@ -491,4 +532,5 @@ def dumps(document):
 
 
 def load_text(path):
-    return loads(bcm.read_limited(path).decode('utf-8'))
+    path = Path(path).resolve()
+    return loads(bcm.read_limited(path).decode('utf-8'), path.parent)

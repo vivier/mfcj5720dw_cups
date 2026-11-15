@@ -116,17 +116,48 @@ describe the filter interfaces and ink-level command.
 
 ## Calibration sources
 
-Edit `lut/*.xml`, then run `make profiles`. These descriptions use IccXML's
-structure with Brother-specific elements in the `urn:brother:bcm:1`
-namespace. `lut/bcm_from_text.py`, `bcm_text.py` and `bcm_xml.py` compile them
-using only the Python standard library. Python is a build dependency, not a
-runtime dependency of the installed filters.
+Edit `lut/*.xml` and the shared tables in `lut/cubes/` and `lut/curves/`,
+then run `make profiles`. These descriptions use IccXML's structure with
+Brother-specific elements in the `urn:brother:bcm:1` namespace.
+`lut/bcm_from_text.py`, `bcm_text.py` and `bcm_xml.py` compile them using only
+the Python standard library. Python is a build dependency, not a runtime
+dependency of the installed filters.
 
 Each color cube has 17 × 17 × 17 RGB grid nodes, with four C, M, Y, K values
 per node. In `TableData`, blue varies fastest, then green, then red. Comments
 label the coordinates; the order of the numbers defines the data. Other
 blocks expose named curves, halftone parameters and correction factors.
 The unedited XML sources reconstruct the original BCM files byte for byte.
+
+The 75 cube blocks share 45 tables in `lut/cubes/`. The 234 individual curves
+use 64 nonconstant tables in `lut/curves/` and 104 zero-filled curves described
+by `Constant="0"`. Each profile keeps its ink limits, curve names and tag IDs:
+
+```xml
+<bcm:CubeType Source="cubes/cube-001.xml" />
+<bcm:Curve Name="cyan_transfer" Source="curves/curve-001.xml" />
+<bcm:Curve Name="cyan_offset" Constant="0" />
+```
+
+Paths are relative to the profile file. Shared filenames are stable
+identifiers; comments record the original BCM profiles, tags and curve
+names. A shared cube file contains a complete `bcm:CubeType` with `Channels`,
+`CLUT` and `TableData`. A shared curve file has a `bcm:Curve` root containing
+256 integers, without a `Name` attribute. The referring curve name selects
+its binary slot and signedness: the four offset curves use s16, while the
+transfer and monochrome-black curves use u16.
+
+`Constant` generates 256 identical samples and accepts any integer within
+the named curve's range. `Source`, `Constant` and inline sample values are
+mutually exclusive. References use local `cubes/<name>.xml` or
+`curves/<name>.xml` files; paths outside the profile directory and nested
+references are rejected.
+
+Editing a shared table affects all its users. To edit one independently,
+copy the table and change that reference. `make profiles` tracks changes to
+both shared directories, and source RPMs include them. The BCM exporter
+`lut/bcm_to_text.py` writes standalone XML with inline tables and compact
+`Constant` values; the compiler accepts both standalone and shared sources.
 
 The converter generates the fixed bytes shared by the original profiles;
 they no longer appear as `bcm:Opaque` elements in XML. Importing a BCM file

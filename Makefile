@@ -32,7 +32,7 @@ RPM_SRPMDIR = $(RPM_TOPDIR)/SRPMS
 DIST_FILES = .gitattributes .gitignore COPYRIGHT LICENSE PROVENANCE.md README.md \
 	Makefile .copr/Makefile $(RPM_SPEC) $(wildcard *.c *.h *.1 *.drv) \
 	$(wildcard encoder/*.c encoder/*.h) \
-	lut/Makefile lut/.gitignore $(wildcard lut/*.py lut/*.xml)
+	lut/Makefile lut/.gitignore $(wildcard lut/*.py lut/*.xml lut/cubes/*.xml lut/curves/*.xml)
 
 .PHONY: all profiles ppd check-static check-man check-encoder-interfaces install rpm srpm rpm-sources clean distclean
 all: $(BUILD)/rastertomfcj5720dw $(BUILD)/mfcj5720dw_ink $(PPD) profiles
