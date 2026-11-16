@@ -45,7 +45,7 @@ enum dither_state_offset {
 	STATE_HALF_RATE_ROWS = 0x81350,
 	STATE_DENSITY_FLAGS = 0x81360,
 	STATE_CHANNEL_DENSITIES = 0x81362,
-	STATE_HEAD_FILES_REQUESTED = 0x817d8,
+	STATE_HEAD_TABLES_AVAILABLE = 0x817d8,
 };
 
 enum ink_channel {
@@ -192,7 +192,7 @@ static void convert_pixel(struct dither_context *context, const uint8_t *pixel)
 
 static void select_row_thresholds(struct dither_context *context, unsigned int row)
 {
-	if (state_dword(context->printer, STATE_HEAD_FILES_REQUESTED) &&
+	if (state_dword(context->printer, STATE_HEAD_TABLES_AVAILABLE) &&
 	    (context->parameters->head_flags & HEAD_TABLES_BUILT))
 		select_dither_row_thresholds(context->printer, row);
 }

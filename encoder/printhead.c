@@ -1,5 +1,6 @@
 /* Calibrate nozzle thresholds, row correction and borderless ink density. */
 #include "printhead.h"
+#include "calibration.h"
 #include "data.h"
 #include "diffusion.h"
 #include "halftone.h"
@@ -11,13 +12,10 @@
 #include "swath.h"
 
 #include <endian.h>
-#include <fcntl.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 
 enum head_parameter {
 	HEAD_CHANNELS = 4,
@@ -30,9 +28,7 @@ enum head_parameter {
 	HEAD_ROW_MAP_SIZE = 40,
 	HEAD_SELECTOR_COUNT = 28,
 	DENSITY_SELECTOR_COUNT = 20,
-	DENSITY_BANKS = 7,
-	HEAD_PARAMETERS_BYTES = 893,
-	HEAD_PATH_BYTES = 1024,
+	DENSITY_BANKS = CALIBRATION_DENSITY_BANKS,
 	HEAD_GAIN_HEADER_BYTES = HEAD_GAIN_SETS * HEAD_CHANNELS * HEAD_LEVELS,
 	HEAD_ACTIVE = 0x01,
 	HEAD_BUILD_REQUESTED = 0x10,
@@ -171,13 +167,13 @@ struct head_settings {
 	uint8_t reserved_density[0x81362 - 0x81361];
 	uint16_t density[HEAD_CHANNELS];
 	uint16_t density_banks[DENSITY_BANKS][HEAD_CHANNELS];
-	uint8_t reserved_ramp_mode[0x817c4 - 0x813a2];
+	uint8_t reserved_ramp_mode[0x817c4 - 0x813c2];
 	uint32_t ramp_mode;
 	int32_t band_first_row;
 	int32_t ramp_position;
 	int32_t ramp_length;
-	uint8_t reserved_head_files_requested[0x817d8 - 0x817d4];
-	int32_t head_files_requested;
+	uint8_t reserved_head_tables_available[0x817d8 - 0x817d4];
+	int32_t head_tables_available;
 };
 
 static struct head_state *head_state(struct printer_state *printer)
@@ -200,71 +196,24 @@ find_selector(const struct calibration_selector *selectors, size_t count,
 	return &selectors[fallback];
 }
 
-static bool head_profile_path(char path[HEAD_PATH_BYTES], const char *name)
-{
-	int length = snprintf(path, HEAD_PATH_BYTES, "%s%s",
-			      lpr_color_table_directory, name);
-
-	return length >= 0 && length < HEAD_PATH_BYTES;
-}
-
 void load_printhead_parameters(struct printer_state *printer)
 {
-	static const char *const filenames[] = {
-		"brheadparan0.bin",
-		"brheadparan1.bin",
-		"brheadparan2.bin",
-		"brheadparaw.bin",
-	};
+	const struct printer_calibration *calibration = printer->calibration;
 	struct head_settings *settings = (void *)printer->numeric_state;
 	struct head_state *head = head_state(printer);
-	int descriptors[] = {-1, -1, -1, -1};
-	uint8_t parameters[HEAD_PARAMETERS_BYTES];
-	char path[HEAD_PATH_BYTES];
-	unsigned int index;
 	uint16_t family;
-	bool opened = false;
 
-	settings->head_files_requested = 0;
+	settings->head_tables_available = 0;
+	if (!calibration) {
+		head->flags = 0;
+		return;
+	}
 	if (!(head->flags & HEAD_BUILD_REQUESTED)) {
-		settings->head_files_requested = 1;
-		/* Open the complete set before changing any calibration samples. */
-		for (index = 0; index < HEAD_SAMPLE_SETS + 1; index++) {
-			if (!head_profile_path(path, filenames[index]))
-				goto close_files;
-			descriptors[index] = open(path, O_RDONLY);
-			if (descriptors[index] < 0)
-				goto close_files;
-		}
-		opened = true;
-		for (index = 0; index < HEAD_SAMPLE_SETS; index++) {
-			ssize_t count =
-				read(descriptors[index], head->samples[index],
-				     sizeof(head->samples[index]));
-
-			/*
-			 * Retain the legacy build flag on read failure. Short reads
-			 * now follow that path too, keeping unread samples unchanged.
-			 */
-			if (count != sizeof(head->samples[index]))
-				head->flags = HEAD_BUILD_REQUESTED;
-		}
-		if (read(descriptors[HEAD_SAMPLE_SETS], parameters,
-			 sizeof(parameters)) == sizeof(parameters))
-			decode_head_parameters(printer, (intptr_t)parameters);
-		else
-			set_default_head_parameters(printer);
-	close_files:
-		/* Include descriptor zero and files opened before a later failure. */
-		for (index = 0; index < HEAD_SAMPLE_SETS + 1; index++)
-			if (descriptors[index] >= 0)
-				close(descriptors[index]);
-		if (!opened)
-			return;
+		/* The frontend only supplies a complete, validated snapshot. */
+		memcpy(head->samples, calibration->nozzle, sizeof(head->samples));
+		head->flags = HEAD_BUILD_REQUESTED;
 	}
 	head->flags &= ~HEAD_ACTIVE;
-	if (!(head->flags & HEAD_BUILD_REQUESTED))
-		return;
 	family = settings->raster_mode & RASTER_RESOLUTION_FAMILY_MASK;
 	switch (family) {
 	case RASTER_MEDIUM_RESOLUTION_FAMILY:
@@ -278,12 +227,15 @@ void load_printhead_parameters(struct printer_state *printer)
 	}
 	head->flags |= HEAD_ACTIVE;
 	if (!(head->flags & HEAD_TABLES_BUILT)) {
+		decode_head_parameters(printer, (intptr_t)calibration->parameters);
 		if (settings->halftone_method == HALFTONE_DIFFUSION)
 			build_diffusion_head_tables(printer);
 		else
 			build_dither_head_tables(printer);
 		head->flags |= HEAD_TABLES_BUILT;
 	}
+	/* The dither renderer tests this gate on every row, including later bands. */
+	settings->head_tables_available = 1;
 }
 
 void apply_head_density_calibration(struct printer_state *printer)
@@ -372,6 +324,22 @@ void prepare_halftone_band(struct printer_state *printer, struct raster_band *ba
 	settings->raster_mode = (mode & ~RASTER_DEPTH_MASK) | depth;
 	select_raster_color_mode(printer);
 	if (!settings->band_initialized) {
+		struct head_state *head = head_state(printer);
+		unsigned int channel;
+
+		/* Row rendering leaves the last nozzle's thresholds in the channels. */
+		if (head->flags & HEAD_TABLES_BUILT) {
+			for (channel = 0; channel < HEAD_CHANNELS; channel++) {
+				struct head_channel *output = &head->channels[channel];
+
+				output->black_drop = output->base_black_drop;
+				output->small_drop = output->base_small_drop;
+				output->medium_drop = output->base_medium_drop;
+				output->large_drop = output->base_large_drop;
+			}
+		}
+		/* Page settings and base drop thresholds may have changed. */
+		head->flags &= ~(HEAD_ACTIVE | HEAD_TABLES_BUILT);
 		configure_halftone_channels(printer);
 		profile = settings->raster_mode & RASTER_PROFILE_MASK;
 		width = (uint32_t)band->width * band_width_multiplier(profile);
@@ -495,27 +463,23 @@ uint32_t needs_bidirectional_correction(struct printer_state *printer)
 
 void load_head_density_calibration(struct printer_state *printer)
 {
+	const struct printer_calibration *calibration = printer->calibration;
 	struct head_settings *settings = (void *)printer->numeric_state;
-	uint16_t densities[HEAD_CHANNELS];
-	char path[HEAD_PATH_BYTES];
-	ssize_t count;
-	int descriptor;
-	unsigned int channel;
+	unsigned int bank, channel;
 
 	if (settings->density_flags & DENSITY_LOADED)
 		return;
-	if (!head_profile_path(path, "brheadparadc.bin"))
+	if (!calibration)
 		return;
-	descriptor = open(path, O_RDONLY);
-	if (descriptor < 0)
-		return;
-	count = read(descriptor, densities, sizeof(densities));
-	close(descriptor);
-	/* A short file must not publish uninitialized channel densities. */
-	if (count != sizeof(densities))
-		return;
-	for (channel = 0; channel < HEAD_CHANNELS; channel++)
-		settings->density[channel] = be16toh(densities[channel]);
+	for (bank = 0; bank < DENSITY_BANKS; bank++) {
+		for (channel = 0; channel < HEAD_CHANNELS; channel++) {
+			uint16_t value;
+
+			memcpy(&value, calibration->density[bank][channel],
+			       sizeof(value));
+			settings->density_banks[bank][channel] = be16toh(value);
+		}
+	}
 	settings->density_flags |= DENSITY_LOADED;
 }
 

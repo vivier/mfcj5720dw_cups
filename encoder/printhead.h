@@ -8,6 +8,7 @@
 struct printer_state;
 struct raster_band;
 
+/* Consume the job's optional, complete factory-calibration snapshot. */
 void load_printhead_parameters(struct printer_state *printer);
 void apply_head_density_calibration(struct printer_state *printer);
 void prepare_halftone_band(struct printer_state *printer, struct raster_band *band);

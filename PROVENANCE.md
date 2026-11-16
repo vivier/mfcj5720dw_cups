@@ -7,6 +7,11 @@ of Laurent Vivier. The sources reconstruct the printing pipeline studied in
 the original Brother driver; subsequent changes include the direct CUPS
 interface, native data structures and a libjpeg adapter.
 
+The factory-calibration reader reconstructs the read-only SNMP retrieval
+protocol studied in Brother's Windows and macOS drivers. Printer-specific
+snapshots are read from the device at runtime; no captured snapshots or
+original vendor executables are included in this repository.
+
 Copyright (C) 2026 Laurent Vivier applies to original project contributions,
 subject to the scope and third-party exceptions in [COPYRIGHT](COPYRIGHT).
 The project code is distributed under GPL-3.0-or-later; see [LICENSE](LICENSE).

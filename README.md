@@ -2,9 +2,9 @@
 
 An independent native CUPS driver for the Brother MFC-J5720DW, developed by
 reverse engineering the original Brother printing pipeline. It converts
-CUPS Raster directly into printer data and reports ink levels through the
-CUPS side channel. The encoder is linked into the filter, so no Brother LPR
-command or wrapper is needed.
+CUPS Raster directly into printer data and retrieves ink levels and factory
+printhead calibration through the CUPS side channel. The encoder is linked
+into the filter, so no Brother LPR command or wrapper is needed.
 
 ## Development and authorship
 
@@ -113,6 +113,40 @@ make install DESTDIR=/tmp/mfcj5720dw-install
 
 After installation, `man rastertomfcj5720dw` and `man mfcj5720dw_ink`
 describe the filter interfaces and ink-level command.
+
+## Printhead calibration
+
+The **Printhead Calibration** option controls nozzle and density corrections
+specific to the physical printer. These complement the model and paper profiles
+in the BCM files; they are separate from ink-level reporting and ICC profiles.
+
+| Choice | Behavior |
+| --- | --- |
+| **Automatic** (`BRCalibration=Auto`) | Use cached calibration, or retrieve it when none is available. This is the default. |
+| **Refresh Before Each Job** (`BRCalibration=Refresh`) | Retrieve a fresh snapshot before every job while selected. |
+| **Disabled** (`BRCalibration=Off`) | Use the model profiles without per-printer corrections. |
+
+For a one-time refresh, pass `-o BRCalibration=Refresh` to `lp` for that job.
+Queues created with an older PPD also default to Automatic in the filter;
+update their PPD to expose the new choices in the print dialog.
+
+Retrieval uses read-only SNMP queries through the CUPS backend and requires
+a backend with SNMP support and network access to the printer. It has an
+eight-second budget, separate from ink polling. A failed reading retains a
+valid cached snapshot or falls back to the model defaults. It does not prevent
+printing or run a cleaning or alignment operation.
+
+Complete snapshots are cached per queue and device URI in `CUPS_CACHEDIR`
+(normally `/var/cache/cups`) as `mfcj5720dw-*.calibration`, with permissions
+`0600`. Credentials are excluded from the cache identity, and replacement is
+atomic. If the directory is unwritable, a successful reading still applies to
+the current job. Select Refresh when replacing a physical printer at the same
+URI. Cache files have no periodic expiry and are not purged on package removal.
+
+The encoder holds one snapshot for the job, loads all eleven density banks
+and rebuilds nozzle thresholds for each page. Corrections apply to supported
+raster modes; host-side JPEG transfer bypasses these threshold calculations.
+See `man rastertomfcj5720dw` for the option and environment details.
 
 ## Calibration sources
 

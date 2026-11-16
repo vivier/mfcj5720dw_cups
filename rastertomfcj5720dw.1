@@ -29,15 +29,39 @@ JPEG transfer modes use libjpeg-turbo through the libjpeg API. The filter
 retains Brother framing and baseline YCbCr 4:2:2 compression parameters.
 JPEG bytes and decoded pixels can differ slightly from the legacy compressor
 because the library performs color conversion, chroma sampling and DCT.
-The non-JPEG renderer is unchanged.
+.SH FACTORY CALIBRATION
+The BRCalibration PPD option, displayed as Printhead Calibration, controls
+per-printer nozzle and density corrections.
+Auto (Automatic) uses the queue's cached snapshot or retrieves one through
+the CUPS backend. Refresh (Refresh Before Each Job) requests a new complete
+snapshot before every job while selected and keeps the previous one on failure.
+Off (Disabled) uses only the model profiles and does not access the calibration cache.
+Auto is the default, including for queues with an older PPD.
+.PP
+Reading calibration changes no printer setting. Unsupported SNMP backends and
+failed reads fall back to cached data or model defaults. Retrieval has an
+eight-second budget in addition to ink polling. Corrections apply to supported
+raster modes; host-side JPEG transfer bypasses their threshold calculations.
+.PP
+Cache identity uses the queue name and device URI, excluding credentials.
+Select Refresh if another physical printer replaces one at the same address.
+The snapshot is held for the entire job; partial reads are never installed.
 .SH ENVIRONMENT
 .TP
 .B PPD
 Required path to the direct raster driver's PPD, normally supplied by CUPS.
 .TP
 .B DEVICE_URI
-When present, request ink levels through the CUPS backend's side channel.
-An unavailable ink reading does not prevent printing.
+When present, request ink levels and factory calibration through the CUPS
+backend's side channel. Unavailable readings do not prevent printing.
+.TP
+.B PRINTER
+CUPS queue name, used with DEVICE_URI to identify its calibration cache.
+.TP
+.B CUPS_CACHEDIR
+Directory for mfcj5720dw-*.calibration snapshots; default /var/cache/cups.
+Files are created with mode 0600 and replaced atomically. An unwritable
+directory still allows a fresh reading to be used for the current job.
 .TP
 .B MFCJ5720DW_PROFILE_DIR
 Override the color-profile directory for isolated tests. The installation

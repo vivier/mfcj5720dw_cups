@@ -17,9 +17,9 @@ ENGINE_CFLAGS = -mfpmath=387 -std=gnu11 -O0 -g -fPIE \
 ENGINE_LINK = -pie
 ENGINE_SOURCES = $(wildcard $(ENGINE)/*.c)
 ENGINE_HEADERS = $(wildcard $(ENGINE)/*.h)
-FILTER_HEADERS = driver.h ink.h
+FILTER_HEADERS = driver.h ink.h calibration.h
 ENGINE_OBJECTS = $(patsubst $(ENGINE)/%.c,$(BUILD)/engine/%.o,$(ENGINE_SOURCES))
-FILTER_OBJECTS = $(addprefix $(BUILD)/,rastertomfcj5720dw.o settings.o paper.o ink.o ink_status.o)
+FILTER_OBJECTS = $(addprefix $(BUILD)/,rastertomfcj5720dw.o settings.o paper.o ink.o ink_status.o calibration.o calibration_cache.o)
 PPD = ppd/mfcj5720dw.ppd
 MANPAGES = rastertomfcj5720dw.1 mfcj5720dw_ink.1
 PROFILE_SOURCES = $(wildcard lut/*.xml)

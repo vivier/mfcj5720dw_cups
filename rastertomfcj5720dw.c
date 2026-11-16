@@ -1,9 +1,11 @@
 /* Convert CUPS Raster to Brother printer data in one process. */
+#include "calibration.h"
 #include "data.h"
 #include "driver.h"
 #include "encoder/driver.h"
 #include "encoder/memory.h"
 #include "encoder/settings.h"
+#include "encoder/state.h"
 #include "ink.h"
 
 #include <fcntl.h>
@@ -118,7 +120,8 @@ out:
 	return result;
 }
 
-static int render_job(cups_raster_t *raster, struct job_settings *settings)
+static int render_job(cups_raster_t *raster, struct job_settings *settings,
+		      const struct printer_calibration *calibration)
 {
 	cups_page_header2_t header;
 	struct page_state page = { 0 };
@@ -136,6 +139,7 @@ static int render_job(cups_raster_t *raster, struct job_settings *settings)
 				fputs("ERROR: Cannot allocate printer state.\n", stderr);
 				goto out;
 			}
+			page.printer->calibration = calibration;
 			page.borderless = settings->borderless;
 			if (start_printer_job(settings, &page))
 				goto out;
@@ -196,11 +200,14 @@ static int set_color_profile_directory(void)
 int main(int argc, char **argv)
 {
 	struct job_settings settings;
+	struct printer_calibration calibration;
+	const struct printer_calibration *job_calibration = NULL;
 	struct sigaction cancel_action = { 0 };
 	cups_option_t *options = NULL;
 	cups_raster_t *raster = NULL;
 	ppd_file_t *ppd = NULL;
-	const char *ppd_path;
+	ppd_choice_t *calibration_choice;
+	const char *ppd_path, *device_uri;
 	int input_fd = STDIN_FILENO, option_count = 0, result = 1;
 
 	if (argc == 2 && (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help"))) {
@@ -242,9 +249,18 @@ int main(int argc, char **argv)
 		fputs("ERROR: Cannot open CUPS Raster stream.\n", stderr);
 		goto out;
 	}
-	if (getenv("DEVICE_URI"))
+	device_uri = getenv("DEVICE_URI");
+	if (device_uri && *device_uri) {
 		brother_report_ink_levels();
-	result = render_job(raster, &settings);
+		calibration_choice = ppdFindMarkedChoice(ppd, "BRCalibration");
+		/* Queues created with an older PPD also use automatic retrieval. */
+		if ((!calibration_choice || strcmp(calibration_choice->choice, "Off")) &&
+		    calibration_prepare(&calibration, getenv("PRINTER"), device_uri,
+					calibration_choice &&
+					!strcmp(calibration_choice->choice, "Refresh")))
+			job_calibration = &calibration;
+	}
+	result = render_job(raster, &settings, job_calibration);
 out:
 	if (raster)
 		cupsRasterClose(raster);

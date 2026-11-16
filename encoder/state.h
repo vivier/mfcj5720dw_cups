@@ -166,6 +166,7 @@ struct range_encoder {
 };
 
 struct jpeg_encoder;
+struct printer_calibration;
 
 struct printer_state {
 	/*
@@ -176,6 +177,8 @@ struct printer_state {
 	struct printer_buffers buffers;
 	struct output_swath swaths[PRINTER_SWATH_CAPACITY];
 	struct jpeg_encoder *jpeg;
+	/* Borrowed, validated snapshot; immutable for the whole print job. */
+	const struct printer_calibration *calibration;
 };
 
 #endif

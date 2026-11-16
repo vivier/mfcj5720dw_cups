@@ -106,6 +106,12 @@
 			*Choice "Color/Color" $NoPostScript
 			Choice "Mono/Grayscale" $NoPostScript
 
+		// Factory correction is specific to the physical printer, not the paper profile.
+		Option "BRCalibration/Printhead Calibration" PickOne AnySetup 40
+			*Choice "Auto/Automatic" $NoPostScript
+			Choice "Refresh/Refresh Before Each Job" $NoPostScript
+			Choice "Off/Disabled" $NoPostScript
+
 		Option "BRSlowDrying/Slow Drying Paper" PickOne AnySetup 31
 			*Choice "OFF/Off" $NoPostScript
 			Choice "ON/On" $NoPostScript
