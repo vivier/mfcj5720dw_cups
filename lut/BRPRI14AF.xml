@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <IccProfile xmlns:bcm="urn:brother:bcm:1">
   <!-- IccXML with BCM extensions; see README.md. Original data notices: PROVENANCE.md. -->
+  <!--
+    Legacy calibration for internal media 0x28 (BCM bank 0x0600).
+    Selected for job media code 3. The original paper name is unknown;
+    this media choice is not exposed by the current CUPS driver.
+    Contains RGB-to-CMYK cubes, per-ink curves and halftone parameters
+    for the natural, vivid and unmatched color modes at resolution tag 0x4.
+    The resolution tag is an internal selector, not a DPI value.
+  -->
   <Header>
     <ProfileVersion>2.0</ProfileVersion>
     <CreationDateTime>2011-12-01T16:33:10</CreationDateTime>

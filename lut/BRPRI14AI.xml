@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <IccProfile xmlns:bcm="urn:brother:bcm:1">
   <!-- IccXML with BCM extensions; see README.md. Original data notices: PROVENANCE.md. -->
+  <!--
+    Plain-paper duplex calibration with reduced ink (BCM bank 0x0900).
+    Selected for either binding edge when BRDuplexMode is Duplex2
+    (DRYING_REDUCED_INK); normal and slow duplex drying use BRPRI14AH.
+    Contains RGB-to-CMYK cubes, per-ink curves, halftone parameters,
+    row correction and density limits. Tags select the resolution,
+    color matching mode and, where applicable, dithering variant.
+  -->
   <Header>
     <ProfileVersion>2.0</ProfileVersion>
     <CreationDateTime>2013-12-19T19:36:20</CreationDateTime>

@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <IccProfile xmlns:bcm="urn:brother:bcm:1">
   <!-- IccXML with BCM extensions; see README.md. Original data notices: PROVENANCE.md. -->
+  <!--
+    Plain-paper slow-drying calibration (BCM bank 0x0700).
+    Selected on the plain-paper path for single-sided printing with
+    BRSlowDrying enabled; duplex printing uses BRPRI14AH or BRPRI14AI instead.
+    Contains RGB-to-CMYK cubes, per-ink curves, halftone parameters,
+    row correction and density limits. Tags select the resolution,
+    color matching mode and, where applicable, dithering variant.
+  -->
   <Header>
     <ProfileVersion>2.0</ProfileVersion>
     <CreationDateTime>2013-12-19T19:36:19</CreationDateTime>

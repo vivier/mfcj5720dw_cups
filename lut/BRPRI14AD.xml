@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <IccProfile xmlns:bcm="urn:brother:bcm:1">
   <!-- IccXML with BCM extensions; see README.md. Original data notices: PROVENANCE.md. -->
+  <!--
+    Other photo paper and Hagaki reverse-side calibration (BCM bank 0x0400).
+    Selected for the Glossy and HagakiUra media choices.
+    Contains RGB-to-CMYK cubes, per-ink curves and halftone parameters.
+    Tags select the resolution and color matching variant within this profile.
+  -->
   <Header>
     <ProfileVersion>2.0</ProfileVersion>
     <CreationDateTime>2013-12-18T11:24:05</CreationDateTime>

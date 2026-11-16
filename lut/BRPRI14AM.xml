@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <IccProfile xmlns:bcm="urn:brother:bcm:1">
   <!-- IccXML with BCM extensions; see README.md. Original data notices: PROVENANCE.md. -->
+  <!--
+    Alternate legacy printable-disc calibration (BCM bank 0x0c00, CI11).
+    Selected for job media code 11 (JOB_MEDIA_DISC_ALTERNATE), mapped to
+    internal media 0x1d. This choice is not exposed by the current CUPS
+    media menu; its presence does not establish hardware support.
+    Contains RGB-to-CMYK cubes and per-ink curves for the natural, vivid
+    and unmatched color modes at internal resolution tag 0x6,
+    without halftone or other correction blocks.
+  -->
   <Header>
     <ProfileVersion>2.0</ProfileVersion>
     <CreationDateTime>2010-10-15T08:59:20</CreationDateTime>

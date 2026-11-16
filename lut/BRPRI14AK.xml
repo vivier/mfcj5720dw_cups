@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <IccProfile xmlns:bcm="urn:brother:bcm:1">
   <!-- IccXML with BCM extensions; see README.md. Original data notices: PROVENANCE.md. -->
+  <!--
+    Retained legacy calibration for BCM bank 0x0a00, device marker CI11.
+    The original medium is unknown. The filename remains in the loader's
+    list, but profile_file_index() never selects it automatically.
+    Contains RGB-to-CMYK cubes and per-ink curves for the natural, vivid
+    and unmatched color modes at internal resolution tag 0x1.
+    This profile contains no halftone, row-correction or density blocks.
+  -->
   <Header>
     <ProfileVersion>2.0</ProfileVersion>
     <CreationDateTime>2010-07-22T21:19:46</CreationDateTime>
