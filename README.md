@@ -61,7 +61,7 @@ The resulting files are:
 - `build/rastertomfcj5720dw`: the CUPS Raster printing filter;
 - `build/mfcj5720dw_ink`: the ink-level reporting filter and command;
 - `ppd/mfcj5720dw.ppd`: the generated printer description;
-- `lut/*.BCM`: the eleven generated color calibration profiles.
+- `lut/*.BCM`: the ten generated color calibration profiles.
 
 `make check-static` checks the PPD, manpage formatting, encoder header
 interfaces and ELF metadata. It does not send a print job or contact a
@@ -129,8 +129,8 @@ label the coordinates; the order of the numbers defines the data. Other
 blocks expose named curves, halftone parameters and correction factors.
 The unedited XML sources reconstruct the original BCM files byte for byte.
 
-The 75 cube blocks share 45 tables in `lut/cubes/`. The 234 individual curves
-use 64 nonconstant tables in `lut/curves/` and 104 zero-filled curves described
+The 72 cube blocks share 42 tables in `lut/cubes/`. The 225 individual curves
+use 61 nonconstant tables in `lut/curves/` and 100 zero-filled curves described
 by `Constant="0"`. Each profile keeps its ink limits, curve names and tag IDs:
 
 ```xml

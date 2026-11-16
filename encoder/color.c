@@ -396,12 +396,31 @@ out:
 	return status;
 }
 
-/* Missing profiles deliberately select the embedded fallback calibration. */
+enum bcm_profile_index {
+	BCM_PROFILE_EMBEDDED = -1,
+	BCM_PROFILE_INKJET,
+	BCM_PROFILE_VARIANT_17,
+	BCM_PROFILE_PHOTO,
+	BCM_PROFILE_BP71,
+	BCM_PROFILE_VARIANT_28,
+	BCM_PROFILE_SLOW_DRYING,
+	BCM_PROFILE_DUPLEX,
+	BCM_PROFILE_DUPLEX_REDUCED_INK,
+	BCM_PROFILE_VARIANT_1C,
+	BCM_PROFILE_VARIANT_1D,
+};
+
 static const char *const bcm_filenames[] = {
-	"BRPRI14A.BCM",	 "BRPRI14AA.BCM", "BRPRI14AB.BCM", "BRPRI14AC.BCM",
-	"BRPRI14AD.BCM", "BRPRI14AE.BCM", "BRPRI14AF.BCM", "BRPRI14AG.BCM",
-	"BRPRI14AH.BCM", "BRPRI14AI.BCM", "BRPRI14AJ.BCM", "BRPRI14AK.BCM",
-	"BRPRI14AL.BCM", "BRPRI14AM.BCM",
+	[BCM_PROFILE_INKJET] = "BRPRI14AA.BCM",
+	[BCM_PROFILE_VARIANT_17] = "BRPRI14AC.BCM",
+	[BCM_PROFILE_PHOTO] = "BRPRI14AD.BCM",
+	[BCM_PROFILE_BP71] = "BRPRI14AE.BCM",
+	[BCM_PROFILE_VARIANT_28] = "BRPRI14AF.BCM",
+	[BCM_PROFILE_SLOW_DRYING] = "BRPRI14AG.BCM",
+	[BCM_PROFILE_DUPLEX] = "BRPRI14AH.BCM",
+	[BCM_PROFILE_DUPLEX_REDUCED_INK] = "BRPRI14AI.BCM",
+	[BCM_PROFILE_VARIANT_1C] = "BRPRI14AL.BCM",
+	[BCM_PROFILE_VARIANT_1D] = "BRPRI14AM.BCM",
 };
 
 uint32_t load_bcm_table(struct printer_state *printer, int table_index)
@@ -422,30 +441,35 @@ uint32_t load_bcm_table(struct printer_state *printer, int table_index)
 	return load_bcm_file(printer, path);
 }
 
-static int profile_file_index(const struct color_state *color)
+static enum bcm_profile_index profile_file_index(const struct color_state *color)
 {
 	switch (color->media) {
 	case MEDIA_INKJET:
 	case MEDIA_BROTHER_BP60:
-		return 1;
+		return BCM_PROFILE_INKJET;
 	case MEDIA_OTHER_PHOTO:
 	case MEDIA_HAGAKI_REVERSE:
-		return 4;
+		return BCM_PROFILE_PHOTO;
 	case MEDIA_VARIANT_17:
-		return 3;
+		return BCM_PROFILE_VARIANT_17;
 	case MEDIA_BROTHER_BP71:
-		return 5;
+		return BCM_PROFILE_BP71;
 	case MEDIA_VARIANT_1C:
-		return 12;
+		return BCM_PROFILE_VARIANT_1C;
 	case MEDIA_VARIANT_1D:
-		return 13;
+		return BCM_PROFILE_VARIANT_1D;
 	case MEDIA_VARIANT_28:
-		return 6;
+		return BCM_PROFILE_VARIANT_28;
 	default:
-		if (color->binding == BINDING_SIMPLEX)
-			return color->slow_drying == SLOW_DRYING_ENABLED ? 7
-									 : 0;
-		return color->duplex_drying == DRYING_REDUCED_INK ? 9 : 8;
+		if (color->binding == BINDING_SIMPLEX) {
+			if (color->slow_drying == SLOW_DRYING_ENABLED)
+				return BCM_PROFILE_SLOW_DRYING;
+			/* Brother supplies no external profile for this case. */
+			return BCM_PROFILE_EMBEDDED;
+		}
+		return color->duplex_drying == DRYING_REDUCED_INK
+			       ? BCM_PROFILE_DUPLEX_REDUCED_INK
+			       : BCM_PROFILE_DUPLEX;
 	}
 }
 
@@ -453,14 +477,17 @@ uintptr_t select_color_tables(struct printer_state *printer, short color_mode)
 {
 	struct color_state *color = (void *)printer->numeric_state;
 	struct printer_buffers *buffers = &printer->buffers;
+	enum bcm_profile_index profile;
 
 	choose_color_table_tags(printer, color_mode);
 	if ((int16_t)color->cube_tag < 0) {
+		profile = profile_file_index(color);
 		buffers->calibration_curves = buffers->color_workspace;
 		buffers->calibration_cube =
 			buffers->color_workspace + BCM_CURVE_BYTES;
 		buffers->color_cube = buffers->calibration_cube;
-		if (!load_bcm_table(printer, profile_file_index(color)))
+		if (profile == BCM_PROFILE_EMBEDDED ||
+		    !load_bcm_table(printer, profile))
 			select_fallback_color_tables(printer, color_mode);
 	}
 	buffers->transfer_curves = buffers->curve_workspace;

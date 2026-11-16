@@ -41,11 +41,12 @@ The original RPM metadata declares:
 2003-2014 Brother Industries, Ltd. All Rights Reserved
 ```
 
-The eleven `lut/*.xml` profiles and shared tables in `lut/cubes/*.xml` and
+The ten retained `lut/*.xml` profiles and shared tables in `lut/cubes/*.xml` and
 `lut/curves/*.xml` are lossless textual transcriptions of Brother's BCM
 profiles. The XML-to-BCM compiler generates the profiles used at runtime.
 Embedded copyright strings, calibration values and uninterpreted bytes are
 retained. XML storage does not create new ownership of the underlying data.
+The unused `BRPRI14AK.BCM` profile and its exclusive XML tables were removed.
 
 The nine `encoder/*_tables.c` files contain transcriptions of numerical data
 used by the driver: color interpolation and calibration, dither thresholds,
