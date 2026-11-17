@@ -26,8 +26,11 @@ The supply type is ink, recognized by CUPS clients including GNOME 50.
 .PP
 The raster filter calls the shared reporting function before rendering each job.
 Updates can also be requested without printing through a CUPS command job.
-The PPD advertises only ReportLevels and disables generic SNMP supply polling
-because this printer's standard Printer-MIB does not return usable percentages.
+The PPD routes command jobs through commandtomfcj5720dw(1), which shares this
+query implementation and also supports head cleaning and the nozzle check.
+This ink-only executable remains available for older queue PPDs and direct
+status queries. Generic SNMP supply polling is disabled because this printer's
+standard Printer-MIB does not return usable percentages.
 .SH COMMAND FILE
 With the CUPS positional arguments, read the named file or stdin.
 The first line must be #CUPS-COMMAND. Only ReportLevels is supported;
@@ -56,5 +59,6 @@ Normal reporting never writes to stdout.
 .SH FILES
 .I /usr/lib/cups/filter/mfcj5720dw_ink
 .SH SEE ALSO
+.BR commandtomfcj5720dw (1),
 .BR rastertomfcj5720dw (1),
 .BR lp (1)

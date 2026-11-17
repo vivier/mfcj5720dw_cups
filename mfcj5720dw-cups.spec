@@ -38,7 +38,8 @@ Requires(preun): coreutils
 
 %description
 Native CUPS Raster filter for the Brother MFC-J5720DW, with a generated PPD,
-color profiles and ink-level reporting through the CUPS side channel.
+color profiles, ink-level reporting through the CUPS side channel, three
+head-cleaning strengths and an internal nozzle-check page.
 The encoder is linked directly into the filter; no Brother LPR executable
 or wrapper package is needed. This is an independent, experimental driver.
 
@@ -63,6 +64,7 @@ reinstalls preserve existing queues and settings.
 make check-static
 cmp build/rastertomfcj5720dw %{buildroot}%{cupsfilterdir}/rastertomfcj5720dw
 cmp build/mfcj5720dw_ink %{buildroot}%{cupsfilterdir}/mfcj5720dw_ink
+cmp build/commandtomfcj5720dw %{buildroot}%{cupsfilterdir}/commandtomfcj5720dw
 cmp ppd/mfcj5720dw.ppd %{buildroot}%{ppddir}/mfcj5720dw.ppd
 
 %preun
@@ -76,7 +78,7 @@ if [ "$1" -eq 0 ]; then
         if LC_ALL=C grep -q '^\*cupsFilter2:' "$queue_ppd"; then
             filter_attribute=cupsFilter2
         fi
-        filter_program='(%{cupsfilterdir}/)?(rastertomfcj5720dw|mfcj5720dw_ink)'
+        filter_program='(%{cupsfilterdir}/)?(rastertomfcj5720dw|mfcj5720dw_ink|commandtomfcj5720dw)'
         if ! LC_ALL=C grep -Eq "^\*$filter_attribute:[[:space:]]*\"[^\"]*[[:space:]]$filter_program[[:space:]]*\"[[:space:]]*$" "$queue_ppd"; then
             continue
         fi
@@ -97,6 +99,7 @@ exit 0
 %license LICENSE COPYRIGHT PROVENANCE.md
 %{cupsfilterdir}/rastertomfcj5720dw
 %{cupsfilterdir}/mfcj5720dw_ink
+%{cupsfilterdir}/commandtomfcj5720dw
 %dir %{ppddir}
 %{ppddir}/mfcj5720dw.ppd
 %dir %{driverdatadir}
@@ -104,9 +107,11 @@ exit 0
 %{driverdatadir}/lut/*.BCM
 %{_mandir}/man1/rastertomfcj5720dw.1*
 %{_mandir}/man1/mfcj5720dw_ink.1*
+%{_mandir}/man1/commandtomfcj5720dw.1*
 
 %changelog
 * Mon Nov 16 2026 Laurent Vivier <laurent@vivier.eu> - 0.2.0-1
+- Add three head-cleaning strengths and the internal nozzle-check page as CUPS commands.
 - Include French option, paper-size and ink-color labels in the generated PPD.
 - Retrieve and cache per-printer factory calibration through the CUPS backend.
 - Apply complete density banks and nozzle correction with per-page initialization.

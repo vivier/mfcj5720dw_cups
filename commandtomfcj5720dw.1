@@ -1,0 +1,116 @@
+.TH COMMANDTOMFCJ5720DW 1 "November 2026" "MFC-J5720DW driver" "User Commands"
+.SH NAME
+commandtomfcj5720dw \- execute Brother MFC-J5720DW CUPS maintenance jobs
+.SH SYNOPSIS
+.B commandtomfcj5720dw
+.I job-id user title copies options
+.RI [ file ]
+.br
+.B commandtomfcj5720dw
+.BR \-h " | " \-\-help
+.SH DESCRIPTION
+This CUPS filter reads maintenance commands from a file or standard input.
+It writes printer commands to standard output for delivery by the queue's
+backend. Ink queries use the backend's side channel on file descriptor 4.
+The filter does not open a printer connection itself.
+.PP
+The entire input is validated before any command or query is issued.
+Commands execute in file order and stop on the first query or output error.
+Maintenance operations execute once per command, regardless of the CUPS copies
+argument or print options. Repeated ReportLevels commands issue only one query.
+.SH COMMAND FILE
+The first line must be #CUPS-COMMAND.
+Command names and ink selections are case insensitive. Blank lines, leading
+and trailing whitespace, and comments starting with # are accepted.
+Files must contain ASCII text, with LF or CRLF line endings.
+The last line need not end in a newline.
+Limits are 65536 bytes per file, 255 bytes per line excluding LF, and
+256 commands. Unknown commands, invalid arguments and embedded NULs are rejected.
+.TP
+.B ReportLevels
+Read and report ink estimates without printing. Requires a network backend
+supporting CUPS side-channel SNMP queries; see mfcj5720dw_ink(1).
+.TP
+.B Clean all
+Request normal cleaning of the black and color print heads.
+.TP
+.B Clean black
+Request normal cleaning of the black print head.
+.TP
+.B Clean color
+Request normal cleaning of the color print heads together.
+.TP
+.B CleanStrong all|black|color
+Request strong cleaning (POWERPURGE) of the selected print heads.
+.TP
+.B CleanStrongest all|black|color
+Request the strongest cleaning (SUPERPOWERPURGE) of the selected print heads.
+These stronger modes consume more ink than normal cleaning.
+.TP
+.B PrintSelfTestPage
+Print the printer's internal print-quality sheet to check the nozzles.
+This is distinct from the CUPS document test page.
+.PP
+The two additional cleaning commands are extensions defined by this
+driver, not standard CUPS or Brother command names. They select the same
+three cleaning strengths and ink groups as Brother's maintenance utility.
+Standard Clean always means normal cleaning.
+Alignment commands are not advertised or accepted.
+.SH EXAMPLES
+Submit a nozzle check to an existing queue, replacing PRINTER with its name:
+.PP
+.nf
+printf '#CUPS-COMMAND\enPrintSelfTestPage\en' | \e
+  lp -d PRINTER -t 'Nozzle check' \e
+     -o document-format=application/vnd.cups-command
+.fi
+.PP
+Request normal cleaning of all heads:
+.PP
+.nf
+printf '#CUPS-COMMAND\enClean all\en' | \e
+  lp -d PRINTER -t 'Clean print heads' \e
+     -o document-format=application/vnd.cups-command
+.fi
+.PP
+For strong cleaning of the black head, submit this separate job:
+.PP
+.nf
+printf '#CUPS-COMMAND\enCleanStrong black\en' | \e
+  lp -d PRINTER -t 'Strong black-head cleaning' \e
+     -o document-format=application/vnd.cups-command
+.fi
+.PP
+Use CleanStrongest for the strongest mode.
+Both extensions require exactly one ink selection: all, black or color.
+.PP
+GNOME's head-cleaning action submits Clean all when the queue advertises Clean.
+It does not provide strength or ink-selection controls; use command jobs for
+those choices.
+Existing queues need their PPD updated to advertise the new commands; installing
+a new model PPD alone does not replace a queue's private copy.
+.SH ALIGNMENT
+Use the printer touchscreen: Settings, Maintenance, Improve Print Quality,
+Alignment. Select the paper size and follow the printed-pattern instructions.
+No remote alignment protocol was established from the inspected Windows and
+macOS drivers. PrintAlignmentPage and SetAlignment are unsupported.
+The driver's vertical-line rendering preferences do not perform this calibration.
+.SH STATUS
+Successful filter completion means the command bytes were written to the backend,
+not that the printer has finished cleaning or printing its check sheet.
+There is no maintenance-completion polling. Submit an ink-level refresh after
+the printer finishes if needed; a ReportLevels in the same job may read levels
+before maintenance completes.
+.PP
+Each nozzle check reports a PAGE record on standard error.
+Cleaning does not report a printed page.
+.SH EXIT STATUS
+Zero means success, an empty command job, or help. One means an invalid input,
+input/output failure or failed ink query. Two indicates an invalid invocation.
+.SH FILES
+.I /usr/lib/cups/filter/commandtomfcj5720dw
+.SH SEE ALSO
+.BR mfcj5720dw_ink (1),
+.BR rastertomfcj5720dw (1),
+.BR lp (1),
+.BR lpadmin (8)

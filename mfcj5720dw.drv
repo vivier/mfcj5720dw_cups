@@ -36,7 +36,7 @@
 	// Brother's private maintenance OID provides the actual ink estimates.
 	// Disable generic polling so Printer-MIB sentinels cannot overwrite them.
 	Attribute "cupsSNMPSupplies" "" "False"
-	Attribute "cupsCommands" "" "ReportLevels"
+	Attribute "cupsCommands" "" "ReportLevels Clean PrintSelfTestPage CleanStrong CleanStrongest"
 	// Localize supply names while keeping the side-channel marker identifiers.
 	LocAttribute "cupsMarkerName" "Black/Black" ""
 	LocAttribute "cupsMarkerName" "Cyan/Cyan" ""
@@ -45,7 +45,7 @@
 
 	// CUPS performs PDF/PostScript rendering and page management upstream.
 	Filter "application/vnd.cups-raster 0 rastertomfcj5720dw"
-	Filter "application/vnd.cups-command 0 mfcj5720dw_ink"
+	Filter "application/vnd.cups-command 0 commandtomfcj5720dw"
 
 	// Width, height and margins in PostScript points (1/72 inch).
 	// Preserve Brother's rounded dimensions instead of generic media.defs.

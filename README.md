@@ -60,6 +60,7 @@ The resulting files are:
 
 - `build/rastertomfcj5720dw`: the CUPS Raster printing filter;
 - `build/mfcj5720dw_ink`: the ink-level reporting filter and command;
+- `build/commandtomfcj5720dw`: the maintenance command filter;
 - `ppd/mfcj5720dw.ppd`: the generated printer description;
 - `lut/*.BCM`: the ten generated color calibration profiles.
 
@@ -88,8 +89,8 @@ make rpm-sources     # Source archive and spec only
 
 Packages are written to `build/rpm/RPMS/<architecture>/` and
 `build/rpm/SRPMS/`. The source archive contains the build sources, XML
-profiles and notices. The binary package installs both filters, the PPD,
-generated BCM profiles, two manpages and license/provenance notices.
+profiles and notices. The binary package installs three filters, the PPD,
+generated BCM profiles, three manpages and license/provenance notices.
 
 For an x86_64 Fedora build, installation is:
 
@@ -103,7 +104,7 @@ interface and select **Brother MFC-J5720DW CUPS**. For network printing, a
 JetDirect connection uses `socket://PRINTER_IP:9100`; replace `PRINTER_IP`
 with the printer's address.
 
-Final RPM removal deletes local CUPS queues using either of this driver's
+Final RPM removal deletes local CUPS queues using any of this driver's
 filters. Upgrades and reinstalls preserve the queues and their settings.
 
 ## Install without RPM
@@ -119,8 +120,56 @@ The default prefix is `/usr`. `PREFIX`, `CUPSFILTERDIR`, `PPDDIR` and
 make install DESTDIR=/tmp/mfcj5720dw-install
 ```
 
-After installation, `man rastertomfcj5720dw` and `man mfcj5720dw_ink`
-describe the filter interfaces and ink-level command.
+After installation, `man rastertomfcj5720dw`, `man mfcj5720dw_ink` and
+`man commandtomfcj5720dw` describe the printing, ink-level and maintenance interfaces.
+
+## Maintenance
+
+The driver advertises `Clean`, `PrintSelfTestPage`, `ReportLevels` and two
+cleaning extensions as CUPS commands. All cleaning commands take exactly one
+ink selection: `all`, `black` or `color`.
+
+| CUPS command | Cleaning strength | Printer operation |
+| --- | --- | --- |
+| `Clean` | Normal | `NORMALPURGE` |
+| `CleanStrong` | Strong | `POWERPURGE` |
+| `CleanStrongest` | Strongest | `SUPERPOWERPURGE` |
+
+The additional cleaning commands are defined by this driver.
+Stronger modes consume more ink. `PrintSelfTestPage` prints the internal nozzle-check sheet;
+it is distinct from the ordinary CUPS document test page.
+
+For example, replace `PRINTER` with the queue name:
+
+```sh
+printf '#CUPS-COMMAND\nPrintSelfTestPage\n' | \
+  lp -d PRINTER -t 'Nozzle check' -o document-format=application/vnd.cups-command
+```
+
+GNOME's head-cleaning action submits `Clean all`. An existing queue must use
+the updated PPD to expose that action; updating the installed model PPD alone
+does not update the queue's private copy. Re-select the driver for that queue,
+or use `sudo lpadmin -p PRINTER -m Brother/mfcj5720dw.ppd` and review its defaults.
+The other ink selections and strengths are available through command jobs;
+GNOME does not add buttons for these extensions. For example:
+
+```sh
+printf '#CUPS-COMMAND\nCleanStrong black\n' | \
+  lp -d PRINTER -t 'Strong black-head cleaning' -o document-format=application/vnd.cups-command
+```
+
+The filter validates the complete job before sending anything, then leaves
+transport and job ordering to CUPS. It does not poll for physical completion.
+See [commandtomfcj5720dw(1)](commandtomfcj5720dw.1)
+for command syntax, limits, ink reporting and examples.
+
+Printhead alignment is still performed on the printer's touchscreen, using
+Settings → Maintenance → Improve Print Quality → Alignment. Choose the paper
+size and follow the on-screen pattern selection. See
+[Brother's alignment procedure](https://support.brother.com/g/b/faqend.aspx?c=us&faqid=faq00000259_027&lang=en&prod=mfcj5720dw_us_eu_as).
+The inspected Windows and macOS drivers did not establish a remote calibration
+protocol. Their vertical-line rendering options are separate from this procedure;
+`PrintAlignmentPage` and `SetAlignment` are therefore not advertised.
 
 ## Printhead calibration
 

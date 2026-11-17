@@ -23,7 +23,7 @@ FILTER_OBJECTS = $(addprefix $(BUILD)/,rastertomfcj5720dw.o settings.o paper.o i
 PPD = ppd/mfcj5720dw.ppd
 PPD_LANGUAGES = en,fr
 PPD_TRANSLATIONS = fr.po
-MANPAGES = rastertomfcj5720dw.1 mfcj5720dw_ink.1
+MANPAGES = rastertomfcj5720dw.1 mfcj5720dw_ink.1 commandtomfcj5720dw.1
 PROFILE_SOURCES = $(wildcard lut/*.xml)
 BCM_PROFILES = $(patsubst %.xml,%.BCM,$(PROFILE_SOURCES))
 RPMBUILD ?= rpmbuild
@@ -37,7 +37,7 @@ DIST_FILES = .gitattributes .gitignore COPYRIGHT LICENSE PROVENANCE.md README.md
 	lut/Makefile lut/.gitignore $(wildcard lut/*.py lut/*.xml lut/cubes/*.xml lut/curves/*.xml)
 
 .PHONY: all profiles ppd check-static check-man check-encoder-interfaces install rpm srpm rpm-sources clean distclean
-all: $(BUILD)/rastertomfcj5720dw $(BUILD)/mfcj5720dw_ink $(PPD) profiles
+all: $(BUILD)/rastertomfcj5720dw $(BUILD)/mfcj5720dw_ink $(BUILD)/commandtomfcj5720dw $(PPD) profiles
 
 profiles:
 	$(MAKE) -C lut profiles
@@ -61,6 +61,9 @@ $(BUILD)/rastertomfcj5720dw: $(FILTER_OBJECTS) $(ENGINE_OBJECTS) Makefile
 $(BUILD)/mfcj5720dw_ink: $(BUILD)/mfcj5720dw_ink.o $(BUILD)/ink.o $(BUILD)/ink_status.o Makefile
 	$(CC) $(LDFLAGS) -no-pie $(filter %.o,$^) -lcups -o $@
 
+$(BUILD)/commandtomfcj5720dw: $(BUILD)/commandtomfcj5720dw.o $(BUILD)/ink.o $(BUILD)/ink_status.o Makefile
+	$(CC) $(LDFLAGS) -pie $(filter %.o,$^) -lcups -o $@
+
 # Compile interface checks and inspect build artifacts without running filters.
 check-encoder-interfaces:
 	@for header in $(wildcard $(ENGINE)/*.h); do \
@@ -70,17 +73,19 @@ check-encoder-interfaces:
 
 check-static: all check-man check-encoder-interfaces
 	cupstestppd -I filters $(PPD)
-	file $(BUILD)/rastertomfcj5720dw $(BUILD)/mfcj5720dw_ink
+	file $(BUILD)/rastertomfcj5720dw $(BUILD)/mfcj5720dw_ink $(BUILD)/commandtomfcj5720dw
 	readelf -h $(BUILD)/rastertomfcj5720dw
 	readelf -d $(BUILD)/rastertomfcj5720dw
 
 check-man:
 	groff -ww -Tutf8 -man rastertomfcj5720dw.1 > /dev/null
 	groff -ww -Tutf8 -man mfcj5720dw_ink.1 > /dev/null
+	groff -ww -Tutf8 -man commandtomfcj5720dw.1 > /dev/null
 
 install: all
 	install -Dm755 $(BUILD)/rastertomfcj5720dw $(DESTDIR)$(CUPSFILTERDIR)/rastertomfcj5720dw
 	install -Dm755 $(BUILD)/mfcj5720dw_ink $(DESTDIR)$(CUPSFILTERDIR)/mfcj5720dw_ink
+	install -Dm755 $(BUILD)/commandtomfcj5720dw $(DESTDIR)$(CUPSFILTERDIR)/commandtomfcj5720dw
 	install -Dm644 $(PPD) $(DESTDIR)$(PPDDIR)/$(notdir $(PPD))
 	install -d $(DESTDIR)$(DATADIR)/lut $(DESTDIR)$(PREFIX)/share/man/man1
 	install -m644 $(BCM_PROFILES) $(DESTDIR)$(DATADIR)/lut/
