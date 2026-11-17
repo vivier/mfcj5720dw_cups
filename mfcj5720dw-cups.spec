@@ -9,8 +9,8 @@
 %global driverdatadir %{_datadir}/mfcj5720dw
 
 Name:           mfcj5720dw-cups
-Version:        0.1.0
-Release:        3%{?dist}
+Version:        0.2.0
+Release:        1%{?dist}
 Summary:        Direct CUPS Raster driver for the Brother MFC-J5720DW
 License:        GPL-3.0-or-later AND GPL-2.0-or-later AND LicenseRef-Brother-Data
 URL:            https://github.com/vivier/mfcj5720dw_cups
@@ -106,7 +106,8 @@ exit 0
 %{_mandir}/man1/mfcj5720dw_ink.1*
 
 %changelog
-* Mon Nov 16 2026 Laurent Vivier <laurent@vivier.eu> - 0.1.0-3
+* Mon Nov 16 2026 Laurent Vivier <laurent@vivier.eu> - 0.2.0-1
+- Include French option, paper-size and ink-color labels in the generated PPD.
 - Retrieve and cache per-printer factory calibration through the CUPS backend.
 - Apply complete density banks and nozzle correction with per-page initialization.
 

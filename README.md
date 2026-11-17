@@ -70,6 +70,14 @@ printer, and it does not replace a hardware printing test.
 The source tree is self-contained. It requires no other checkout, original
 Brother RPM, decompilation tool or downloaded calibration files.
 
+The PPD includes English and French labels for options, choices, paper sizes
+and ink colors. CUPS selects the appropriate labels for the application's
+locale. Edit `fr.po` to update the French translation, then run `make ppd`.
+The source RPM includes this catalog; translations are embedded in the
+installed PPD and require no separate runtime package. Existing queues retain
+their own PPD copy and must be updated to use the translated PPD; recheck
+queue defaults after replacing it.
+
 ## Build RPM packages
 
 ```sh

@@ -21,6 +21,8 @@ FILTER_HEADERS = driver.h ink.h calibration.h
 ENGINE_OBJECTS = $(patsubst $(ENGINE)/%.c,$(BUILD)/engine/%.o,$(ENGINE_SOURCES))
 FILTER_OBJECTS = $(addprefix $(BUILD)/,rastertomfcj5720dw.o settings.o paper.o ink.o ink_status.o calibration.o calibration_cache.o)
 PPD = ppd/mfcj5720dw.ppd
+PPD_LANGUAGES = en,fr
+PPD_TRANSLATIONS = fr.po
 MANPAGES = rastertomfcj5720dw.1 mfcj5720dw_ink.1
 PROFILE_SOURCES = $(wildcard lut/*.xml)
 BCM_PROFILES = $(patsubst %.xml,%.BCM,$(PROFILE_SOURCES))
@@ -30,7 +32,7 @@ RPM_SPEC = mfcj5720dw-cups.spec
 RPM_TOPDIR = $(abspath $(BUILD)/rpm)
 RPM_SRPMDIR = $(RPM_TOPDIR)/SRPMS
 DIST_FILES = .gitattributes .gitignore COPYRIGHT LICENSE PROVENANCE.md README.md \
-	Makefile .copr/Makefile $(RPM_SPEC) $(wildcard *.c *.h *.1 *.drv) \
+	Makefile .copr/Makefile $(RPM_SPEC) $(PPD_TRANSLATIONS) $(wildcard *.c *.h *.1 *.drv) \
 	$(wildcard encoder/*.c encoder/*.h) \
 	lut/Makefile lut/.gitignore $(wildcard lut/*.py lut/*.xml lut/cubes/*.xml lut/curves/*.xml)
 
@@ -42,8 +44,8 @@ profiles:
 
 ppd: $(PPD)
 
-$(PPD): mfcj5720dw.drv
-	$(PPDC) --lf -l en -d ppd $<
+$(PPD): mfcj5720dw.drv $(PPD_TRANSLATIONS) Makefile
+	$(PPDC) --lf -l $(PPD_LANGUAGES) -d ppd $<
 
 $(BUILD)/%.o: %.c $(FILTER_HEADERS) $(ENGINE_HEADERS) Makefile
 	mkdir -p $(BUILD)
@@ -67,7 +69,7 @@ check-encoder-interfaces:
 	done
 
 check-static: all check-man check-encoder-interfaces
-	cupstestppd -I filters -W translations $(PPD)
+	cupstestppd -I filters $(PPD)
 	file $(BUILD)/rastertomfcj5720dw $(BUILD)/mfcj5720dw_ink
 	readelf -h $(BUILD)/rastertomfcj5720dw
 	readelf -d $(BUILD)/rastertomfcj5720dw

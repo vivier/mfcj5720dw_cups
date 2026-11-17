@@ -1,0 +1,334 @@
+# French translations for the Brother MFC-J5720DW CUPS driver.
+# Copyright (C) 2026 Laurent Vivier
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Numeric adjustment values use the unchanged source labels.
+msgid ""
+msgstr ""
+"Project-Id-Version: mfcj5720dw-cups\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Brother"
+msgstr "Brother"
+
+msgid "MFC-J5720DW"
+msgstr "MFC-J5720DW"
+
+msgid "A3"
+msgstr "A3"
+
+msgid "A3 (Borderless)"
+msgstr "A3 (sans bordure)"
+
+msgid "JB4"
+msgstr "JIS B4"
+
+msgid "Tabloid"
+msgstr "Tabloïd"
+
+msgid "Tabloid (Borderless)"
+msgstr "Tabloïd (sans bordure)"
+
+msgid "A4"
+msgstr "A4"
+
+msgid "A4 (Borderless)"
+msgstr "A4 (sans bordure)"
+
+msgid "Letter"
+msgstr "Lettre US"
+
+msgid "Letter (Borderless)"
+msgstr "Lettre US (sans bordure)"
+
+msgid "Legal"
+msgstr "Légal US"
+
+msgid "Folio"
+msgstr "Folio"
+
+msgid "Executive"
+msgstr "Executive"
+
+msgid "JIS B5"
+msgstr "JIS B5"
+
+msgid "A5"
+msgstr "A5"
+
+msgid "A6"
+msgstr "A6"
+
+msgid "A6 (Borderless)"
+msgstr "A6 (sans bordure)"
+
+msgid "4 x 6 in"
+msgstr "4 × 6 po"
+
+msgid "4 x 6 in (Borderless)"
+msgstr "4 × 6 po (sans bordure)"
+
+msgid "5 x 8 in"
+msgstr "5 × 8 po"
+
+msgid "5 x 8 in (Borderless)"
+msgstr "5 × 8 po (sans bordure)"
+
+msgid "3.5 x 5 in"
+msgstr "3,5 × 5 po"
+
+msgid "3.5 x 5 in (Borderless)"
+msgstr "3,5 × 5 po (sans bordure)"
+
+msgid "5 x 7 in"
+msgstr "5 × 7 po"
+
+msgid "5 x 7 in (Borderless)"
+msgstr "5 × 7 po (sans bordure)"
+
+msgid "Postcard 1"
+msgstr "Carte postale"
+
+msgid "Postcard 1 (Borderless)"
+msgstr "Carte postale (sans bordure)"
+
+msgid "Postcard 2 (Double)"
+msgstr "Carte postale double"
+
+msgid "C5 Envelope"
+msgstr "Enveloppe C5"
+
+msgid "DL Envelope"
+msgstr "Enveloppe DL"
+
+msgid "Com-10"
+msgstr "Enveloppe n° 10"
+
+msgid "Monarch"
+msgstr "Enveloppe Monarch"
+
+msgid "C6 Envelope"
+msgstr "Enveloppe C6"
+
+msgid "Y4 Envelope"
+msgstr "Enveloppe Y4"
+
+msgid "Two-Sided"
+msgstr "Recto verso"
+
+msgid "Short-Edge Binding"
+msgstr "Reliure sur le bord court"
+
+msgid "Long-Edge Binding"
+msgstr "Reliure sur le bord long"
+
+msgid "Off"
+msgstr "Désactivé"
+
+msgid "Paper Source"
+msgstr "Source du papier"
+
+msgid "Auto Select"
+msgstr "Sélection automatique"
+
+msgid "Tray1"
+msgstr "Bac 1"
+
+msgid "Tray2"
+msgstr "Bac 2"
+
+msgid "MP Tray"
+msgstr "Bac multifonction"
+
+msgid "Print Quality"
+msgstr "Qualité d'impression"
+
+msgid "Plain Fast"
+msgstr "Rapide (papier ordinaire)"
+
+msgid "Plain Normal"
+msgstr "Standard (papier ordinaire)"
+
+msgid "Fast"
+msgstr "Rapide"
+
+msgid "Normal"
+msgstr "Standard"
+
+msgid "Photo"
+msgstr "Photo"
+
+msgid "Best"
+msgstr "Optimale"
+
+msgid "Color / Grayscale"
+msgstr "Couleur / Niveaux de gris"
+
+msgid "Color"
+msgstr "Couleur"
+
+msgid "Grayscale"
+msgstr "Niveaux de gris"
+
+msgid "Printhead Calibration"
+msgstr "Étalonnage de la tête d'impression"
+
+msgid "Automatic"
+msgstr "Automatique"
+
+msgid "Refresh Before Each Job"
+msgstr "Actualiser avant chaque impression"
+
+msgid "Disabled"
+msgstr "Désactivé"
+
+msgid "Slow Drying Paper"
+msgstr "Papier à séchage lent"
+
+msgid "On"
+msgstr "Activé"
+
+msgid "Media Type"
+msgstr "Type de papier"
+
+msgid "Plain Duplex Paper"
+msgstr "Papier ordinaire (recto verso)"
+
+msgid "Plain Paper"
+msgstr "Papier ordinaire"
+
+msgid "Inkjet Paper"
+msgstr "Papier jet d'encre"
+
+msgid "Brother BP71 Photo Paper"
+msgstr "Papier photo Brother BP71"
+
+msgid "Brother BP60 Matte Paper"
+msgstr "Papier mat Brother BP60"
+
+msgid "Other Photo Paper"
+msgstr "Autre papier photo"
+
+msgid "HagakiAtena"
+msgstr "Hagaki (côté adresse)"
+
+msgid "HagakiUra"
+msgstr "Hagaki (côté image)"
+
+msgid "Paper Thickness"
+msgstr "Épaisseur du papier"
+
+msgid "Regular"
+msgstr "Normale"
+
+msgid "Thick"
+msgstr "Épais"
+
+msgid "Envelope"
+msgstr "Enveloppe"
+
+msgid "Bi-Directional Printing"
+msgstr "Impression bidirectionnelle"
+
+msgid "Color Mode"
+msgstr "Mode couleur"
+
+msgid "Natural"
+msgstr "Naturel"
+
+msgid "Vivid"
+msgstr "Couleurs vives"
+
+msgid "None"
+msgstr "Aucune correction"
+
+msgid "Change Data Transfer Mode"
+msgstr "Mode de transfert des données"
+
+msgid "Recommended Setting"
+msgstr "Réglage recommandé"
+
+msgid "Improved Print Quality"
+msgstr "Priorité à la qualité"
+
+msgid "Improved Print Speed"
+msgstr "Priorité à la vitesse"
+
+msgid "Advanced Two-Sided Settings"
+msgstr "Réglages avancés du recto verso"
+
+msgid "Two-Sided 1 (Slower print speed)"
+msgstr "Recto verso 1 (plus lent)"
+
+msgid "Two-Sided 2 (Slower print speed & less ink)"
+msgstr "Recto verso 2 (plus lent, moins d'encre)"
+
+msgid "Vertical Line Alignment"
+msgstr "Alignement des lignes verticales"
+
+msgid "Vertical Line Alignment A3, JIS B4, Ledger"
+msgstr "Alignement des lignes verticales A3, JIS B4, Ledger"
+
+msgid "Vertical Line Alignment A4, Letter"
+msgstr "Alignement des lignes verticales A4, Lettre US"
+
+msgid "Vertical Line Alignment Other Sizes"
+msgstr "Alignement des lignes verticales, autres formats"
+
+msgid "Color Settings (Advanced)"
+msgstr "Réglages avancés des couleurs"
+
+msgid "Halftone Pattern"
+msgstr "Tramage"
+
+msgid "Diffusion"
+msgstr "Diffusion d'erreur"
+
+msgid "Dither"
+msgstr "Trame ordonnée"
+
+msgid "Color Enhancement"
+msgstr "Amélioration des couleurs"
+
+msgid "Brightness"
+msgstr "Luminosité"
+
+msgid "Contrast"
+msgstr "Contraste"
+
+msgid "Red"
+msgstr "Rouge"
+
+msgid "Green"
+msgstr "Vert"
+
+msgid "Blue"
+msgstr "Bleu"
+
+msgid "General"
+msgstr "Général"
+
+msgid "Media Size"
+msgstr "Format du papier"
+
+msgid "Media Region"
+msgstr "Zone de page"
+
+msgid "Custom"
+msgstr "Personnalisé"
+
+msgid "Black"
+msgstr "Noir"
+
+msgid "Cyan"
+msgstr "Cyan"
+
+msgid "Magenta"
+msgstr "Magenta"
+
+msgid "Yellow"
+msgstr "Jaune"

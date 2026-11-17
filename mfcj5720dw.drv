@@ -1,4 +1,5 @@
 // Brother MFC-J5720DW description for the direct CUPS Raster filter.
+#po fr "fr.po"
 #define NoPostScript "          "
 
 {
@@ -36,6 +37,11 @@
 	// Disable generic polling so Printer-MIB sentinels cannot overwrite them.
 	Attribute "cupsSNMPSupplies" "" "False"
 	Attribute "cupsCommands" "" "ReportLevels"
+	// Localize supply names while keeping the side-channel marker identifiers.
+	LocAttribute "cupsMarkerName" "Black/Black" ""
+	LocAttribute "cupsMarkerName" "Cyan/Cyan" ""
+	LocAttribute "cupsMarkerName" "Magenta/Magenta" ""
+	LocAttribute "cupsMarkerName" "Yellow/Yellow" ""
 
 	// CUPS performs PDF/PostScript rendering and page management upstream.
 	Filter "application/vnd.cups-raster 0 rastertomfcj5720dw"
@@ -80,7 +86,8 @@
 
 	// Printer controls and their presentation in the CUPS options dialog.
 
-	Group "General/General"
+	// An explicit group lets ppdc localize its title; "General" is implicit.
+	Group "GeneralOptions/General"
 
 		// Standard Duplex lets CUPS pad odd reversed jobs before rasterization.
 		Option "Duplex/Two-Sided" PickOne AnySetup 25
@@ -150,7 +157,7 @@
 			Choice "Duplex1/Two-Sided 1 (Slower print speed)" $NoPostScript
 			Choice "Duplex2/Two-Sided 2 (Slower print speed & less ink)" $NoPostScript
 
-	Group "Vertical Line Alignment/Vertical Line Alignment"
+	Group "VerticalLineAlignment/Vertical Line Alignment"
 
 		Option "BRVertLineAlignA3B4Ledger/Vertical Line Alignment A3, JIS B4, Ledger" PickOne AnySetup 32
 			*Choice "OFF/Off" $NoPostScript
@@ -164,7 +171,7 @@
 			*Choice "OFF/Off" $NoPostScript
 			Choice "ON/On" $NoPostScript
 
-	Group "Color Settings (Advanced)/Color Settings (Advanced)"
+	Group "ColorSettings/Color Settings (Advanced)"
 
 		Option "BRHalfTonePattern/Halftone Pattern" PickOne AnySetup 23
 			Choice "Diffusion/Diffusion" $NoPostScript
