@@ -25,6 +25,19 @@ The inherited renderer consumes a complete RGB page for rotation and enhancement
 Small dimension differences from Brother's paper tables are cropped or padded
 with white at the right and bottom edges, without rescaling.
 .PP
+Borderless sizes request paper-specific enlargement through the PPD's cupsReal0
+field. The upstream renderer supplies a complete, unscaled page; this filter
+uses bilinear interpolation to enlarge it. This avoids a Ghostscript 10.06
+positioning defect with cupsBorderlessScalingFactor. Physical sheet dimensions
+remain separate, and the encoder applies the corresponding image-edge placement.
+Content near the edges can fall outside the sheet. An already-enlarged raster
+using the standard CUPS factor is accepted without further enlargement.
+All expanded pages in one job must have the same raster dimensions.
+Existing queues must update their PPD to use local expansion.
+The private cupsReal1 field specifies a downward placement correction in
+millimeters. A4 uses a measured 1.5 mm adjustment within the overspray area;
+other sizes use zero. This translation does not change the enlargement factor.
+.PP
 JPEG transfer modes use libjpeg-turbo through the libjpeg API. The filter
 retains Brother framing and baseline YCbCr 4:2:2 compression parameters.
 JPEG bytes and decoded pixels can differ slightly from the legacy compressor

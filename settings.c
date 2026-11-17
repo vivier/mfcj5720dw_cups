@@ -1,9 +1,11 @@
 /* Resolve marked CUPS options and validate the raster supplied by CUPS. */
 #include "driver.h"
+#include "raster.h"
 #include "encoder/config.h"
 #include "encoder/settings.h"
 
 #include <errno.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -16,6 +18,7 @@ enum raster_format {
 	BITS_PER_SAMPLE = 8,
 	BYTES_PER_SAMPLE = 1,
 	PAPER_TABLE_DPI = 600,
+	POINTS_PER_INCH = 72,
 	FAST_RASTER_DPI = 150,
 	FAST_RASTER_SCALE = PAPER_TABLE_DPI / FAST_RASTER_DPI,
 	MAX_RASTER_WIDTH = 8000,
@@ -23,6 +26,11 @@ enum raster_format {
 	MAX_ROW_PADDING = 16,
 	PAPER_ROUNDING_TOLERANCE = 8,
 };
+
+/* The largest supported stock enlargement is 1.0595 (3.5 x 5 inches). */
+#define MAX_BORDERLESS_SCALE 1.06f
+#define MAX_BORDERLESS_DOWNWARD_MM 2.0f
+#define PAGE_POINT_TOLERANCE 1.0f
 
 /* Configuration codes, distinct from the encoder's internal mode identifiers. */
 enum job_option_value {
@@ -175,11 +183,44 @@ static unsigned int raster_channels(cups_cspace_t color_space)
 	}
 }
 
+static bool valid_borderless_geometry(const cups_page_header2_t *header,
+				     const struct job_settings *settings)
+{
+	float scale = header->cupsBorderlessScalingFactor;
+	unsigned int axis;
+
+	if (!settings->borderless || !isfinite(scale) || scale < 1.0f ||
+	    scale > MAX_BORDERLESS_SCALE)
+		return false;
+	/* Stock borderless media use the whole sheet, with no raster margins. */
+	for (axis = 0; axis < 2; axis++) {
+		float physical = header->cupsPageSize[axis];
+		float nominal = axis ? settings->height_points : settings->width_points;
+		unsigned int pixels = axis ? header->cupsHeight : header->cupsWidth;
+		float image_edge = header->cupsImagingBBox[axis + 2];
+		float scaled_points = physical * scale;
+
+		if (!isfinite(physical) || fabsf(physical - nominal) > PAGE_POINT_TOLERANCE ||
+		    !isfinite(image_edge) || fabsf(image_edge - physical) > PAGE_POINT_TOLERANCE ||
+		    header->cupsImagingBBox[axis] != 0.0f || header->Margins[axis] ||
+		    header->ImagingBoundingBox[axis] ||
+		    header->ImagingBoundingBox[axis + 2] != header->PageSize[axis] ||
+		    fabsf(header->PageSize[axis] - scaled_points) > PAGE_POINT_TOLERANCE ||
+		    fabsf(pixels - scaled_points * header->HWResolution[axis] / POINTS_PER_INCH) >
+			PAPER_ROUNDING_TOLERANCE)
+			return false;
+	}
+	return true;
+}
+
 int validate_raster_header(const cups_page_header2_t *header, const struct job_settings *settings)
 {
 	unsigned int resolution =
 		settings->resolution == QUALITY_PLAIN_FAST ? FAST_RASTER_DPI : PAPER_TABLE_DPI;
 	unsigned int channels = raster_channels(header->cupsColorSpace);
+	float scale = header->cupsBorderlessScalingFactor;
+	float enlargement = header->cupsReal[BORDERLESS_SCALE_REAL];
+	float downward_mm = header->cupsReal[BORDERLESS_DOWNWARD_MM_REAL];
 
 	/* Bound dimensions before row-size arithmetic, signed comparisons or allocation. */
 	if (!channels || !header->cupsWidth || header->cupsWidth > MAX_RASTER_WIDTH ||
@@ -191,13 +232,31 @@ int validate_raster_header(const cups_page_header2_t *header, const struct job_s
 	    header->cupsBytesPerLine < header->cupsWidth * channels ||
 	    header->cupsBytesPerLine > header->cupsWidth * channels + MAX_ROW_PADDING)
 		goto invalid;
-	/* Small rounding differences are cropped/padded by the raster reader. */
-	if (header->HWResolution[0] != resolution || header->HWResolution[1] != resolution ||
-	    header->PageSize[0] != (unsigned int)settings->width_points ||
-	    header->PageSize[1] != (unsigned int)settings->height_points ||
-	    abs((int)header->cupsWidth - settings->width_pixels) > PAPER_ROUNDING_TOLERANCE ||
-	    abs((int)header->cupsHeight - settings->height_pixels) > PAPER_ROUNDING_TOLERANCE)
+	if (header->HWResolution[0] != resolution || header->HWResolution[1] != resolution)
 		goto invalid;
+	/* cupsReal0 requests local expansion without altering the upstream matrix.
+	 * Never enlarge a raster that the upstream renderer has already enlarged.
+	 */
+	if (!isfinite(enlargement) || enlargement < 0.0f ||
+	    (enlargement != 0.0f && enlargement < 1.0f) || enlargement > MAX_BORDERLESS_SCALE ||
+	    (enlargement > 1.0f && scale != 1.0f))
+		goto invalid;
+	if (!isfinite(downward_mm) || downward_mm < 0.0f ||
+	    downward_mm > MAX_BORDERLESS_DOWNWARD_MM ||
+	    (downward_mm != 0.0f && enlargement <= 1.0f))
+		goto invalid;
+	if (scale > 1.0f || enlargement > 1.0f) {
+		if (!valid_borderless_geometry(header, settings))
+			goto invalid;
+	} else {
+		/* Zero is also accepted for legacy headers without the v2 scale field. */
+		if ((scale != 0.0f && scale != 1.0f) ||
+		    header->PageSize[0] != (unsigned int)settings->width_points ||
+		    header->PageSize[1] != (unsigned int)settings->height_points ||
+		    abs((int)header->cupsWidth - settings->width_pixels) > PAPER_ROUNDING_TOLERANCE ||
+		    abs((int)header->cupsHeight - settings->height_pixels) > PAPER_ROUNDING_TOLERANCE)
+			goto invalid;
+	}
 	/*
 	 * CUPS has already expanded copies and applied rotation/mirroring.
 	 * Copy counts of zero and one are accepted.
@@ -213,4 +272,36 @@ invalid:
 	      "8-bit RGB/gray pages with copies expanded by CUPS.\n",
 	      stderr);
 	return 1;
+}
+
+int configure_raster_page(const cups_page_header2_t *header,
+			  const struct job_settings *job, struct job_settings *page)
+{
+	if (validate_raster_header(header, job))
+		return 1;
+	*page = *job;
+	if (header->cupsReal[BORDERLESS_SCALE_REAL] > 1.0f) {
+		float scale = header->cupsReal[BORDERLESS_SCALE_REAL];
+
+		page->borderless_expansion = 1;
+		page->width_points = header->cupsPageSize[0] * scale + 0.5f;
+		page->height_points = header->cupsPageSize[1] * scale + 0.5f;
+		page->width_pixels = header->cupsWidth * scale + 0.5f;
+		page->height_pixels = header->cupsHeight * scale + 0.5f;
+	} else if (header->cupsBorderlessScalingFactor > 1.0f) {
+		/* Keep physical paper_width/height; retain every already-enlarged pixel. */
+		page->borderless_expansion = 1;
+		page->width_points = header->PageSize[0];
+		page->height_points = header->PageSize[1];
+		page->width_pixels = header->cupsWidth;
+		page->height_pixels = header->cupsHeight;
+	}
+	if (page->borderless_expansion) {
+		page->row_bytes = page->width_pixels * RGB_CHANNELS;
+		page->left_margin = 0;
+		page->bottom_margin = 0;
+		page->image_right = page->width_points;
+		page->image_bottom = page->height_points;
+	}
+	return 0;
 }

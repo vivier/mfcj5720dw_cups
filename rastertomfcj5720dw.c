@@ -7,6 +7,7 @@
 #include "encoder/settings.h"
 #include "encoder/state.h"
 #include "ink.h"
+#include "raster.h"
 
 #include <fcntl.h>
 #include <signal.h>
@@ -95,6 +96,17 @@ static int read_raster_page(cups_raster_t *raster, const cups_page_header2_t *he
 		goto out;
 	}
 	lpr_input_band_bytes = page_bytes;
+	if (header->cupsReal[BORDERLESS_SCALE_REAL] > 1.0f) {
+		fprintf(stderr, "DEBUG: Borderless expansion %ux%u -> %dx%d (%.4f).\n",
+			header->cupsWidth, header->cupsHeight, settings->width_pixels,
+			settings->height_pixels, header->cupsReal[BORDERLESS_SCALE_REAL]);
+		fprintf(stderr, "DEBUG: Borderless downward placement %.2f mm.\n",
+			header->cupsReal[BORDERLESS_DOWNWARD_MM_REAL]);
+		result = enlarge_raster_rgb(raster, header, (unsigned char *)lpr_input_band,
+					    settings->width_pixels, settings->height_pixels,
+					    &job_canceled);
+		goto out;
+	}
 	/* Fill rounded-up edges with white; crop any extra input columns or rows. */
 	memset(lpr_input_band, WHITE_SAMPLE, page_bytes);
 	copy_width = header->cupsWidth;
@@ -125,12 +137,24 @@ static int render_job(cups_raster_t *raster, struct job_settings *settings,
 {
 	cups_page_header2_t header;
 	struct page_state page = { 0 };
+	struct job_settings raster_settings, first_settings;
 	bool printer_state_owned = false, job_started = false;
 	int result = 1, page_number = 0;
 
 	while (!job_canceled && cupsRasterReadHeader2(raster, &header)) {
-		if (validate_raster_header(&header, settings) ||
-		    read_raster_page(raster, &header, settings))
+		if (configure_raster_page(&header, settings, &raster_settings))
+			goto out;
+		/* Encoder workspaces and geometry are allocated for the whole job. */
+		if (job_started &&
+		    (raster_settings.borderless_expansion != first_settings.borderless_expansion ||
+		     raster_settings.width_points != first_settings.width_points ||
+		     raster_settings.height_points != first_settings.height_points ||
+		     raster_settings.width_pixels != first_settings.width_pixels ||
+		     raster_settings.height_pixels != first_settings.height_pixels)) {
+			fputs("ERROR: Raster geometry changed within the print job.\n", stderr);
+			goto out;
+		}
+		if (read_raster_page(raster, &header, &raster_settings))
 			goto out;
 		if (!printer_state_owned) {
 			/* Allocation may fail after acquiring some of the workspaces. */
@@ -141,7 +165,8 @@ static int render_job(cups_raster_t *raster, struct job_settings *settings,
 			}
 			page.printer->calibration = calibration;
 			page.borderless = settings->borderless;
-			if (start_printer_job(settings, &page))
+			first_settings = raster_settings;
+			if (start_printer_job(&raster_settings, &page))
 				goto out;
 			job_started = true;
 			lpr_write_callback = write_printer_output;
@@ -150,8 +175,8 @@ static int render_job(cups_raster_t *raster, struct job_settings *settings,
 		page.band_index = 0;
 		page_number++;
 		fprintf(stderr, "PAGE: %d 1\n", page_number);
-		if (start_printer_page(settings, &page, page_number) ||
-		    send_printer_band(settings, &page) || end_printer_page(&page)) {
+		if (start_printer_page(&raster_settings, &page, page_number) ||
+		    send_printer_band(&raster_settings, &page) || end_printer_page(&page)) {
 			fputs("ERROR: Brother page encoding failed.\n", stderr);
 			goto out;
 		}

@@ -179,6 +179,8 @@ struct printer_state {
 	struct jpeg_encoder *jpeg;
 	/* Borrowed, validated snapshot; immutable for the whole print job. */
 	const struct printer_calibration *calibration;
+	/* Enlarged CUPS raster uses overspray coordinates instead of legacy bounds. */
+	bool borderless_expansion;
 };
 
 #endif

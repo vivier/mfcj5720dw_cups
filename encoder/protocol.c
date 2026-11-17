@@ -516,8 +516,16 @@ void emit_printable_area(struct printer_state *printer)
 		top -= padding * IMAGE_BOUNDS_DPI / dpi;
 	}
 	if (state_byte(printer, STATE_INTERLACE_FLAGS) & INTERLACE_SPECIAL_BOUNDS) {
-		left = SPECIAL_LEFT_BOUND;
-		right = top = bottom = 0;
+		if (printer->borderless_expansion) {
+			/* Place the enlarged image beyond the sheet, as in the Mac filter. */
+			left -= BORDERLESS_OVERRUN_600DPI;
+			right -= BORDERLESS_OVERRUN_600DPI;
+			top -= BORDERLESS_OVERRUN_600DPI;
+			bottom -= BORDERLESS_OVERRUN_600DPI;
+		} else {
+			left = SPECIAL_LEFT_BOUND;
+			right = top = bottom = 0;
+		}
 	}
 	if (orientation & ORIENTATION_REVERSED) {
 		int16_t swap = left;

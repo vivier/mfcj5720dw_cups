@@ -24,5 +24,7 @@ const struct paper_geometry *find_paper(const char *name);
 int configure_job(ppd_file_t *ppd, struct job_settings *settings);
 int validate_raster_header(const cups_page_header2_t *header,
 			   const struct job_settings *settings);
+int configure_raster_page(const cups_page_header2_t *header,
+			  const struct job_settings *job, struct job_settings *page);
 
 #endif

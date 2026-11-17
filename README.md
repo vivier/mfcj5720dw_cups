@@ -79,6 +79,29 @@ installed PPD and require no separate runtime package. Existing queues retain
 their own PPD copy and must be updated to use the translated PPD; recheck
 queue defaults after replacing it.
 
+## Borderless printing
+
+Select a borderless paper size and print at actual size (100%). The driver
+applies a paper-specific enlargement so the image extends beyond the sheet:
+2.35% for A4, for example. Content near the edges is cropped intentionally;
+a 10 mm border drawn in an A4 document leaves about 8 mm at each side and
+6.5–7 mm at the top and bottom. Keep important content away from those edges.
+
+The filter uses bilinear interpolation after upstream rendering, avoiding a
+Ghostscript 10.06 positioning defect that introduced a white strip at the top
+and clipped the bottom when using its standard borderless scaling factor.
+Physical paper size and enlarged image dimensions remain separate.
+
+A4 includes a measured 1.5 mm downward placement correction within the
+overspray area. This adjustment preserves the enlargement and horizontal
+position. Full coverage and centered placement were confirmed on A4 plain
+paper; the other paper sizes retain their original placement. The factors
+and placement values are defined in `mfcj5720dw.drv`.
+
+Existing queues must update their PPD to use these changes; reinstalling the
+RPM updates the model PPD but preserves each queue's own copy. Re-select the
+driver for the queue and review its defaults, as described below for maintenance.
+
 ## Build RPM packages
 
 ```sh

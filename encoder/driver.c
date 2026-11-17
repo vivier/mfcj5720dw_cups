@@ -364,6 +364,14 @@ static void configure_page_geometry(const struct job_settings *settings,
 	options[DEVICE_HEIGHT_120DPI] = settings->height_points * PAGE_GEOMETRY_DPI / POINTS_PER_INCH;
 	page->paper_width_120dpi = options[DEVICE_WIDTH_120DPI];
 	page->paper_height_120dpi = options[DEVICE_HEIGHT_120DPI];
+	page->printer->borderless_expansion = settings->borderless_expansion != 0;
+	if (settings->borderless_expansion) {
+		/* Expanded device bounds must not change the physical sheet selection. */
+		page->paper_width_120dpi = (int)settings->paper_width *
+			PAGE_GEOMETRY_DPI / POINTS_PER_INCH;
+		page->paper_height_120dpi = (int)settings->paper_height *
+			PAGE_GEOMETRY_DPI / POINTS_PER_INCH;
+	}
 	options[DEVICE_PRINTABLE_HEIGHT] = settings->image_bottom - settings->bottom_margin;
 	options[DEVICE_PRINTABLE_WIDTH] = settings->image_right - settings->left_margin;
 	options[DEVICE_HORIZONTAL_DPI] = POINTS_PER_INCH;

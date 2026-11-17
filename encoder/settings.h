@@ -99,7 +99,7 @@ struct job_settings {
 	uint8_t reserved_options[4];
 	int16_t borderless;
 	int16_t paper_type;
-	/* Physical dimensions in PostScript points (1/72 inch). */
+	/* Rendered page dimensions in points, including borderless enlargement. */
 	int16_t width_points;
 	int16_t height_points;
 	/* Input raster dimensions at the selected raster resolution. */
@@ -110,7 +110,8 @@ struct job_settings {
 	int16_t image_right;
 	int16_t bottom_margin;
 	int16_t left_margin;
-	uint16_t reserved_geometry;
+	/* The input image is enlarged; use the corresponding edge placement. */
+	uint16_t borderless_expansion;
 	int row_bytes;
 	/* Media handling, ink processing and line-alignment option codes. */
 	int16_t thickness;
@@ -138,7 +139,7 @@ struct job_settings {
 	int sample_bytes;
 	int pixel_bytes;
 	char paper_name[JOB_PAPER_NAME_BYTES];
-	/* Floating-point paper dimensions in points for rotation decisions. */
+	/* Physical sheet dimensions in points, before borderless enlargement. */
 	float paper_width;
 	float paper_height;
 };
