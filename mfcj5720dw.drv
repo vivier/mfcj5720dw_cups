@@ -16,7 +16,8 @@
 	Attribute "NickName" "" "Brother MFC-J5720DW CUPS"
 	Attribute "ShortNickName" "" "MFC-J5720DW"
 	Attribute "Product" "" "(MFC-J5720DW)"
-	Attribute "1284DeviceID" "" "MFG:Brother;MDL:MFC-J5720DW"
+	// Match both the model and the HBP language emitted by the encoder.
+	Attribute "1284DeviceID" "" "MFG:Brother;MDL:MFC-J5720DW;CMD:HBP;"
 	Attribute "PSVersion" "" "(3010.106) 3"
 	Attribute "ISOCountryCode" "" "JP"
 	Attribute "LanguageLevel" "" "3"
