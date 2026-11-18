@@ -15,6 +15,12 @@ msgstr ""
 msgid "Brother"
 msgstr "Brother"
 
+msgid "Color Density"
+msgstr "Densité des couleurs"
+
+msgid "White Balance"
+msgstr "Balance des blancs"
+
 msgid "MFC-J5720DW"
 msgstr "MFC-J5720DW"
 

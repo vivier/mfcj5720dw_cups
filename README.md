@@ -79,6 +79,29 @@ installed PPD and require no separate runtime package. Existing queues retain
 their own PPD copy and must be updated to use the translated PPD; recheck
 queue defaults after replacing it.
 
+## Color enhancement controls
+
+In **Color Settings (Advanced)**, enable **Color Enhancement** to use the image
+adjustments. **Color Density** and **White Balance** each have five levels,
+from **-2** through **+2**, with **0** as the default. Color Density adjusts
+color intensity; White Balance adjusts the correction of color casts in light
+areas. Zero retains the existing enhancement behaviour, including its automatic
+white-balance correction. It does not disable that correction.
+
+The two controls apply only to color output with enhancement enabled, before
+both raster and JPEG encoding. They are independent of factory printhead
+calibration and ink-level reporting. Brightness, contrast and RGB controls
+continue to work as before. For example:
+
+```sh
+lp -d PRINTER -o BRColorEnhancement=ON -o BRColorDensity=1 \
+  -o BRWhiteBalance=-1 document.pdf
+```
+
+French labels are **Densité des couleurs** and **Balance des blancs**. Existing
+queues need their PPD updated to show the new controls. Older PPDs remain
+compatible and keep both settings at zero.
+
 ## Borderless printing
 
 Select a borderless paper size and print at actual size (100%). The driver

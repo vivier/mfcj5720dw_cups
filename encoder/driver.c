@@ -59,6 +59,8 @@ enum driver_state_offset {
 	STATE_RED = 0x0212,
 	STATE_GREEN = 0x0214,
 	STATE_BLUE = 0x0216,
+	STATE_COLOR_DENSITY = 0x021a,
+	STATE_WHITE_BALANCE = 0x021c,
 	STATE_DITHER_ENABLED = 0x021e,
 	STATE_PAGE_FILTER_ENABLED = 0x0220,
 	STATE_JPEG_PRIORITY = 0x074c,
@@ -438,7 +440,14 @@ static uint16_t configure_color_options(const struct job_settings *settings,
 				       bool vendor_matching)
 {
 	uint16_t *options = page->device_options;
+	bool color_enhancement = vendor_matching && option_is("ColorEnhance", "ON") &&
+				 page->color_mode == PAGE_COLOR;
 
+	/* These controls affect color enhancement, including the JPEG input pixels. */
+	store_word(page->printer, STATE_COLOR_DENSITY,
+		   color_enhancement ? settings->color_density : 0);
+	store_word(page->printer, STATE_WHITE_BALANCE,
+		   color_enhancement ? settings->white_balance : 0);
 	options[DEVICE_BRIGHTNESS_CONTRAST] = 0;
 	options[DEVICE_RED_GREEN] = 0;
 	options[DEVICE_BLUE_LEVELS] = 0;

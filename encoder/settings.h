@@ -130,7 +130,9 @@ struct job_settings {
 	int16_t red;
 	int16_t green;
 	int16_t blue;
-	uint8_t reserved_color[4];
+	/* Five-level enhancement controls, from -2 through +2; zero is default. */
+	int16_t color_density;
+	int16_t white_balance;
 	/* Binding selection and duplex drying mode, respectively. */
 	int16_t duplex;
 	int16_t duplex_mode;

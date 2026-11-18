@@ -39,6 +39,8 @@ enum job_option_value {
 	DUPLEX_SHORT_EDGE = 2,
 	MIN_COLOR_ADJUSTMENT = -20,
 	MAX_COLOR_ADJUSTMENT = 20,
+	MIN_ENHANCEMENT_LEVEL = -2,
+	MAX_ENHANCEMENT_LEVEL = 2,
 };
 
 /* Keep PPD keywords tied to named encoder options rather than table positions. */
@@ -119,6 +121,32 @@ static void copy_job_options(struct configuration *config, struct job_settings *
 	settings->blue = config->options[OPTION_BLUE].value;
 }
 
+static int read_enhancement_level(ppd_file_t *ppd, const char *keyword, int16_t *value)
+{
+	ppd_choice_t *choice;
+	char *end;
+	long level;
+
+	/* Older queue PPDs keep the original enhancement settings. */
+	*value = 0;
+	if (!ppdFindOption(ppd, keyword))
+		return 0;
+	choice = ppdFindMarkedChoice(ppd, keyword);
+	if (!choice)
+		goto invalid;
+	errno = 0;
+	level = strtol(choice->choice, &end, 10);
+	if (errno || end == choice->choice || *end || level < MIN_ENHANCEMENT_LEVEL ||
+	    level > MAX_ENHANCEMENT_LEVEL)
+		goto invalid;
+	*value = level;
+	return 0;
+
+invalid:
+	fprintf(stderr, "ERROR: Missing or invalid PPD option %s.\n", keyword);
+	return 1;
+}
+
 static void copy_paper_geometry(const struct paper_geometry *paper, struct job_settings *settings)
 {
 	strcpy(settings->paper_name, paper->name);
@@ -166,6 +194,9 @@ int configure_job(ppd_file_t *ppd, struct job_settings *settings)
 		return 1;
 	}
 	copy_paper_geometry(paper, settings);
+	if (read_enhancement_level(ppd, "BRColorDensity", &settings->color_density) ||
+	    read_enhancement_level(ppd, "BRWhiteBalance", &settings->white_balance))
+		return 1;
 	return 0;
 }
 

@@ -186,6 +186,20 @@
 			*Choice "OFF/Off" $NoPostScript
 			Choice "ON/On" $NoPostScript
 
+		Option "BRColorDensity/Color Density" PickOne AnySetup 24
+			Choice "-2/-2" $NoPostScript
+			Choice "-1/-1" $NoPostScript
+			*Choice "0/0" $NoPostScript
+			Choice "1/1" $NoPostScript
+			Choice "2/2" $NoPostScript
+
+		Option "BRWhiteBalance/White Balance" PickOne AnySetup 24
+			Choice "-2/-2" $NoPostScript
+			Choice "-1/-1" $NoPostScript
+			*Choice "0/0" $NoPostScript
+			Choice "1/1" $NoPostScript
+			Choice "2/2" $NoPostScript
+
 		Option "BRBrightness/Brightness" PickOne AnySetup 25
 			Choice "-20/-20" $NoPostScript
 			Choice "-19/-19" $NoPostScript

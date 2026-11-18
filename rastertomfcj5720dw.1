@@ -42,6 +42,23 @@ JPEG transfer modes use libjpeg-turbo through the libjpeg API. The filter
 retains Brother framing and baseline YCbCr 4:2:2 compression parameters.
 JPEG bytes and decoded pixels can differ slightly from the legacy compressor
 because the library performs color conversion, chroma sampling and DCT.
+.SH COLOR ENHANCEMENT
+Enable BRColorEnhancement (Color Enhancement) to apply image adjustments.
+BRColorDensity (Color Density) and BRWhiteBalance (White Balance) each accept
+integer values from -2 through +2. Both default to zero, preserving the
+existing enhancement settings. Zero is the default level, not an instruction
+to disable automatic white-balance correction.
+.PP
+Color Density adjusts color intensity. White Balance adjusts the correction
+derived from the image's light areas to reduce color casts in whites.
+These are image adjustments, independent of printhead factory calibration
+and cartridge ink levels. The two settings have no effect with enhancement
+disabled or grayscale output selected. They apply before either raster or
+JPEG encoding. Existing brightness, contrast and RGB controls are unchanged.
+.PP
+For example, add -o BRColorEnhancement=ON -o BRColorDensity=1
+-o BRWhiteBalance=-1 to an lp command. Older queue PPDs without these options
+continue using zero; update the queue's PPD to expose the new controls.
 .SH FACTORY CALIBRATION
 The BRCalibration PPD option, displayed as Printhead Calibration, controls
 per-printer nozzle and density corrections.
