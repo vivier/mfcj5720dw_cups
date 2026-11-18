@@ -6,6 +6,11 @@ CUPS Raster directly into printer data and retrieves ink levels and factory
 printhead calibration through the CUPS side channel. The encoder is linked
 into the filter, so no Brother LPR command or wrapper is needed.
 
+The [printer protocol specification](PROTOCOL.md) describes this model's
+command stream, binary fields, raster and JPEG framing, duplex, maintenance
+and status queries. It includes annotated captures and public references,
+and distinguishes code-derived behavior, physical tests and remaining unknowns.
+
 ## Development and authorship
 
 All project-specific source code, build files and documentation were

@@ -31,7 +31,7 @@ RPMSPEC ?= rpmspec
 RPM_SPEC = mfcj5720dw-cups.spec
 RPM_TOPDIR = $(abspath $(BUILD)/rpm)
 RPM_SRPMDIR = $(RPM_TOPDIR)/SRPMS
-DIST_FILES = .gitattributes .gitignore COPYRIGHT LICENSE PROVENANCE.md README.md \
+DIST_FILES = .gitattributes .gitignore COPYRIGHT LICENSE PROVENANCE.md README.md PROTOCOL.md \
 	Makefile .copr/Makefile $(RPM_SPEC) $(PPD_TRANSLATIONS) $(wildcard *.c *.h *.1 *.drv) \
 	$(wildcard encoder/*.c encoder/*.h) \
 	lut/Makefile lut/.gitignore $(wildcard lut/*.py lut/*.xml lut/cubes/*.xml lut/curves/*.xml)
