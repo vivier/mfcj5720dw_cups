@@ -18,9 +18,19 @@ Two consecutive failed polls trigger a connectivity notification.
 An unavailable measurement is displayed as unavailable, never as zero ink.
 The initial job list does not generate notifications for old completed jobs.
 .PP
-The window can remain running when closed. Use Quit monitor to stop it;
-launch it again to reopen the window. Login startup is an explicit preference.
+The monitor can remain running when its window is closed. A system tray icon
+remains visible while it runs, including when started with --background.
+Activate the icon or choose Show monitor from its menu to reopen the window.
+Use Quit monitor in the window or tray menu to stop it and remove the icon.
+Login startup is an explicit preference.
 Use Apply to save preferences and the selected printer.
+.PP
+The desktop must provide a StatusNotifierItem host. GNOME requires the
+AppIndicator and KStatusNotifierItem Support extension (Fedora package
+gnome-shell-extension-appindicator). Enable appindicatorsupport@rgcjonas.gmail.com
+with gnome-extensions; a newly installed extension may require logging out and
+back in first. Its single click opens the menu; a double-click opens the window.
+Without a tray host, launch the application again to reopen its existing window.
 .SH OPTIONS
 .TP
 .BR \-p ", " \-\-queue " " \fIQUEUE\fR

@@ -12,8 +12,9 @@ and status queries. It includes annotated captures and public references,
 and distinguishes code-derived behavior, physical tests and remaining unknowns.
 
 An optional [desktop status monitor](monitor/README.md) displays physical
-printer status, ink levels and CUPS jobs, with notifications and English/French
-interfaces. It is provided in a separate `mfcj5720dw-cups-monitor` RPM.
+printer status, ink levels and CUPS jobs, with a system tray icon, notifications
+and English/French interfaces. It is provided in a separate
+`mfcj5720dw-cups-monitor` RPM.
 
 ## Development and authorship
 
@@ -44,8 +45,8 @@ document.
 Build on Linux with GCC, GNU Make, CUPS development headers and PPD tools,
 libjpeg development headers, and Python 3.11 or newer. RPM packaging also
 needs `rpmbuild`, `rpmspec`, binutils, `file`, groff, tar and gzip.
-The desktop monitor additionally needs GTK 4.12 or newer, Net-SNMP, gettext
-and desktop-file-utils. Its HP Roman-8 text conversion uses iconv's conversion
+The desktop monitor additionally needs GTK 4.12 or newer, libdbusmenu-glib,
+Net-SNMP, gettext and desktop-file-utils. Its HP Roman-8 text conversion uses iconv's conversion
 module, supplied by `glibc-gconv-extra` on Fedora.
 
 On Fedora, the build dependencies are:
@@ -53,7 +54,7 @@ On Fedora, the build dependencies are:
 ```sh
 sudo dnf install gcc make cups cups-devel libjpeg-turbo-devel python3 \
     rpm-build binutils file groff-base tar gzip grep coreutils \
-    gtk4-devel net-snmp-devel gettext desktop-file-utils glibc-gconv-extra
+    gtk4-devel libdbusmenu-devel net-snmp-devel gettext desktop-file-utils glibc-gconv-extra
 ```
 
 The build targets the host architecture and puts binaries in `build/`.
@@ -113,8 +114,13 @@ confirm that all sheets have physically been printed. Printer display and
 alert text are converted to UTF-8 using the reported character set, including
 HP Roman-8 for French messages such as `Prêt`.
 
-Closing the window keeps monitoring active by default. **Quit monitor** stops
-it; launching the application again reopens the existing window. To start
+Closing the window keeps monitoring active by default, with an icon in the
+system tray. Activate the icon or choose **Show monitor** from its menu to
+reopen the existing window. **Quit monitor** in the window or tray menu stops
+the monitor and removes the icon. GNOME requires the AppIndicator extension;
+see the [installation instructions](monitor/README.md). The RPM recommends
+the extension on GNOME but does not enable it automatically. Launching the
+application again also reopens its existing window. To start
 silently at login, enable **Start monitoring when I log in** and press **Apply**.
 Login startup is disabled by default. The monitor sends no print data or
 maintenance commands. Status queries are read-only; enabling scan reception

@@ -237,6 +237,9 @@ msgstr "Traitement en cours"
 msgid "Quit monitor"
 msgstr "Quitter le moniteur"
 
+msgid "Show monitor"
+msgstr "Afficher le moniteur"
+
 msgid "Ready"
 msgstr "Prête"
 

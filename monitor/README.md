@@ -8,7 +8,8 @@ user. It also supports scans started from the printer's **Scan to PC** menu.
 It performs no printing, maintenance operation or queue modification.
 
 Build with `make -C monitor`, or build the whole project normally. Dependencies
-are GTK 4 (4.12 or newer), GLib, Net-SNMP, libcups, gettext, a C compiler and make.
+are GTK 4 (4.12 or newer), GLib, libdbusmenu-glib, Net-SNMP, libcups, gettext,
+a C compiler and make.
 The runtime also needs iconv's HP Roman-8 conversion module (Fedora's
 `glibc-gconv-extra`, required by the monitor RPM).
 Scanning uses `scanimage` with Brother's separately installed 64-bit `brscan4`
@@ -24,7 +25,27 @@ artifacts go to `../build/monitor`.
 Launch **Brother MFC-J5720DW Monitor**, choose a queue or enter the physical
 printer's IP address, and press **Apply**. The settings section also controls
 notifications, monitoring after closing the window, and optional login startup.
-Reopen it from the application menu; **Quit monitor** stops polling.
+An icon remains in the system tray while the monitor runs, including with
+the window hidden or when started with `--background`. Activate the icon or
+choose **Show monitor** from its menu to reopen the existing window.
+**Quit monitor**, available in both the window and the icon's menu, stops
+polling and scan reception. The icon disappears when the monitor exits.
+
+The desktop must provide a StatusNotifierItem host. On GNOME, install and
+enable the **AppIndicator and KStatusNotifierItem Support** extension:
+
+```sh
+sudo dnf install gnome-shell-extension-appindicator
+gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com
+```
+
+If GNOME does not recognize a newly installed extension, log out and back in
+before enabling it. With this extension, a single click opens the menu and a
+double-click opens the monitor directly. Other desktops may use a single
+click for activation. Without a tray host, monitoring still works; reopen the
+window from the application menu. The monitor RPM recommends the extension
+when GNOME Shell is installed, but does not enable extensions automatically.
+
 Printer addresses from JetDirect, LPD and IPP/IPPS queues are recognized.
 DNS-SD service URIs and USB queues require a network address override.
 An IPP URI pointing to a print server also needs the physical printer's address.

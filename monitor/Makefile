@@ -5,11 +5,13 @@ LOCALEDIR ?= $(PREFIX)/share/locale
 PKG_CONFIG ?= pkg-config
 GTK_CFLAGS = $(shell $(PKG_CONFIG) --cflags gtk4)
 GTK_LIBS = $(shell $(PKG_CONFIG) --libs gtk4)
+MENU_CFLAGS = $(shell $(PKG_CONFIG) --cflags dbusmenu-glib-0.4)
+MENU_LIBS = $(shell $(PKG_CONFIG) --libs dbusmenu-glib-0.4)
 SNMP_CFLAGS = $(shell $(PKG_CONFIG) --cflags netsnmp)
 SNMP_LIBS = $(shell $(PKG_CONFIG) --libs netsnmp)
 CFLAGS = -std=gnu11 -O2 -g -fPIE -Wall -Wextra -Werror -Wstrict-prototypes -Wmissing-prototypes
 CPPFLAGS += -DLOCALEDIR='"$(LOCALEDIR)"'
-OBJECTS = $(addprefix $(BUILD)/,main.o poll.o status.o ink.o scan_protocol.o scan_service.o scan_job.o scan_control.o scan_ui.o)
+OBJECTS = $(addprefix $(BUILD)/,main.o poll.o status.o tray.o ink.o scan_protocol.o scan_service.o scan_job.o scan_control.o scan_ui.o)
 HEADERS = $(wildcard *.h)
 APP_ID = io.github.vivier.mfcj5720dw.monitor
 
@@ -18,14 +20,14 @@ all: $(BUILD)/mfcj5720dw-monitor $(BUILD)/fr.mo
 
 $(BUILD)/%.o: %.c $(HEADERS) Makefile
 	mkdir -p $(BUILD)
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(GTK_CFLAGS) $(SNMP_CFLAGS) -c $< -o $@
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(GTK_CFLAGS) $(SNMP_CFLAGS) $(MENU_CFLAGS) -c $< -o $@
 
 $(BUILD)/ink.o: ../ink.c ../ink.h Makefile
 	mkdir -p $(BUILD)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 $(BUILD)/mfcj5720dw-monitor: $(OBJECTS)
-	$(CC) $(LDFLAGS) -pie $^ $(GTK_LIBS) $(SNMP_LIBS) -lcups -o $@
+	$(CC) $(LDFLAGS) -pie $^ $(GTK_LIBS) $(SNMP_LIBS) $(MENU_LIBS) -lcups -o $@
 
 $(BUILD)/fr.mo: fr.po
 	mkdir -p $(BUILD)

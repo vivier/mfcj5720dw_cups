@@ -2,6 +2,7 @@
 /* Copyright (C) 2026 Laurent Vivier */
 #include "poll.h"
 #include "scan_ui.h"
+#include "tray.h"
 
 #include <gtk/gtk.h>
 #include <cups/ipp.h>
@@ -19,6 +20,7 @@
 struct monitor_app {
 	GtkApplication *application;
 	GtkWindow *window;
+	struct monitor_tray *tray;
 	GtkDropDown *queues;
 	GtkEntry *host;
 	GtkEntry *community;
@@ -518,6 +520,14 @@ static void show_action(GSimpleAction *action, GVariant *parameter, gpointer dat
 	gtk_window_present(app->window);
 }
 
+static void quit_action(GSimpleAction *action, GVariant *parameter, gpointer data)
+{
+	struct monitor_app *app = data;
+
+	(void)action; (void)parameter;
+	g_application_quit(G_APPLICATION(app->application));
+}
+
 static void select_action(GSimpleAction *action, GVariant *parameter, gpointer data)
 {
 	struct monitor_app *app = data;
@@ -544,13 +554,18 @@ static void select_action(GSimpleAction *action, GVariant *parameter, gpointer d
 static void startup(GApplication *application, gpointer data)
 {
 	struct monitor_app *app = data;
+	g_autoptr(GError) error = NULL;
 	const GActionEntry actions[] = {
 		{ .name = "show", .activate = show_action },
+		{ .name = "quit", .activate = quit_action },
 		{ .name = "select", .activate = select_action, .parameter_type = "(sss)" },
 	};
 
 	create_window(app);
 	g_action_map_add_action_entries(G_ACTION_MAP(application), actions, G_N_ELEMENTS(actions), app);
+	app->tray = monitor_tray_new(app->application, app->window, &error);
+	if (!app->tray)
+		g_warning("Cannot create tray icon: %s", error->message);
 	g_application_hold(application);
 	g_timeout_add_seconds(5, refresh, app);
 	refresh(app);
@@ -639,6 +654,7 @@ int main(int argc, char **argv)
 				g_variant_new("(sss)", app.target.queue, app.target.host, app.target.community));
 	}
 	result = g_application_run(G_APPLICATION(app.application), argc, argv);
+	monitor_tray_free(app.tray);
 	scan_panel_free(app.scan_panel);
 	g_object_unref(app.application);
 	g_strfreev(app.queue_names);

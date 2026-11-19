@@ -29,6 +29,7 @@ BuildRequires:  python3 >= 3.11
 BuildRequires:  grep
 BuildRequires:  coreutils
 BuildRequires:  gtk4-devel >= 4.12
+BuildRequires:  libdbusmenu-devel
 BuildRequires:  net-snmp-devel
 BuildRequires:  gettext
 BuildRequires:  desktop-file-utils
@@ -61,6 +62,8 @@ Requires:       sane-backends
 # Brother's separately installed brscan4 backend is needed for scan-to-PC.
 # Keep it optional so status monitoring also works without the external RPM.
 Recommends:     brscan4
+# GNOME needs a StatusNotifier host; other desktops provide their own tray.
+Recommends:     (gnome-shell-extension-appindicator if gnome-shell)
 Requires:       tesseract
 Requires:       tesseract-langpack-eng
 Requires:       tesseract-langpack-fra
@@ -68,7 +71,8 @@ Requires:       xdg-utils
 
 %description monitor
 GTK application displaying physical printer status, detailed faults, ink levels
-and local CUPS jobs. Includes desktop notifications and optional login startup.
+and local CUPS jobs. Includes a system tray icon, desktop notifications and
+optional login startup.
 Network monitoring uses SNMP queries independently of print jobs. Optional
 scan-to-PC support registers this computer on the printer and receives its
 scan-button requests. Documents are acquired using the separately installed
