@@ -3,6 +3,7 @@
 CC = gcc
 PPDC = ppdc
 BUILD = build
+WITH_MONITOR ?= 1
 ENGINE = encoder
 PREFIX ?= /usr
 CUPSFILTERDIR ?= $(PREFIX)/lib/cups/filter
@@ -33,11 +34,24 @@ RPM_TOPDIR = $(abspath $(BUILD)/rpm)
 RPM_SRPMDIR = $(RPM_TOPDIR)/SRPMS
 DIST_FILES = .gitattributes .gitignore COPYRIGHT LICENSE PROVENANCE.md README.md PROTOCOL.md \
 	Makefile .copr/Makefile $(RPM_SPEC) $(PPD_TRANSLATIONS) $(wildcard *.c *.h *.1 *.drv) \
+	monitor/Makefile $(wildcard monitor/*.c monitor/*.h monitor/*.po monitor/*.desktop monitor/*.1 monitor/*.md) \
 	$(wildcard encoder/*.c encoder/*.h) \
 	lut/Makefile lut/.gitignore $(wildcard lut/*.py lut/*.xml lut/cubes/*.xml lut/curves/*.xml)
 
 .PHONY: all profiles ppd check-static check-man check-encoder-interfaces install rpm srpm rpm-sources clean distclean
 all: $(BUILD)/rastertomfcj5720dw $(BUILD)/mfcj5720dw_ink $(BUILD)/commandtomfcj5720dw $(PPD) profiles
+
+ifeq ($(WITH_MONITOR),1)
+all: monitor
+install: install-monitor
+endif
+
+.PHONY: monitor install-monitor
+monitor:
+	$(MAKE) -C monitor
+
+install-monitor:
+	$(MAKE) -C monitor install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 
 profiles:
 	$(MAKE) -C lut profiles
@@ -78,6 +92,7 @@ check-static: all check-man check-encoder-interfaces
 	readelf -d $(BUILD)/rastertomfcj5720dw
 
 check-man:
+	$(MAKE) -C monitor check
 	groff -ww -Tutf8 -man rastertomfcj5720dw.1 > /dev/null
 	groff -ww -Tutf8 -man mfcj5720dw_ink.1 > /dev/null
 	groff -ww -Tutf8 -man commandtomfcj5720dw.1 > /dev/null

@@ -11,6 +11,10 @@ command stream, binary fields, raster and JPEG framing, duplex, maintenance
 and status queries. It includes annotated captures and public references,
 and distinguishes code-derived behavior, physical tests and remaining unknowns.
 
+An optional [desktop status monitor](monitor/README.md) displays physical
+printer status, ink levels and CUPS jobs, with notifications and English/French
+interfaces. It is provided in a separate `mfcj5720dw-cups-monitor` RPM.
+
 ## Development and authorship
 
 All project-specific source code, build files and documentation were
@@ -40,12 +44,16 @@ document.
 Build on Linux with GCC, GNU Make, CUPS development headers and PPD tools,
 libjpeg development headers, and Python 3.11 or newer. RPM packaging also
 needs `rpmbuild`, `rpmspec`, binutils, `file`, groff, tar and gzip.
+The desktop monitor additionally needs GTK 4.12 or newer, Net-SNMP, gettext
+and desktop-file-utils. Its HP Roman-8 text conversion uses iconv's conversion
+module, supplied by `glibc-gconv-extra` on Fedora.
 
 On Fedora, the build dependencies are:
 
 ```sh
 sudo dnf install gcc make cups cups-devel libjpeg-turbo-devel python3 \
-    rpm-build binutils file groff-base tar gzip grep coreutils
+    rpm-build binutils file groff-base tar gzip grep coreutils \
+    gtk4-devel net-snmp-devel gettext desktop-file-utils glibc-gconv-extra
 ```
 
 The build targets the host architecture and puts binaries in `build/`.
@@ -66,12 +74,16 @@ The resulting files are:
 - `build/rastertomfcj5720dw`: the CUPS Raster printing filter;
 - `build/mfcj5720dw_ink`: the ink-level reporting filter and command;
 - `build/commandtomfcj5720dw`: the maintenance command filter;
+- `build/monitor/mfcj5720dw-monitor`: the desktop status monitor;
 - `ppd/mfcj5720dw.ppd`: the generated printer description;
 - `lut/*.BCM`: the ten generated color calibration profiles.
 
 `make check-static` checks the PPD, manpage formatting, encoder header
 interfaces and ELF metadata. It does not send a print job or contact a
 printer, and it does not replace a hardware printing test.
+
+Use `make WITH_MONITOR=0` and `make install WITH_MONITOR=0` to build and
+install only the printing components.
 
 The source tree is self-contained. It requires no other checkout, original
 Brother RPM, decompilation tool or downloaded calibration files.
@@ -83,6 +95,30 @@ The source RPM includes this catalog; translations are embedded in the
 installed PPD and require no separate runtime package. Existing queues retain
 their own PPD copy and must be updated to use the translated PPD; recheck
 queue defaults after replacing it.
+
+## Desktop status monitor
+
+Launch **Brother MFC-J5720DW Monitor** from the application menu, or run
+`mfcj5720dw-monitor`. Select the local CUPS queue, then press **Apply**.
+The printer address is derived from JetDirect, LPD or IPP/IPPS queues.
+For DNS-SD service URIs, USB queues or queues pointing to a print server,
+enter the physical printer's network address explicitly. SNMPv2c read queries
+use UDP port 161; the read community defaults to `public`.
+
+The window shows printer status, detailed faults, four independent ink bars
+and recent CUPS jobs owned by the current user. Notifications report faults,
+recovery, a paused queue and observed job delivery, cancellation or failure.
+**Sent to printer** means that CUPS has finished sending the job; it does not
+confirm that all sheets have physically been printed. Printer display and
+alert text are converted to UTF-8 using the reported character set, including
+HP Roman-8 for French messages such as `Prêt`.
+
+Closing the window keeps monitoring active by default. **Quit monitor** stops
+it; launching the application again reopens the existing window. To start
+silently at login, enable **Start monitoring when I log in** and press **Apply**.
+Login startup is disabled by default. The monitor sends no print data,
+maintenance commands or SNMP writes. See [monitor/README.md](monitor/README.md)
+and `man mfcj5720dw-monitor` for details and limitations.
 
 ## Color enhancement controls
 
@@ -166,7 +202,7 @@ driver for the queue and review its defaults, as described below for maintenance
 ## Build RPM packages
 
 ```sh
-make rpm             # Source RPM and native binary RPM
+make rpm             # Source RPM and two native binary RPMs
 make srpm            # Source RPM only
 make rpm-sources     # Source archive and spec only
 ```
@@ -175,11 +211,20 @@ Packages are written to `build/rpm/RPMS/<architecture>/` and
 `build/rpm/SRPMS/`. The source archive contains the build sources, XML
 profiles and notices. The binary package installs three filters, the PPD,
 generated BCM profiles, three manpages and license/provenance notices.
+The separate `mfcj5720dw-cups-monitor` package contains the monitor executable,
+desktop launcher, French message catalog and manual. GTK and Net-SNMP are
+runtime dependencies of the monitor; the printing driver does not require it.
 
 For an x86_64 Fedora build, installation is:
 
 ```sh
-sudo dnf install ./build/rpm/RPMS/x86_64/mfcj5720dw-cups-*.x86_64.rpm
+sudo dnf install ./build/rpm/RPMS/x86_64/mfcj5720dw-cups-[0-9]*.x86_64.rpm
+```
+
+To add the desktop monitor:
+
+```sh
+sudo dnf install ./build/rpm/RPMS/x86_64/mfcj5720dw-cups-monitor-*.x86_64.rpm
 ```
 
 CUPS, cups-filters and Ghostscript are runtime dependencies of the package.
@@ -190,6 +235,7 @@ with the printer's address.
 
 Final RPM removal deletes local CUPS queues using any of this driver's
 filters. Upgrades and reinstalls preserve the queues and their settings.
+Removing only the monitor package preserves all printer queues.
 
 ## Install without RPM
 

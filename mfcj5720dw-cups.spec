@@ -28,6 +28,10 @@ BuildRequires:  groff-base
 BuildRequires:  python3 >= 3.11
 BuildRequires:  grep
 BuildRequires:  coreutils
+BuildRequires:  gtk4-devel >= 4.12
+BuildRequires:  net-snmp-devel
+BuildRequires:  gettext
+BuildRequires:  desktop-file-utils
 Requires:       cups
 Requires:       cups-filesystem
 Requires:       cups-filters
@@ -46,6 +50,18 @@ or wrapper package is needed. This is an independent, experimental driver.
 Select Brother MFC-J5720DW CUPS when adding the printer.
 Final package removal deletes local queues using its filters. Upgrades and
 reinstalls preserve existing queues and settings.
+
+%package monitor
+Summary:        Desktop status monitor for the Brother MFC-J5720DW
+License:        GPL-3.0-or-later
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+# iconv loads HP Roman-8 dynamically, so ELF dependency scanning cannot see it.
+Requires:       glibc-gconv-extra%{?_isa}
+
+%description monitor
+GTK application displaying physical printer status, detailed faults, ink levels
+and local CUPS jobs. Includes desktop notifications and optional login startup.
+Network monitoring uses read-only SNMP queries independently of print jobs.
 
 %prep
 %setup -q
@@ -108,6 +124,12 @@ exit 0
 %{_mandir}/man1/rastertomfcj5720dw.1*
 %{_mandir}/man1/mfcj5720dw_ink.1*
 %{_mandir}/man1/commandtomfcj5720dw.1*
+
+%files monitor
+%{_bindir}/mfcj5720dw-monitor
+%{_datadir}/applications/io.github.vivier.mfcj5720dw.monitor.desktop
+%{_datadir}/locale/fr/LC_MESSAGES/mfcj5720dw-monitor.mo
+%{_mandir}/man1/mfcj5720dw-monitor.1*
 
 %changelog
 * Mon Nov 16 2026 Laurent Vivier <laurent@vivier.eu> - 0.2.0-1

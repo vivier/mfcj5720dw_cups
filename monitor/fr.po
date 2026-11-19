@@ -1,0 +1,323 @@
+# French messages for the printer status monitor.
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Laurent Vivier
+msgid ""
+msgstr "Project-Id-Version: mfcj5720dw-monitor 0.2.0\nReport-Msgid-Bugs-To: \nPO-Revision-Date: 2026-11-19 12:00+0100\nLast-Translator: Laurent Vivier\nLanguage-Team: French\nLanguage: fr\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Apply"
+msgstr "Appliquer"
+
+msgid "Automatic, or an IP address / host name"
+msgstr "Automatique, ou adresse IP / nom d’hôte"
+
+msgid "Black"
+msgstr "Noir"
+
+msgid "Brother MFC-J5720DW — Status monitor"
+msgstr "Brother MFC-J5720DW — Moniteur d’état"
+
+msgid "CUPS queue"
+msgstr "File d’impression CUPS"
+
+msgid "CUPS queue is unavailable"
+msgstr "La file CUPS est indisponible"
+
+msgid "Canceled"
+msgstr "Annulé"
+
+msgid "Checking…"
+msgstr "Interrogation…"
+
+msgid "Cover is open"
+msgstr "Le capot est ouvert"
+
+msgid "Cyan"
+msgstr "Cyan"
+
+msgid "Direct connection (no queue)"
+msgstr "Connexion directe (sans file)"
+
+msgid "Disc guide is open"
+msgstr "Le guide de disque est ouvert"
+
+msgid "Document feeder jam"
+msgstr "Bourrage dans le chargeur de documents"
+
+msgid "Enter a host name or IP address, without a URL or port."
+msgstr "Saisissez un nom d’hôte ou une adresse IP, sans URL ni port."
+
+#, c-format
+msgid "Error flags: 0x%08x"
+msgstr "Indicateurs d’erreur : 0x%08x"
+
+msgid "Failed"
+msgstr "Échec"
+
+msgid "Firmware version error"
+msgstr "Erreur de version du micrologiciel"
+
+msgid "Held"
+msgstr "Suspendu"
+
+msgid "Idle"
+msgstr "Au repos"
+
+msgid "Ink absorber is almost full"
+msgstr "L’absorbeur d’encre est presque plein"
+
+msgid "Ink absorber is full"
+msgstr "L’absorbeur d’encre est plein"
+
+msgid "Ink cartridge is in the wrong slot"
+msgstr "Une cartouche n’est pas au bon emplacement"
+
+msgid "Ink cartridge is missing"
+msgstr "Une cartouche d’encre est absente"
+
+msgid "Ink cartridge is not recognized"
+msgstr "Une cartouche d’encre n’est pas reconnue"
+
+msgid "Ink is empty"
+msgstr "L’encre est épuisée"
+
+msgid "Ink is running low"
+msgstr "Le niveau d’encre est faible"
+
+msgid "Ink levels"
+msgstr "Niveaux d’encre"
+
+msgid "Ink quantity cannot be measured"
+msgstr "Le niveau d’encre ne peut pas être mesuré"
+
+msgid "Input tray is empty"
+msgstr "Le bac à papier est vide"
+
+msgid "Input tray is missing"
+msgstr "Le bac à papier est absent"
+
+msgid "Invalid arguments; use --help."
+msgstr "Arguments incorrects ; utilisez --help."
+
+msgid "Job list unavailable"
+msgstr "Liste des travaux indisponible"
+
+msgid "Keep monitoring when the window is closed"
+msgstr "Continuer la surveillance après fermeture de la fenêtre"
+
+#, c-format
+msgid "Last check: %s — %s"
+msgstr "Dernière vérification : %s — %s"
+
+msgid "Loaded paper does not match the job"
+msgstr "Le papier chargé ne correspond pas au travail"
+
+msgid "Local CUPS queue"
+msgstr "File CUPS locale"
+
+msgid "Magenta"
+msgstr "Magenta"
+
+msgid "No SNMP reply. Check the address, network and SNMP settings."
+msgstr "Aucune réponse SNMP. Vérifiez l’adresse, le réseau et les paramètres SNMP."
+
+msgid "No address"
+msgstr "Aucune adresse"
+
+msgid "No print queue selected"
+msgstr "Aucune file d’impression sélectionnée"
+
+msgid "No recent jobs"
+msgstr "Aucun travail récent"
+
+msgid "Notify about errors and job delivery"
+msgstr "Notifier les erreurs et l’envoi des travaux"
+
+msgid "Output tray is almost full"
+msgstr "Le bac de sortie est presque plein"
+
+msgid "Output tray is full"
+msgstr "Le bac de sortie est plein"
+
+msgid "Output tray is missing"
+msgstr "Le bac de sortie est absent"
+
+msgid "Paper could not be fed"
+msgstr "Le papier n’a pas pu être entraîné"
+
+msgid "Paper could not be fed from tray 1"
+msgstr "Le papier du bac 1 n’a pas pu être entraîné"
+
+msgid "Paper could not be fed from tray 2"
+msgstr "Le papier du bac 2 n’a pas pu être entraîné"
+
+msgid "Paper is empty"
+msgstr "Il n’y a plus de papier"
+
+msgid "Paper is running low"
+msgstr "Le niveau de papier est faible"
+
+msgid "Paper jam"
+msgstr "Bourrage papier"
+
+msgid "Paused"
+msgstr "En pause"
+
+msgid "Preventive maintenance is overdue"
+msgstr "Une maintenance préventive est nécessaire"
+
+msgid "Print one status report without a graphical display"
+msgstr "Afficher un rapport d’état sans interface graphique"
+
+msgid "Print queue"
+msgstr "File d’impression"
+
+msgid "Print queue is paused"
+msgstr "La file d’impression est en pause"
+
+msgid "Printer IP address or host name"
+msgstr "Adresse IP ou nom d’hôte de l’imprimante"
+
+msgid "Printer address (optional for a network queue)"
+msgstr "Adresse de l’imprimante (facultative pour une file réseau)"
+
+msgid "Printer and notifications"
+msgstr "Imprimante et notifications"
+
+msgid "Printer cannot access its log"
+msgstr "L’imprimante ne peut pas accéder à son journal"
+
+msgid "Printer is available again"
+msgstr "L’imprimante est de nouveau disponible"
+
+msgid "Printer is locked"
+msgstr "L’imprimante est verrouillée"
+
+msgid "Printer is not responding"
+msgstr "L’imprimante ne répond pas"
+
+msgid "Printer is offline"
+msgstr "L’imprimante est hors ligne"
+
+msgid "Printer is unavailable"
+msgstr "L’imprimante est indisponible"
+
+msgid "Printer memory is full"
+msgstr "La mémoire de l’imprimante est pleine"
+
+msgid "Printer needs attention"
+msgstr "L’imprimante demande une intervention"
+
+msgid "Printer requires service"
+msgstr "L’imprimante nécessite une réparation"
+
+msgid "Printer status"
+msgstr "État de l’imprimante"
+
+msgid "Printer temperature is too high"
+msgstr "La température de l’imprimante est trop élevée"
+
+msgid "Printer temperature is too low"
+msgstr "La température de l’imprimante est trop basse"
+
+msgid "Printing"
+msgstr "Impression en cours"
+
+msgid "Printing fault (3X)"
+msgstr "Défaut d’impression (3X)"
+
+msgid "Printing fault (5X)"
+msgstr "Défaut d’impression (5X)"
+
+msgid "Printing fault (7X)"
+msgstr "Défaut d’impression (7X)"
+
+msgid "Processing"
+msgstr "Traitement en cours"
+
+msgid "Quit monitor"
+msgstr "Quitter le moniteur"
+
+msgid "Ready"
+msgstr "Prête"
+
+msgid "Refresh"
+msgstr "Actualiser"
+
+msgid "Replace ink cartridge"
+msgstr "Remplacez la cartouche d’encre"
+
+msgid "SNMP read community"
+msgstr "Communauté SNMP de lecture"
+
+msgid "SNMP read community (default: public)"
+msgstr "Communauté SNMP de lecture (par défaut : public)"
+
+msgid "Scanning fault (AX)"
+msgstr "Défaut de numérisation (AX)"
+
+msgid "Select a network printer or enter its IP address."
+msgstr "Sélectionnez une imprimante réseau ou saisissez son adresse IP."
+
+msgid "Sent to printer"
+msgstr "Envoyé à l’imprimante"
+
+msgid "Service is required"
+msgstr "Une réparation est nécessaire"
+
+msgid "Sleeping"
+msgstr "En veille"
+
+msgid "Some diagnostic information is unavailable."
+msgstr "Certaines informations de diagnostic sont indisponibles."
+
+msgid "Start monitoring when I log in"
+msgstr "Lancer la surveillance à l’ouverture de session"
+
+msgid "Start without showing the window"
+msgstr "Démarrer sans afficher la fenêtre"
+
+msgid "Starter ink cartridges are required"
+msgstr "Les cartouches d’encre de démarrage sont nécessaires"
+
+msgid "Status unavailable"
+msgstr "État indisponible"
+
+msgid "Stopped"
+msgstr "Arrêté"
+
+msgid "Tray 1 is missing"
+msgstr "Le bac 1 est absent"
+
+msgid "Tray 2 is missing"
+msgstr "Le bac 2 est absent"
+
+msgid "Unavailable"
+msgstr "Indisponible"
+
+msgid "Unknown"
+msgstr "Inconnu"
+
+msgid "Untitled document"
+msgstr "Document sans titre"
+
+msgid "Unrecognized printer error"
+msgstr "Erreur d’imprimante non reconnue"
+
+#, c-format
+msgid "Unrecognized printer status (%d)"
+msgstr "État d’imprimante non reconnu (%d)"
+
+msgid "Waiting"
+msgstr "En attente"
+
+msgid "Warming up"
+msgstr "Préchauffage"
+
+msgid "Yellow"
+msgstr "Jaune"
+
+msgid "— Brother MFC-J5720DW status monitor"
+msgstr "— moniteur d’état Brother MFC-J5720DW"
+
+msgid "“Sent to printer” means CUPS finished sending the job; it does not confirm that all sheets have been printed."
+msgstr "« Envoyé à l’imprimante » signifie que CUPS a fini l’envoi du travail ; cela ne confirme pas que toutes les feuilles sont imprimées."

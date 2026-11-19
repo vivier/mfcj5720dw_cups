@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=Brother MFC-J5720DW Monitor
+Name[fr]=Moniteur Brother MFC-J5720DW
+Comment=Monitor printer status, ink levels and print jobs
+Comment[fr]=Suivre l’état de l’imprimante, les encres et les travaux d’impression
+Exec=mfcj5720dw-monitor
+Icon=printer
+Terminal=false
+Categories=Utility;GTK;
+Keywords=printer;ink;Brother;CUPS;
+Keywords[fr]=imprimante;encre;Brother;CUPS;
+StartupNotify=true
+X-GNOME-UsesNotifications=true

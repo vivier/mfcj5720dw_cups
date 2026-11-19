@@ -1,0 +1,72 @@
+.TH MFCJ5720DW-MONITOR 1 "November 2026" "mfcj5720dw-cups 0.2.0" "User Commands"
+.SH NAME
+mfcj5720dw-monitor \- monitor a Brother MFC-J5720DW network printer
+.SH SYNOPSIS
+.B mfcj5720dw-monitor
+.RI [ options ]
+.SH DESCRIPTION
+Display physical printer status, diagnostic messages, four ink levels and
+recent jobs belonging to the current user in a local CUPS queue.
+Poll the printer and CUPS every five seconds without blocking the window.
+The monitor sends no print data, maintenance commands or SNMP writes.
+.PP
+Desktop notifications report new faults, recovery, a paused queue and
+observed job delivery, cancellation or failure.
+Two consecutive failed polls trigger a connectivity notification.
+An unavailable measurement is displayed as unavailable, never as zero ink.
+The initial job list does not generate notifications for old completed jobs.
+.PP
+The window can remain running when closed. Use Quit monitor to stop it;
+launch it again to reopen the window. Login startup is an explicit preference.
+Use Apply to save preferences and the selected printer.
+.SH OPTIONS
+.TP
+.BR \-p ", " \-\-queue " " \fIQUEUE\fR
+Follow this local CUPS queue. Otherwise use the saved selection or the first
+MFC-J5720DW queue. CUPS is contacted through its local Unix socket.
+.TP
+.BR \-H ", " \-\-host " " \fIHOST\fR
+Query this bare host name, IPv4 or IPv6 address.
+Do not include a URI scheme, brackets or a port.
+Without an override, derive the address from a socket, LPD, IPP or IPPS queue.
+For a DNS-SD service URI, USB queue or print-server URI, enter the physical
+printer's address explicitly. The printer must be reachable over the network.
+.TP
+.BR \-\-community " " \fICOMMUNITY\fR
+SNMP read community (default: public). SNMPv2c queries use UDP port 161.
+The community is saved in a private user settings file when Apply is used.
+.TP
+.B \-\-background
+Start monitoring without showing the window.
+.TP
+.B \-\-once
+Print a single textual status report and exit. No graphical session is needed.
+Exit status is 0 on an SNMP reply, 1 when unavailable, or 2 for invalid options.
+A successful query can still report a printer fault or unsupported diagnostics.
+.TP
+.B \-\-help
+Show command-line help.
+.SH LIMITATIONS
+CUPS completion means that the backend finished sending the job. It is not
+proof that the printer has finished producing all sheets. A job disappearing
+from CUPS history is not treated as successful completion.
+.PP
+The printer's display text and diagnostic state also reflect maintenance.
+The monitor does not infer completion of a particular cleaning operation from
+an idle state and does not offer an alignment wizard.
+Unknown Brother status codes remain visible with the printer's own message.
+Alerts and job history are bounded to 16 and 20 entries per query respectively.
+.SH FILES
+.I $XDG_CONFIG_HOME/mfcj5720dw-monitor/settings.ini
+.br
+.I $XDG_CONFIG_HOME/autostart/io.github.vivier.mfcj5720dw.monitor.desktop
+.PP
+XDG_CONFIG_HOME defaults to ~/.config.
+.SH EXAMPLES
+.nf
+mfcj5720dw-monitor --queue Brother-MFC-J5720DW
+mfcj5720dw-monitor --host 192.168.100.2 --once
+.fi
+.SH SEE ALSO
+.BR lpstat (1),
+.BR commandtomfcj5720dw (1)
