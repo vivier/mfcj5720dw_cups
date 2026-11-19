@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Laurent Vivier
 msgid ""
-msgstr "Project-Id-Version: mfcj5720dw-monitor 0.2.0\nReport-Msgid-Bugs-To: \nPO-Revision-Date: 2026-11-19 12:00+0100\nLast-Translator: Laurent Vivier\nLanguage-Team: French\nLanguage: fr\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\n"
+msgstr "Project-Id-Version: mfcj5720dw-monitor 0.3.0\nReport-Msgid-Bugs-To: \nPO-Revision-Date: 2026-11-19 12:00+0100\nLast-Translator: Laurent Vivier\nLanguage-Team: French\nLanguage: fr\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "Apply"
 msgstr "Appliquer"

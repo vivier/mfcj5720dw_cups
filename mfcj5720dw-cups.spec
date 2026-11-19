@@ -9,7 +9,7 @@
 %global driverdatadir %{_datadir}/mfcj5720dw
 
 Name:           mfcj5720dw-cups
-Version:        0.2.0
+Version:        0.3.0
 Release:        1%{?dist}
 Summary:        Direct CUPS Raster driver for the Brother MFC-J5720DW
 License:        GPL-3.0-or-later AND GPL-2.0-or-later AND LicenseRef-Brother-Data
@@ -132,6 +132,13 @@ exit 0
 %{_mandir}/man1/mfcj5720dw-monitor.1*
 
 %changelog
+* Thu Nov 19 2026 Laurent Vivier <laurent@vivier.eu> - 0.3.0-1
+- Add an optional GTK status monitor with notifications and French translation.
+- Package the monitor separately and decode printer-localized text, including HP Roman-8.
+- Build the monitor as PIE for standalone RPM rebuilds with Fedora linker flags.
+- Support custom paper sizes with validated geometry and tray/duplex constraints.
+- Declare HBP support for driver matching and publish the printer protocol specification.
+
 * Mon Nov 16 2026 Laurent Vivier <laurent@vivier.eu> - 0.2.0-1
 - Add three head-cleaning strengths and the internal nozzle-check page as CUPS commands.
 - Include French option, paper-size and ink-color labels in the generated PPD.
