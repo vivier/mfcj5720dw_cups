@@ -89,6 +89,7 @@ enum driver_state_offset {
 
 /* Configuration selections, before conversion to protocol.h renderer IDs. */
 enum job_selection {
+	JOB_QUALITY_PLAIN_FAST = 0,
 	JOB_MEDIA_PLAIN = 0,
 	JOB_MEDIA_INKJET = 1,
 	JOB_MEDIA_PHOTO = 2,
@@ -378,6 +379,26 @@ static void configure_page_geometry(const struct job_settings *settings,
 	options[DEVICE_PRINTABLE_WIDTH] = settings->image_right - settings->left_margin;
 	options[DEVICE_HORIZONTAL_DPI] = POINTS_PER_INCH;
 	options[DEVICE_VERTICAL_DPI] = POINTS_PER_INCH;
+	if (!strcmp(settings->paper_name, "Custom")) {
+		int raster_scale = settings->resolution == JOB_QUALITY_PLAIN_FAST ?
+			NORMAL_RENDER_DPI / FAST_RENDER_DPI : 1;
+
+		/* Preserve fractional sheet sizes and use the actual raster extent. */
+		page->paper_width_120dpi = settings->paper_width *
+			PAGE_GEOMETRY_DPI / POINTS_PER_INCH + 0.5f;
+		page->paper_height_120dpi = settings->paper_height *
+			PAGE_GEOMETRY_DPI / POINTS_PER_INCH + 0.5f;
+		options[DEVICE_WIDTH_120DPI] = page->paper_width_120dpi;
+		options[DEVICE_HEIGHT_120DPI] = page->paper_height_120dpi;
+		options[DEVICE_HORIZONTAL_DPI] = NORMAL_RENDER_DPI;
+		options[DEVICE_VERTICAL_DPI] = NORMAL_RENDER_DPI;
+		options[DEVICE_LEFT_MARGIN] = settings->left_margin *
+			NORMAL_RENDER_DPI / POINTS_PER_INCH;
+		options[DEVICE_BOTTOM_MARGIN] = settings->bottom_margin *
+			NORMAL_RENDER_DPI / POINTS_PER_INCH;
+		options[DEVICE_PRINTABLE_WIDTH] = settings->width_pixels * raster_scale;
+		options[DEVICE_PRINTABLE_HEIGHT] = settings->height_pixels * raster_scale;
+	}
 	memset(page->reserved_margins, 0, sizeof(page->reserved_margins));
 	page->width_pixels = settings->width_pixels;
 	page->raster_width = settings->width_pixels;

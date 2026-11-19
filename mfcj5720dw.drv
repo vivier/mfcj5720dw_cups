@@ -30,7 +30,13 @@
 	// The original omits LandscapeOrientation: CUPS then uses Minus90.
 	// ppdc would otherwise generate Plus90 and reverse landscape rotation.
 	Attribute "LandscapeOrientation" "" "Minus90"
-	Attribute "VariablePaperSize" "" "False"
+	// Brother's Windows custom range: 88.9 x 127 through 287 x 431.8 mm.
+	// Use exact points for the minimum to avoid rounding above 3.5 x 5 inches.
+	VariablePaperSize Yes
+	Attribute "VariablePaperSize" "" "True"
+	MinSize 252 360
+	MaxSize 287mm 431.8mm
+	HWMargins 9 9 9 9
 	Attribute "cupsVersion" "" "1.4"
 	// The encoder handles the printer-specific duplex rotation.
 	Attribute "cupsBackSide" "" "Normal"
@@ -418,6 +424,11 @@
 
 	// Invalid combinations, enforced by CUPS and printer setup tools.
 	// ppdc emits both directions of each constraint.
+	// Custom stock uses the MP tray and does not support duplex or overspray.
+	UIConstraints "*PageSize Custom *BRInputSlot Tray1"
+	UIConstraints "*PageSize Custom *BRInputSlot Tray2"
+	UIConstraints "*PageSize Custom *Duplex DuplexNoTumble"
+	UIConstraints "*PageSize Custom *Duplex DuplexTumble"
 	UIConstraints "*PageSize Folio *BRInputSlot Tray1"
 	UIConstraints "*PageSize EnvC5 *BRInputSlot Tray2"
 	UIConstraints "*PageSize Executive *BRInputSlot Tray2"

@@ -42,6 +42,22 @@ JPEG transfer modes use libjpeg-turbo through the libjpeg API. The filter
 retains Brother framing and baseline YCbCr 4:2:2 compression parameters.
 JPEG bytes and decoded pixels can differ slightly from the legacy compressor
 because the library performs color conversion, chroma sampling and DCT.
+.SH CUSTOM PAPER SIZES
+PageSize accepts Custom.WIDTHxHEIGHTmm, Custom.WIDTHxHEIGHTin, or
+Custom.WIDTHxHEIGHT in PostScript points. The sheet must be 88.9-287 mm wide
+and 127-431.8 mm long. The hardware margins are 9 points (3.175 mm) on each
+edge. All pages in a job must have the same dimensions.
+.PP
+Use Duplex=None and BRInputSlot=MPTray or AutoSelect, and load the sheet in
+the MP tray. Custom sizes do not support duplex or borderless printing.
+Dimensions specify the unrotated sheet; document landscape orientation is
+handled upstream. The encoder feeds custom sheets 127-215.9 mm wide and
+longer than 215.9 mm, up to about 297 mm, long edge first. Other custom sizes
+feed short edge first.
+.PP
+For example: lp -d PRINTER -o PageSize=Custom.100x150mm
+-o BRInputSlot=MPTray -o Duplex=None document.pdf.
+Update the queue PPD and filter together to enable this feature.
 .SH COLOR ENHANCEMENT
 Enable BRColorEnhancement (Color Enhancement) to apply image adjustments.
 BRColorDensity (Color Density) and BRWhiteBalance (White Balance) each accept

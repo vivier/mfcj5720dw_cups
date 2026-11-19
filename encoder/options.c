@@ -152,6 +152,7 @@ enum paper_config_value {
 	CONFIG_PAPER_ENVELOPE_CHOU3 = 73,
 	CONFIG_PAPER_ENVELOPE_CHOU4 = 74,
 	CONFIG_PAPER_ENVELOPE_KAKU2 = 71,
+	CONFIG_PAPER_CUSTOM = 256,
 };
 
 static char *const paper_size_labels[] = {
@@ -191,6 +192,7 @@ static char *const paper_size_labels[] = {
 	"N3 Envelope",
 	"N4 Envelope",
 	"K2 Envelope",
+	"Custom",
 };
 
 static char *const paper_size_choices[] = {
@@ -230,6 +232,7 @@ static char *const paper_size_choices[] = {
 	"EnvChou3",
 	"EnvChou4",
 	"EnvKaku2",
+	"Custom",
 };
 
 static const int16_t paper_size_codes[] = {
@@ -269,6 +272,7 @@ static const int16_t paper_size_codes[] = {
 	CONFIG_PAPER_ENVELOPE_CHOU3,
 	CONFIG_PAPER_ENVELOPE_CHOU4,
 	CONFIG_PAPER_ENVELOPE_KAKU2,
+	CONFIG_PAPER_CUSTOM,
 };
 
 enum thickness_config_value {

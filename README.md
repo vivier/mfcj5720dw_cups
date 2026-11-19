@@ -107,6 +107,39 @@ French labels are **Densité des couleurs** and **Balance des blancs**. Existing
 queues need their PPD updated to show the new controls. Older PPDs remain
 compatible and keep both settings at zero.
 
+## Custom paper sizes
+
+Custom sheets can be 88.9–287 mm wide and 127–431.8 mm long. These limits
+follow Brother's Windows user-defined size range. All four hardware margins
+are 9 points (3.175 mm), matching the driver's ordinary paper margins.
+Custom sizes support simplex printing with Auto Select or MP Tray; load the
+paper in the MP tray. Duplex and borderless printing require a supported
+named paper size.
+
+In applications that offer custom page setup, enter the sheet dimensions
+there and select the Brother MFC-J5720DW CUPS queue. From the command line:
+
+```sh
+lp -d PRINTER -o PageSize=Custom.100x150mm -o BRInputSlot=MPTray \
+   -o Duplex=None document.pdf
+```
+
+CUPS also accepts inches (`Custom.4x6in`) or points (`Custom.288x432`).
+Dimensions describe the unrotated sheet; select landscape separately in the
+application. The encoder retains automatic landscape feeding for custom
+sheets 127–215.9 mm wide and longer than 215.9 mm, up to approximately 297 mm.
+Load those sheets with their long edge entering the printer; other custom
+sheets use short-edge feeding. This transport rotation is independent of
+the document's portrait/landscape layout.
+
+The filter preserves fractional dimensions and CUPS' raster rounding. It
+rejects out-of-range sheets, incompatible trays or duplex, and rasters whose
+sheet size or printable area disagrees with the job. Pages in one job must
+use the same dimensions. Update both the filter and an existing queue's PPD
+to enable custom sizes. The implementation has been checked in the VM with
+PDF rendering and captured output, but custom stock has not yet been tested
+on the physical printer.
+
 ## Borderless printing
 
 Select a borderless paper size and print at actual size (100%). The driver

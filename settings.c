@@ -32,6 +32,14 @@ enum raster_format {
 #define MAX_BORDERLESS_DOWNWARD_MM 2.0f
 #define PAGE_POINT_TOLERANCE 1.0f
 
+/* Brother's user-defined range: 88.9 x 127 through 287 x 431.8 mm. */
+#define CUSTOM_MIN_WIDTH 252.0f
+#define CUSTOM_MIN_HEIGHT 360.0f
+#define CUSTOM_MAX_WIDTH (287.0f * POINTS_PER_INCH / 25.4f)
+#define CUSTOM_MAX_HEIGHT 1224.0f
+#define CUSTOM_MARGIN 9
+#define CUSTOM_POINT_TOLERANCE 0.01f
+
 /* Configuration codes, distinct from the encoder's internal mode identifiers. */
 enum job_option_value {
 	QUALITY_PLAIN_FAST = 0,
@@ -171,6 +179,46 @@ static void copy_paper_geometry(const struct paper_geometry *paper, struct job_s
 	settings->pixel_bytes = RGB_CHANNELS * BYTES_PER_SAMPLE;
 }
 
+static int configure_custom_paper(ppd_file_t *ppd, struct job_settings *settings)
+{
+	ppd_size_t *paper = ppdPageSize(ppd, NULL);
+	int resolution = settings->resolution == QUALITY_PLAIN_FAST ?
+		FAST_RASTER_DPI : PAPER_TABLE_DPI;
+	const char *source = get_option_text("PaperSource", &lpr_configuration);
+
+	/* Do not trust limits or constraints in an old or edited queue PPD. */
+	if (!paper || !isfinite(paper->width) || !isfinite(paper->length) ||
+	    paper->width < CUSTOM_MIN_WIDTH - CUSTOM_POINT_TOLERANCE ||
+	    paper->width > CUSTOM_MAX_WIDTH + CUSTOM_POINT_TOLERANCE ||
+	    paper->length < CUSTOM_MIN_HEIGHT - CUSTOM_POINT_TOLERANCE ||
+	    paper->length > CUSTOM_MAX_HEIGHT + CUSTOM_POINT_TOLERANCE) {
+		fputs("ERROR: Custom paper must be 88.9-287 mm wide and 127-431.8 mm long.\n",
+		      stderr);
+		return 1;
+	}
+	if (settings->duplex != DUPLEX_SIMPLEX ||
+	    (strcmp(source, "AutoSelect") && strcmp(source, "MPTray"))) {
+		fputs("ERROR: Custom paper requires simplex and Auto Select or MP Tray.\n", stderr);
+		return 1;
+	}
+	strcpy(settings->paper_name, "Custom");
+	settings->paper_width = paper->width;
+	settings->paper_height = paper->length;
+	settings->width_points = paper->width + 0.5f;
+	settings->height_points = paper->length + 0.5f;
+	settings->left_margin = settings->bottom_margin = CUSTOM_MARGIN;
+	settings->image_right = settings->width_points - CUSTOM_MARGIN;
+	settings->image_bottom = settings->height_points - CUSTOM_MARGIN;
+	settings->width_pixels = (paper->width - 2 * CUSTOM_MARGIN) * resolution /
+		POINTS_PER_INCH + 0.5f;
+	settings->height_pixels = (paper->length - 2 * CUSTOM_MARGIN) * resolution /
+		POINTS_PER_INCH + 0.5f;
+	settings->row_bytes = settings->width_pixels * RGB_CHANNELS;
+	settings->sample_bytes = BYTES_PER_SAMPLE;
+	settings->pixel_bytes = RGB_CHANNELS * BYTES_PER_SAMPLE;
+	return 0;
+}
+
 int configure_job(ppd_file_t *ppd, struct job_settings *settings)
 {
 	struct configuration *config = &lpr_configuration;
@@ -188,12 +236,17 @@ int configure_job(ppd_file_t *ppd, struct job_settings *settings)
 		}
 	}
 	copy_job_options(config, settings);
-	paper = find_paper(get_option_text("PaperType", config));
-	if (!paper) {
-		fputs("ERROR: Unsupported paper size.\n", stderr);
-		return 1;
+	if (!strcmp(get_option_text("PaperType", config), "Custom")) {
+		if (configure_custom_paper(ppd, settings))
+			return 1;
+	} else {
+		paper = find_paper(get_option_text("PaperType", config));
+		if (!paper) {
+			fputs("ERROR: Unsupported paper size.\n", stderr);
+			return 1;
+		}
+		copy_paper_geometry(paper, settings);
 	}
-	copy_paper_geometry(paper, settings);
 	if (read_enhancement_level(ppd, "BRColorDensity", &settings->color_density) ||
 	    read_enhancement_level(ppd, "BRWhiteBalance", &settings->white_balance))
 		return 1;
@@ -244,6 +297,32 @@ static bool valid_borderless_geometry(const cups_page_header2_t *header,
 	return true;
 }
 
+static bool valid_custom_geometry(const cups_page_header2_t *header,
+				  const struct job_settings *settings)
+{
+	unsigned int axis;
+
+	for (axis = 0; axis < 2; axis++) {
+		float physical = axis ? settings->paper_height : settings->paper_width;
+		float size = header->cupsPageSize[axis];
+		float lower = header->cupsImagingBBox[axis];
+		float upper = header->cupsImagingBBox[axis + 2];
+		unsigned int pixels = axis ? header->cupsHeight : header->cupsWidth;
+		float expected = (physical - 2 * CUSTOM_MARGIN) *
+			header->HWResolution[axis] / POINTS_PER_INCH;
+
+		/* Fractional sheet dimensions and the printable area must agree. */
+		if (!isfinite(size) || fabsf(size - physical) > CUSTOM_POINT_TOLERANCE ||
+		    fabsf(header->PageSize[axis] - physical) > PAGE_POINT_TOLERANCE ||
+		    !isfinite(lower) || fabsf(lower - CUSTOM_MARGIN) > PAGE_POINT_TOLERANCE ||
+		    !isfinite(upper) || fabsf(upper - physical + CUSTOM_MARGIN) > PAGE_POINT_TOLERANCE ||
+		    header->Margins[axis] != CUSTOM_MARGIN ||
+		    fabsf(pixels - expected) > 1.0f)
+			return false;
+	}
+	return true;
+}
+
 int validate_raster_header(const cups_page_header2_t *header, const struct job_settings *settings)
 {
 	unsigned int resolution =
@@ -281,11 +360,15 @@ int validate_raster_header(const cups_page_header2_t *header, const struct job_s
 			goto invalid;
 	} else {
 		/* Zero is also accepted for legacy headers without the v2 scale field. */
-		if ((scale != 0.0f && scale != 1.0f) ||
-		    header->PageSize[0] != (unsigned int)settings->width_points ||
-		    header->PageSize[1] != (unsigned int)settings->height_points ||
-		    abs((int)header->cupsWidth - settings->width_pixels) > PAPER_ROUNDING_TOLERANCE ||
-		    abs((int)header->cupsHeight - settings->height_pixels) > PAPER_ROUNDING_TOLERANCE)
+		if (scale != 0.0f && scale != 1.0f)
+			goto invalid;
+		if (!strcmp(settings->paper_name, "Custom")) {
+			if (!valid_custom_geometry(header, settings))
+				goto invalid;
+		} else if (header->PageSize[0] != (unsigned int)settings->width_points ||
+			   header->PageSize[1] != (unsigned int)settings->height_points ||
+			   abs((int)header->cupsWidth - settings->width_pixels) > PAPER_ROUNDING_TOLERANCE ||
+			   abs((int)header->cupsHeight - settings->height_pixels) > PAPER_ROUNDING_TOLERANCE)
 			goto invalid;
 	}
 	/*
@@ -311,6 +394,12 @@ int configure_raster_page(const cups_page_header2_t *header,
 	if (validate_raster_header(header, job))
 		return 1;
 	*page = *job;
+	if (!strcmp(job->paper_name, "Custom")) {
+		/* Keep CUPS' pixel rounding without cropping fractional custom sizes. */
+		page->width_pixels = header->cupsWidth;
+		page->height_pixels = header->cupsHeight;
+		page->row_bytes = header->cupsWidth * RGB_CHANNELS;
+	}
 	if (header->cupsReal[BORDERLESS_SCALE_REAL] > 1.0f) {
 		float scale = header->cupsReal[BORDERLESS_SCALE_REAL];
 
