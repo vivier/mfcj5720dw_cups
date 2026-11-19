@@ -8,7 +8,9 @@ mfcj5720dw-monitor \- monitor a Brother MFC-J5720DW network printer
 Display physical printer status, diagnostic messages, four ink levels and
 recent jobs belonging to the current user in a local CUPS queue.
 Poll the printer and CUPS every five seconds without blocking the window.
-The monitor sends no print data, maintenance commands or SNMP writes.
+The monitor sends no print data or maintenance commands.
+Optional scan-to-PC reception registers temporary destinations with SNMP writes
+and acquires documents through Brother's separately installed brscan4 SANE backend.
 .PP
 Desktop notifications report new faults, recovery, a paused queue and
 observed job delivery, cancellation or failure.
@@ -46,6 +48,61 @@ A successful query can still report a printer fault or unsupported diagnostics.
 .TP
 .B \-\-help
 Show command-line help.
+.SH SCAN TO PC
+Install Brother's 64-bit brscan4 scanner backend and configure this model with
+brsaneconfig4, using a unique scanner name and the printer's literal IPv4
+address (ip=, not nodename=). The monitor matches this configuration to SANE's
+device list. It does not require the separate brscan-skey program.
+.PP
+Expand Scan to this PC, enable reception and set the PC name, output folder,
+resolution and OCR languages. Press Apply, then choose this PC from
+the printer's File, Image, OCR or Email menu.
+Click the output folder to open the GTK folder chooser. Select a folder, then
+press Apply to save it. Cancelling the chooser keeps the previous folder.
+The proposed PC name combines the system hostname and login name, separated by
+" de " (for example "quad de laurent"). The complete string is truncated to its
+first 15 characters; unsupported characters become underscores. Saved names are
+preserved. Clear the name and press Apply to restore, display and save the
+default; a name containing only spaces has the same effect. Other settings
+are preserved. Custom names may also contain spaces and dots.
+.PP
+Available resolutions are 100, 150, 200, 300, 400, 600, 1200 and 2400 dpi;
+the default is 300 dpi. Optical resolution depends on the physical input.
+.PP
+File saves a multipage PDF. Image saves JPEG pages and opens the first image.
+OCR uses Tesseract to save only a searchable PDF, then opens the PDF.
+Email opens the default mail composer with a PDF attachment; it never sends
+email automatically. Final documents and scan.log remain in a new private
+subdirectory for each job. All PNG working images are deleted after success,
+failure or cancellation. Image output uses JPEG quality 95. Quitting waits
+for acquisition cleanup to finish.
+.PP
+Choose Off, Long edge or Short edge in the printer's duplex menu. The monitor
+reads that choice before acquisition. Duplex selects the feeder; short-edge
+scans rotate back pages 180 degrees before image, PDF or OCR output.
+For one-sided scans, the printer automatically uses the feeder when loaded,
+otherwise the glass. All available pages are acquired; a glass scan produces
+one page. Old source preferences are ignored. Resolution and grayscale come
+from the monitor.
+An unreadable panel setting stops the job. Use Cancel scan to stop acquisition.
+A job is limited to 500 pages and 20 minutes.
+.PP
+Allow UDP 54925 from the printer through the PC firewall. The temporary
+destinations use SNMPv1 with community internal, independently of the read
+community. Acquisition uses TCP 54921 via brscan4 and scanimage.
+A VM behind NAT requires forwarding or a bridged network. The optional PC
+address sets the advertised IPv4 address; it does not configure forwarding.
+.PP
+Keep the monitor running to receive scans; hiding the window is sufficient when
+background monitoring is enabled. Login startup is optional. Quitting cancels
+acquisition and stops registration renewals. The PC entry can remain visible
+until the six-minute lease expires. Another receiver, such as brscan-skey,
+cannot use UDP 54925 concurrently. Only network IPv4 scan-button events are
+supported. This legacy protocol is unencrypted and unauthenticated.
+.PP
+Launching the monitor again in the same desktop session opens the existing
+instance. Different users can each monitor printer status, but only one
+instance on the PC can receive scans at a time.
 .SH LIMITATIONS
 CUPS completion means that the backend finished sending the job. It is not
 proof that the printer has finished producing all sheets. A job disappearing
@@ -69,4 +126,6 @@ mfcj5720dw-monitor --host 192.168.100.2 --once
 .fi
 .SH SEE ALSO
 .BR lpstat (1),
+.BR scanimage (1),
+.BR tesseract (1),
 .BR commandtomfcj5720dw (1)

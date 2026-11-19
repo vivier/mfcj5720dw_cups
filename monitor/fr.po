@@ -321,3 +321,183 @@ msgstr "— moniteur d’état Brother MFC-J5720DW"
 
 msgid "“Sent to printer” means CUPS finished sending the job; it does not confirm that all sheets have been printed."
 msgstr "« Envoyé à l’imprimante » signifie que CUPS a fini l’envoi du travail ; cela ne confirme pas que toutes les feuilles sont imprimées."
+
+msgid "Choose an absolute folder path for scanned documents."
+msgstr "Choisissez un chemin de dossier absolu pour les documents numérisés."
+
+msgid "Enter a reachable IPv4 address for this PC, or leave it empty."
+msgstr "Saisissez une adresse IPv4 joignable pour ce PC, ou laissez ce champ vide."
+
+msgid "Invalid scan resolution."
+msgstr "Résolution de numérisation non valide."
+
+msgid "The PC name must contain 1–15 ASCII letters, digits, spaces, dots, hyphens or underscores."
+msgstr "Le nom du PC doit contenir de 1 à 15 lettres ASCII, chiffres, espaces, points, tirets ou tirets bas."
+
+msgid "Use OCR language codes separated by +, for example fra+eng."
+msgstr "Utilisez des codes de langue OCR séparés par +, par exemple fra+eng."
+
+msgid "Image"
+msgstr "Image"
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "OCR"
+msgstr "OCR"
+
+msgid "File"
+msgstr "Fichier"
+
+#, c-format
+msgid "Cannot create PDF: %s"
+msgstr "Impossible de créer le PDF : %s"
+
+msgid "OCR failed. Check the installed Tesseract languages and scan.log."
+msgstr "Échec de l’OCR. Vérifiez les langues Tesseract installées et le fichier scan.log."
+
+#, c-format
+msgid "Scanning failed (status %d). See scan.log."
+msgstr "Échec de la numérisation (état %d). Consultez scan.log."
+
+msgid "The 500-page limit was reached. Check the feeder."
+msgstr "La limite de 500 pages a été atteinte. Vérifiez le chargeur."
+
+#, c-format
+msgid "Cannot create the scan folder: %s"
+msgstr "Impossible de créer le dossier de numérisation : %s"
+
+msgid "Scan-to-PC needs a unicast IPv4 printer address."
+msgstr "La numérisation vers le PC nécessite une adresse IPv4 unicast de l’imprimante."
+
+msgid "Cannot register this PC with the printer. Check its address and SNMP access."
+msgstr "Impossible d’enregistrer ce PC auprès de l’imprimante. Vérifiez son adresse et l’accès SNMP."
+
+#, c-format
+msgid "Scan saved (%u pages): %s"
+msgstr "Numérisation enregistrée (%u pages) : %s"
+
+msgid "Scan request received; acquiring the document…"
+msgstr "Demande reçue ; numérisation du document…"
+
+#, c-format
+msgid "Registered as %s — waiting for a scan from the printer."
+msgstr "Enregistré sous le nom %s — en attente d’une demande de l’imprimante."
+
+msgid "Cannot open the scanned document"
+msgstr "Impossible d’ouvrir le document numérisé"
+
+msgid "Cannot open the email composer"
+msgstr "Impossible d’ouvrir la rédaction d’e-mail"
+
+msgid "The PDF is saved. Configure a default email application and attach it manually."
+msgstr "Le PDF est enregistré. Configurez une application de messagerie par défaut et joignez-le manuellement."
+
+msgid "Scanned document"
+msgstr "Document numérisé"
+
+msgid "Scanning is unavailable"
+msgstr "La numérisation est indisponible"
+
+msgid "Scanning started"
+msgstr "Numérisation en cours"
+
+msgid "Scanning finished"
+msgstr "Numérisation terminée"
+
+msgid "Scan to this PC"
+msgstr "Numériser vers ce PC"
+
+msgid "Receive scans started on the printer"
+msgstr "Recevoir les numérisations lancées depuis l’imprimante"
+
+msgid "Disabled"
+msgstr "Désactivé"
+
+msgid "PC name shown on the printer"
+msgstr "Nom du PC affiché sur l’imprimante"
+
+msgid "Save scans in this folder"
+msgstr "Enregistrer les numérisations dans ce dossier"
+
+msgid "Choose a folder on this PC."
+msgstr "Choisissez un dossier sur ce PC."
+
+msgid "The printer uses the document feeder when loaded, otherwise the scanner glass."
+msgstr "L’imprimante utilise le chargeur s’il contient des feuilles, sinon la vitre."
+
+msgid "Scan resolution"
+msgstr "Résolution de numérisation"
+
+msgid "Scan in grayscale"
+msgstr "Numériser en niveaux de gris"
+
+msgid "OCR languages (for example fra+eng)"
+msgstr "Langues OCR (par exemple fra+eng)"
+
+msgid "PC address (optional; automatic on a local network)"
+msgstr "Adresse du PC (facultative ; automatique en réseau local)"
+
+msgid "File: PDF. Image: JPEG. OCR: searchable PDF. Email: open a draft with a PDF attachment."
+msgstr "Fichier : PDF. Image : JPEG. OCR : PDF avec texte recherchable. E-mail : ouvrir un brouillon avec le PDF en pièce jointe."
+
+msgid "Use Apply below. Keep the monitor running to receive scans. Allow UDP port 54925 from the printer in the PC firewall."
+msgstr "Utilisez Appliquer ci-dessous. Laissez le moniteur actif pour recevoir les numérisations. Autorisez le port UDP 54925 depuis l’imprimante dans le pare-feu du PC."
+
+msgid "Cancel scan"
+msgstr "Annuler la numérisation"
+
+msgid "Open last scan folder"
+msgstr "Ouvrir le dernier dossier de numérisation"
+
+msgid "Wait for the current scan to finish, or cancel it before changing settings."
+msgstr "Attendez la fin de la numérisation, ou annulez-la avant de modifier les paramètres."
+
+msgid "Registering this PC with the printer…"
+msgstr "Enregistrement de ce PC auprès de l’imprimante…"
+
+#, c-format
+msgid "Configure one Brother brscan4 network scanner for %s, with a unique name and an IP address."
+msgstr "Configurez un scanner réseau Brother brscan4 pour %s, avec un nom unique et une adresse IP."
+
+msgid "Install and configure the Brother brscan4 64-bit scanner backend before receiving scans."
+msgstr "Installez et configurez le backend de numérisation Brother brscan4 64 bits avant de recevoir des numérisations."
+
+msgid "Cannot list SANE scanners. Check scan.log and the brscan4 installation."
+msgstr "Impossible de lister les scanners SANE. Vérifiez scan.log et l’installation de brscan4."
+msgid "Requires the Brother brscan4 64-bit scanner driver, configured for this printer's IP address."
+msgstr "Nécessite le pilote de numérisation Brother brscan4 64 bits, configuré avec l’adresse IP de cette imprimante."
+
+msgid "The scan folder path is too long."
+msgstr "Le chemin du dossier de numérisation est trop long."
+
+msgid "Choose one-sided, long-edge or short-edge scanning on the printer. Two-sided scans always use the document feeder."
+msgstr "Choisissez recto, recto verso bord long ou bord court sur l’imprimante. Les numérisations recto verso utilisent toujours le chargeur."
+
+msgid "The scanner closed the connection before sending its panel settings."
+msgstr "Le scanner a fermé la connexion avant d’envoyer les réglages du panneau."
+
+msgid "Unexpected scanner greeting while reading the panel settings."
+msgstr "Réponse initiale inattendue du scanner lors de la lecture des réglages du panneau."
+
+#, c-format
+msgid "No panel scan settings are available (reply 0x%02x). Start the scan again from the printer."
+msgstr "Les réglages de numérisation du panneau sont indisponibles (réponse 0x%02x). Relancez la numérisation depuis l’imprimante."
+
+msgid "Invalid panel settings reply length."
+msgstr "Longueur incorrecte de la réponse contenant les réglages du panneau."
+
+msgid "The scanner returned invalid or unsupported panel scan settings."
+msgstr "Le scanner a renvoyé des réglages du panneau incorrects ou non pris en charge."
+
+#, c-format
+msgid "Cannot orient the scanned back page: %s"
+msgstr "Impossible d’orienter le verso numérisé : %s"
+
+#, c-format
+msgid "Cannot save the oriented back page: %s"
+msgstr "Impossible d’enregistrer le verso réorienté : %s"
+
+#, c-format
+msgid "Cannot remove a temporary scan image: %s"
+msgstr "Impossible de supprimer une image temporaire de numérisation : %s"

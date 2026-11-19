@@ -4,12 +4,18 @@
 It complements CUPS/GNOME with independent network polling, four separate ink
 bars, the printer's display message, detailed faults and desktop notifications.
 It reads local CUPS queue state and up to 20 recent jobs owned by the current
-user. It performs no printing, maintenance operation or queue modification.
+user. It also supports scans started from the printer's **Scan to PC** menu.
+It performs no printing, maintenance operation or queue modification.
 
 Build with `make -C monitor`, or build the whole project normally. Dependencies
 are GTK 4 (4.12 or newer), GLib, Net-SNMP, libcups, gettext, a C compiler and make.
 The runtime also needs iconv's HP Roman-8 conversion module (Fedora's
 `glibc-gconv-extra`, required by the monitor RPM).
+Scanning uses `scanimage` with Brother's separately installed 64-bit `brscan4`
+backend, configured for the printer's IPv4 address. Follow the
+[scanner setup instructions](SCANNING.md#scanner-setup); `brscan-skey` is not
+needed. Tesseract with the selected language packs provides OCR; `xdg-email`
+opens the default mail composer.
 The RPM build produces an optional `mfcj5720dw-cups-monitor` subpackage. The core
 driver does not acquire a GTK dependency. `make WITH_MONITOR=0` builds only the
 driver. Source, manual and Makefile are together in this directory; native
@@ -25,13 +31,71 @@ An IPP URI pointing to a print server also needs the physical printer's address.
 The read community defaults to `public` and can be changed in the window.
 `--once` provides a display-independent diagnostic report.
 
+Expand **Scan to this PC**, enable reception, choose the PC name, output folder,
+resolution and OCR languages, then press **Apply**. Choose that PC from
+the printer's File, Image, OCR or Email menu. File produces a multipage PDF;
+Image saves JPEG pages and opens the first one; OCR saves only a searchable PDF
+and opens it; Email opens a draft with a PDF attachment. No mail
+is sent automatically. Output goes into a new private subdirectory for each job,
+with the final documents and `scan.log` for diagnostics. PNG working images
+are deleted after every job, including failure and cancellation. Image output
+uses JPEG at quality 95. Quitting waits for acquisition cleanup to finish.
+
+Click the current output folder to open GTK's folder chooser, select a folder,
+then press **Apply** to save the choice. Cancelling the chooser keeps the
+previous folder. The full path is available in the button's tooltip.
+
+The proposed PC name combines the system hostname and login name with ` de `,
+for example `quad de laurent`. The complete string is truncated to its first
+15 characters, and unsupported characters become underscores. A saved name
+takes precedence. Clear the name and press **Apply** to restore the default;
+a name containing only spaces has the same effect. The restored name appears
+in the field and is saved without changing the other scan settings.
+You can edit it freely using ASCII letters, digits, spaces, dots, hyphens and
+underscores.
+
+Choose **Off**, **Long edge** or **Short edge** on the printer's duplex menu.
+The monitor reads that choice for each request; both duplex modes select the
+feeder, and short-edge scans rotate the back pages before PDF/OCR processing.
+For one-sided scans, the printer automatically uses the feeder when loaded,
+otherwise the glass. Acquisition continues until the available pages are
+exhausted; a glass scan produces one page. Old source preferences are ignored
+and removed when settings are saved. Resolution and grayscale still come from
+the monitor. Unreadable panel settings stop acquisition instead of silently
+choosing a mode.
+
+Available resolutions are 100, 150, 200, 300, 400, 600, 1200 and 2400 dpi;
+300 dpi remains the default. These values are exposed by the Brother backend.
+The [optical limit](https://support.brother.com/g/b/spec.aspx?c=fr&lang=fr&prod=mfcj5720dw_us_eu_as)
+depends on the physical input: 2400 × 2400 dpi on the glass
+and 2400 × 1200 dpi in the feeder. The backend's 4800 and 9600 dpi choices
+exceed both optical limits and are not offered by the monitor.
+
+Scanning continues when the window is hidden if background
+monitoring is enabled. **Quit monitor** stops reception and cancels acquisition.
+The printer may retain the PC entry until its six-minute registration expires.
+
+Allow incoming **UDP 54925 from the printer** in the PC firewall. Status-only
+monitoring does not need this rule. Only one scan-button receiver can bind this
+port: stop `brscan-skey` or another receiver before enabling this feature.
+Launching the monitor again in the same desktop session opens the existing
+instance. Different users can each monitor status, but only one can receive
+scans on the PC at a time. Including the login name identifies the recipient;
+it does not enable concurrent scan receivers.
+A VM behind NAT needs a port forward or a bridged network; supplying a public
+PC address alone does not create that forwarding rule. The address override is
+for such routed setups. See [SCANNING.md](SCANNING.md) for the wire protocol,
+security boundary and validation scope.
+
 ## Status interpretation
 
 Each poll uses a Net-SNMP session with a 1.5-second timeout and no retry, followed
 by localization and bounded alert-table requests if the printer responds. CUPS uses a separate
 local connection with a timeout. All network operations run in a worker thread;
 only one poll can run at once. Changing the selection discards any older result.
-Only read requests are issued. SNMPv2c is unencrypted, including its community.
+Status polling issues only read requests. SNMPv2c is unencrypted, including its
+community. Enabling scan reception separately performs SNMPv1 SET requests for
+temporary scan destinations, using Brother's `internal` registration community.
 
 | Information | OID |
 | --- | --- |

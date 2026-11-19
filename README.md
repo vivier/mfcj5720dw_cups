@@ -116,9 +116,28 @@ HP Roman-8 for French messages such as `Prêt`.
 Closing the window keeps monitoring active by default. **Quit monitor** stops
 it; launching the application again reopens the existing window. To start
 silently at login, enable **Start monitoring when I log in** and press **Apply**.
-Login startup is disabled by default. The monitor sends no print data,
-maintenance commands or SNMP writes. See [monitor/README.md](monitor/README.md)
-and `man mfcj5720dw-monitor` for details and limitations.
+Login startup is disabled by default. The monitor sends no print data or
+maintenance commands. Status queries are read-only; enabling scan reception
+also registers temporary destinations with SNMP writes. See
+[monitor/README.md](monitor/README.md) and `man mfcj5720dw-monitor` for details
+and limitations.
+
+Enable **Scan to this PC** to register this computer in the printer's File,
+Image, OCR and Email menus. File saves a multipage PDF; Image saves JPEG pages;
+OCR saves and opens a searchable PDF; Email opens a draft with a PDF attachment
+in the configured desktop mail application. It does not send mail automatically.
+The printer selects the glass or loaded feeder, and its duplex setting controls
+one-sided, long-edge or short-edge acquisition. Resolutions from 100 to 2400 dpi
+are offered, with 300 dpi as the default. Select the output folder using the GTK
+folder chooser, then press **Apply**. Temporary PNG pages are deleted after
+processing, including failures and cancellation.
+
+Scanning requires Brother's separately installed **64-bit brscan4 SANE backend**,
+configured for this printer's IPv4 address. The monitor RPM supplies scanimage,
+Tesseract, its English/French language packs and xdg-utils; status monitoring
+and printing work without brscan4. Keep the monitor running and allow UDP 54925
+from the printer. See [scan-to-PC setup and protocol](monitor/SCANNING.md) for
+scanner configuration, other OCR languages and routed-network requirements.
 
 ## Color enhancement controls
 

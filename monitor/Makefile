@@ -9,13 +9,14 @@ SNMP_CFLAGS = $(shell $(PKG_CONFIG) --cflags netsnmp)
 SNMP_LIBS = $(shell $(PKG_CONFIG) --libs netsnmp)
 CFLAGS = -std=gnu11 -O2 -g -fPIE -Wall -Wextra -Werror -Wstrict-prototypes -Wmissing-prototypes
 CPPFLAGS += -DLOCALEDIR='"$(LOCALEDIR)"'
-OBJECTS = $(addprefix $(BUILD)/,main.o poll.o status.o ink.o)
+OBJECTS = $(addprefix $(BUILD)/,main.o poll.o status.o ink.o scan_protocol.o scan_service.o scan_job.o scan_control.o scan_ui.o)
+HEADERS = $(wildcard *.h)
 APP_ID = io.github.vivier.mfcj5720dw.monitor
 
 .PHONY: all install check clean distclean
 all: $(BUILD)/mfcj5720dw-monitor $(BUILD)/fr.mo
 
-$(BUILD)/%.o: %.c status.h poll.h Makefile
+$(BUILD)/%.o: %.c $(HEADERS) Makefile
 	mkdir -p $(BUILD)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(GTK_CFLAGS) $(SNMP_CFLAGS) -c $< -o $@
 

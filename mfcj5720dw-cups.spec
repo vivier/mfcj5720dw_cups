@@ -57,11 +57,23 @@ License:        GPL-3.0-or-later
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 # iconv loads HP Roman-8 dynamically, so ELF dependency scanning cannot see it.
 Requires:       glibc-gconv-extra%{?_isa}
+Requires:       sane-backends
+# Brother's separately installed brscan4 backend is needed for scan-to-PC.
+# Keep it optional so status monitoring also works without the external RPM.
+Recommends:     brscan4
+Requires:       tesseract
+Requires:       tesseract-langpack-eng
+Requires:       tesseract-langpack-fra
+Requires:       xdg-utils
 
 %description monitor
 GTK application displaying physical printer status, detailed faults, ink levels
 and local CUPS jobs. Includes desktop notifications and optional login startup.
-Network monitoring uses read-only SNMP queries independently of print jobs.
+Network monitoring uses SNMP queries independently of print jobs. Optional
+scan-to-PC support registers this computer on the printer and receives its
+scan-button requests. Documents are acquired using the separately installed
+Brother brscan4 SANE backend, with PDF, JPEG, Tesseract OCR and email-composer
+destinations.
 
 %prep
 %setup -q
@@ -72,12 +84,12 @@ Network monitoring uses read-only SNMP queries independently of print jobs.
 %make_build LDFLAGS=""
 
 %install
-%make_install PREFIX=%{_prefix} CUPSFILTERDIR=%{cupsfilterdir} \
+%make_install LDFLAGS="" PREFIX=%{_prefix} CUPSFILTERDIR=%{cupsfilterdir} \
     PPDDIR=%{ppddir} DATADIR=%{driverdatadir}
 
 %check
 # Inspect build artifacts without running the printing filters.
-make check-static
+make check-static LDFLAGS=""
 cmp build/rastertomfcj5720dw %{buildroot}%{cupsfilterdir}/rastertomfcj5720dw
 cmp build/mfcj5720dw_ink %{buildroot}%{cupsfilterdir}/mfcj5720dw_ink
 cmp build/commandtomfcj5720dw %{buildroot}%{cupsfilterdir}/commandtomfcj5720dw

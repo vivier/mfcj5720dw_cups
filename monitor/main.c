@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* Copyright (C) 2026 Laurent Vivier */
 #include "poll.h"
+#include "scan_ui.h"
 
 #include <gtk/gtk.h>
 #include <cups/ipp.h>
@@ -31,6 +32,8 @@ struct monitor_app {
 	GtkCheckButton *background;
 	GtkCheckButton *autostart;
 	GtkButton *refresh;
+	struct scan_panel *scan_panel;
+	struct scan_settings scan_settings;
 	struct monitor_target target;
 	struct monitor_snapshot *previous;
 	GStrv queue_names;
@@ -67,8 +70,10 @@ static void load_settings(struct monitor_app *app)
 	g_strlcpy(app->target.community, "public", sizeof(app->target.community));
 	app->notify_enabled = TRUE;
 	app->keep_running = TRUE;
+	scan_settings_defaults(&app->scan_settings);
 	if (!g_key_file_load_from_file(settings, path, G_KEY_FILE_NONE, NULL))
 		return;
+	scan_settings_load(&app->scan_settings, settings);
 	queue = g_key_file_get_string(settings, "Monitor", "queue", NULL);
 	host = g_key_file_get_string(settings, "Monitor", "host", NULL);
 	community = g_key_file_get_string(settings, "Monitor", "community", NULL);
@@ -94,6 +99,7 @@ static gboolean save_settings(struct monitor_app *app, GError **error)
 	g_key_file_set_boolean(settings, "Monitor", "notifications", app->notify_enabled);
 	g_key_file_set_boolean(settings, "Monitor", "background", app->keep_running);
 	g_key_file_set_boolean(settings, "Monitor", "autostart", app->start_at_login);
+	scan_settings_save(&app->scan_settings, settings);
 	text = g_key_file_to_data(settings, NULL, NULL);
 	if (g_mkdir_with_parents(directory, 0700) < 0) {
 		g_set_error_literal(error, G_FILE_ERROR, g_file_error_from_errno(errno), g_strerror(errno));
@@ -293,6 +299,7 @@ static void poll_done(GObject *source, GAsyncResult *result, gpointer data)
 	app->initialized = TRUE;
 	send_changes(app, snapshot);
 	show_snapshot(app, snapshot);
+	scan_panel_follow(app->scan_panel, snapshot->target.host, &app->scan_settings);
 	g_free(app->previous);
 	app->previous = snapshot;
 }
@@ -335,12 +342,18 @@ static void apply_settings(GtkButton *button, gpointer data)
 	const char *host = gtk_editable_get_text(GTK_EDITABLE(app->host));
 	const char *community = gtk_editable_get_text(GTK_EDITABLE(app->community));
 	g_autoptr(GError) error = NULL;
+	struct scan_settings scan_settings = app->scan_settings;
 
 	(void)button;
 	if (!valid_host(host)) {
 		gtk_label_set_text(app->status, _("Enter a host name or IP address, without a URL or port."));
 		return;
 	}
+	if (!scan_panel_read(app->scan_panel, &scan_settings, &error)) {
+		gtk_label_set_text(app->status, error->message);
+		return;
+	}
+	app->scan_settings = scan_settings;
 	if (app->queue_names && selected < g_strv_length(app->queue_names))
 		g_strlcpy(app->target.queue, app->queue_names[selected], sizeof(app->target.queue));
 	g_strlcpy(app->target.host, host, sizeof(app->target.host));
@@ -354,6 +367,7 @@ static void apply_settings(GtkButton *button, gpointer data)
 	app->failures = 0;
 	app->problem_reported = FALSE;
 	g_clear_pointer(&app->previous, g_free);
+	scan_panel_follow(app->scan_panel, app->target.host, &app->scan_settings);
 	refresh(app);
 }
 
@@ -457,6 +471,7 @@ static void create_window(struct monitor_app *app)
 	gtk_label_set_selectable(app->jobs, TRUE);
 	label(box, _("“Sent to printer” means CUPS finished sending the job; "
 		     "it does not confirm that all sheets have been printed."), "dim-label");
+	app->scan_panel = scan_panel_new(box, app->application, &app->scan_settings, &app->notify_enabled);
 	gtk_box_append(box, expander);
 	gtk_expander_set_child(GTK_EXPANDER(expander), GTK_WIDGET(settings));
 	gtk_expander_set_expanded(GTK_EXPANDER(expander), !app->target.queue[0] && !app->target.host[0]);
@@ -477,10 +492,10 @@ static void create_window(struct monitor_app *app)
 	app->notifications = check(settings, _("Notify about errors and job delivery"), app->notify_enabled);
 	app->background = check(settings, _("Keep monitoring when the window is closed"), app->keep_running);
 	app->autostart = check(settings, _("Start monitoring when I log in"), app->start_at_login);
+	row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
 	button = gtk_button_new_with_label(_("Apply"));
 	g_signal_connect(button, "clicked", G_CALLBACK(apply_settings), app);
-	gtk_box_append(settings, button);
-	row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+	gtk_box_append(GTK_BOX(row), button);
 	app->refresh = GTK_BUTTON(gtk_button_new_with_label(_("Refresh")));
 	g_signal_connect(app->refresh, "clicked", G_CALLBACK(refresh_clicked), app);
 	gtk_box_append(GTK_BOX(row), GTK_WIDGET(app->refresh));
@@ -624,6 +639,7 @@ int main(int argc, char **argv)
 				g_variant_new("(sss)", app.target.queue, app.target.host, app.target.community));
 	}
 	result = g_application_run(G_APPLICATION(app.application), argc, argv);
+	scan_panel_free(app.scan_panel);
 	g_object_unref(app.application);
 	g_strfreev(app.queue_names);
 	g_free(app.previous);
