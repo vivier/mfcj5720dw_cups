@@ -1,5 +1,7 @@
 # Brother MFC-J5720DW CUPS driver
 
+**Fedora RPMs: [lvivier/mfcj5720dw on COPR](https://copr.fedorainfracloud.org/coprs/lvivier/mfcj5720dw/)**
+
 An independent native CUPS driver for the Brother MFC-J5720DW, developed by
 reverse engineering the original Brother printing pipeline. It converts
 CUPS Raster directly into printer data and retrieves ink levels and factory
@@ -15,6 +17,41 @@ An optional [desktop status monitor](monitor/README.md) displays physical
 printer status and ink levels, with a system tray icon, notifications
 and English/French interfaces. It is provided in a separate
 `mfcj5720dw-cups-monitor` RPM.
+
+## Install on Fedora from COPR
+
+Enable the repository and install the printing driver:
+
+```sh
+sudo dnf copr enable lvivier/mfcj5720dw
+sudo dnf install mfcj5720dw-cups
+sudo systemctl enable --now cups
+```
+
+To add the optional desktop monitor, maintenance window and scan-to-PC support:
+
+```sh
+sudo dnf install mfcj5720dw-cups-monitor
+```
+
+On GNOME, install and enable AppIndicator to display the monitor's tray icon:
+
+```sh
+sudo dnf install gnome-shell-extension-appindicator
+gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com
+```
+
+If GNOME does not recognize the newly installed extension, log out and back in,
+then enable it again. After a monitor upgrade, choose **Quit** and relaunch it
+to load the new version; closing its window normally leaves it running.
+
+Add the printer in GNOME's printer settings using its IP address and
+**JetDirect** (`socket://PRINTER_IP:9100`), then select
+**Brother → MFC-J5720DW CUPS**. Automatic IPP discovery may create a driverless
+queue with different printing options.
+
+Scanning additionally requires the separately installed Brother brscan4 backend;
+see [scanner setup](monitor/SCANNING.md#scanner-setup).
 
 ## Development and authorship
 
@@ -40,7 +77,7 @@ not as a copyright holder. Project code is licensed under
 notice and license; third-party exceptions are described in the provenance
 document.
 
-## Requirements
+## Fedora build requirements
 
 Build on Linux with GCC, GNU Make, CUPS development headers and PPD tools,
 libjpeg development headers, and Python 3.11 or newer. RPM packaging also
