@@ -154,6 +154,19 @@ and printing work without brscan4. Keep the monitor running and allow UDP 54925
 from the printer. See [scan-to-PC setup and protocol](monitor/SCANNING.md) for
 scanner configuration, other OCR languages and routed-network requirements.
 
+The official Brother **brscan4 0.4.11-2 scanner RPM for x86_64** is available at:
+
+<https://download.brother.com/welcome/dlf105203/brscan4-0.4.11-2.x86_64.rpm>
+
+Install it with:
+
+```sh
+sudo dnf install https://download.brother.com/welcome/dlf105203/brscan4-0.4.11-2.x86_64.rpm
+```
+
+Then follow the [scanner configuration instructions](monitor/SCANNING.md#scanner-setup)
+to register the printer's IPv4 address with `brsaneconfig4`.
+
 ## Color enhancement controls
 
 In **Color Settings (Advanced)**, enable **Color Enhancement** to use the image
