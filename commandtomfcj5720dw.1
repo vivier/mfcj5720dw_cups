@@ -85,8 +85,8 @@ Use CleanStrongest for the strongest mode.
 Both extensions require exactly one ink selection: all, black or color.
 .PP
 GNOME's head-cleaning action submits Clean all when the queue advertises Clean.
-It does not provide strength or ink-selection controls; use command jobs for
-those choices.
+It does not provide strength or ink-selection controls; use the Maintenance
+window of mfcj5720dw-monitor or command jobs for those choices.
 Existing queues need their PPD updated to advertise the new commands; installing
 a new model PPD alone does not replace a queue's private copy.
 .SH ALIGNMENT
@@ -111,6 +111,7 @@ input/output failure or failed ink query. Two indicates an invalid invocation.
 .I /usr/lib/cups/filter/commandtomfcj5720dw
 .SH SEE ALSO
 .BR mfcj5720dw_ink (1),
+.BR mfcj5720dw-monitor (1),
 .BR rastertomfcj5720dw (1),
 .BR lp (1),
 .BR lpadmin (8)

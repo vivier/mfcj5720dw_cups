@@ -243,9 +243,6 @@ msgstr "Afficher le moniteur"
 msgid "Ready"
 msgstr "Prête"
 
-msgid "Refresh"
-msgstr "Actualiser"
-
 msgid "Replace ink cartridge"
 msgstr "Remplacez la cartouche d’encre"
 
@@ -504,3 +501,123 @@ msgstr "Impossible d’enregistrer le verso réorienté : %s"
 #, c-format
 msgid "Cannot remove a temporary scan image: %s"
 msgstr "Impossible de supprimer une image temporaire de numérisation : %s"
+
+msgid "Normal cleaning"
+msgstr "Nettoyage normal"
+
+msgid "Strong cleaning"
+msgstr "Nettoyage intensif"
+
+msgid "Strongest cleaning"
+msgstr "Nettoyage très intensif"
+
+msgid "Nozzle check"
+msgstr "Contrôle des buses"
+
+msgid "Refresh CUPS ink levels"
+msgstr "Actualiser les niveaux d’encre CUPS"
+
+msgid "All print heads"
+msgstr "Toutes les têtes"
+
+msgid "Colors"
+msgstr "Couleurs"
+
+msgid "Invalid maintenance request or print queue."
+msgstr "Opération de maintenance ou file d’impression incorrecte."
+
+#, c-format
+msgid "Cannot connect to local CUPS: %s"
+msgstr "Impossible de se connecter au serveur CUPS local : %s"
+
+#, c-format
+msgid "Cannot read maintenance capabilities for %s: %s"
+msgstr "Impossible de lire les opérations de maintenance disponibles pour %s : %s"
+
+msgid "This print queue does not support the selected maintenance operation."
+msgstr "Cette file d’impression ne prend pas en charge l’opération de maintenance sélectionnée."
+
+msgid "This print queue is not accepting jobs."
+msgstr "Cette file d’impression n’accepte pas de travaux."
+
+#, c-format
+msgid "CUPS rejected the maintenance request: %s"
+msgstr "CUPS a refusé la demande de maintenance : %s"
+
+msgid "CUPS did not confirm the maintenance request. Check the queue before trying again."
+msgstr "CUPS n’a pas confirmé la demande de maintenance. Vérifiez la file d’impression avant de réessayer."
+
+#, c-format
+msgid "%s: job #%d submitted to %s."
+msgstr "%s : travail n° %d transmis à %s."
+
+msgid "Requesting updated CUPS ink levels…"
+msgstr "Demande d’actualisation des niveaux d’encre CUPS…"
+
+msgid "Updating ink levels…"
+msgstr "Actualisation des niveaux d’encre en cours…"
+
+#, c-format
+msgid "Ink levels updated at %s"
+msgstr "Niveaux d’encre actualisés à %s"
+
+msgid "Unable to confirm the ink-level update."
+msgstr "Impossible de confirmer l’actualisation des niveaux d’encre."
+
+msgid "Ink-level update cancelled."
+msgstr "Actualisation des niveaux d’encre annulée."
+
+msgid "Ink-level update failed."
+msgstr "Échec de l’actualisation des niveaux d’encre."
+
+msgid "Submitting the maintenance request to CUPS…"
+msgstr "Envoi de la demande de maintenance à CUPS…"
+
+msgid "The print queue changed. Select the maintenance operation again."
+msgstr "La file d’impression a changé. Sélectionnez à nouveau l’opération de maintenance."
+
+msgid "Start print head cleaning?"
+msgstr "Lancer le nettoyage des têtes ?"
+
+#, c-format
+msgid "%s\nPrint queue: %s\n\nCleaning consumes ink. Strong and strongest cleaning use more ink than normal cleaning."
+msgstr "%s\nFile d’impression : %s\n\nLe nettoyage consomme de l’encre. Les modes intensif et très intensif en utilisent davantage que le nettoyage normal."
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Start cleaning"
+msgstr "Lancer le nettoyage"
+
+msgid "Maintenance"
+msgstr "Maintenance"
+
+msgid "Print heads to clean"
+msgstr "Têtes à nettoyer"
+
+msgid "Cleaning strength"
+msgstr "Intensité du nettoyage"
+
+msgid "Clean print heads…"
+msgstr "Nettoyer les têtes…"
+
+msgid "Print nozzle check"
+msgstr "Imprimer le contrôle des buses"
+
+msgid "The nozzle check prints one sheet."
+msgstr "Le contrôle des buses imprime une feuille."
+
+msgid "Select a CUPS queue under Printer and notifications, then press Apply to use maintenance."
+msgstr "Sélectionnez une file CUPS dans Imprimante et notifications, puis cliquez sur Appliquer pour utiliser la maintenance."
+
+#, c-format
+msgid "Maintenance is unavailable for %s. Check CUPS and select the Brother MFC-J5720DW CUPS driver."
+msgstr "La maintenance est indisponible pour %s. Vérifiez CUPS et sélectionnez le pilote Brother MFC-J5720DW CUPS."
+
+#, c-format
+msgid "Print queue: %s — not accepting jobs"
+msgstr "File d’impression : %s — n’accepte pas de travaux"
+
+#, c-format
+msgid "Print queue: %s"
+msgstr "File d’impression : %s"

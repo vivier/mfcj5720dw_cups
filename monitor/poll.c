@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* Copyright (C) 2026 Laurent Vivier */
 #include "poll.h"
+#include "maintenance.h"
 #include "../ink.h"
 
 #include <net-snmp/net-snmp-config.h>
@@ -396,6 +397,62 @@ out:
 	ippDelete(response);
 }
 
+static void read_ink_job(http_t *http, struct monitor_snapshot *s)
+{
+	const char *wanted[] = { "job-state", "date-time-at-completed" };
+	ipp_t *request, *response;
+	const ipp_uchar_t *completed;
+	char uri[128];
+
+	if (s->target.ink_job_id <= 0)
+		return;
+	/* Query this job directly: it may fall outside the bounded job history. */
+	g_snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", s->target.ink_job_id);
+	request = ippNewRequest(IPP_OP_GET_JOB_ATTRIBUTES);
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL, uri);
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
+	ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes",
+		      G_N_ELEMENTS(wanted), NULL, wanted);
+	response = cupsDoRequest(http, request, "/");
+	if (response && ippGetStatusCode(response) <= IPP_STATUS_OK_EVENTS_COMPLETE) {
+		s->ink_job.id = s->target.ink_job_id;
+		s->ink_job.state = ippGetInteger(ippFindAttribute(response, "job-state", IPP_TAG_ENUM), 0);
+		s->ink_job_valid = s->ink_job.state >= IPP_JSTATE_PENDING &&
+			s->ink_job.state <= IPP_JSTATE_COMPLETED;
+		completed = ippGetDate(ippFindAttribute(response, "date-time-at-completed", IPP_TAG_DATE), 0);
+		if (completed)
+			s->ink_job.completed_at = (gint64)ippDateToTime(completed) * G_USEC_PER_SEC;
+	}
+	ippDelete(response);
+}
+
+static void read_cups_ink(ipp_t *response, struct monitor_snapshot *s)
+{
+	const char *colors[] = { "#000000", "#00FFFF", "#FF00FF", "#FFFF00" };
+	ipp_attribute_t *names = ippFindAttribute(response, "marker-colors", IPP_TAG_NAME);
+	ipp_attribute_t *levels = ippFindAttribute(response, "marker-levels", IPP_TAG_INTEGER);
+	unsigned int found = 0;
+	int i;
+	size_t color;
+
+	if (ippGetCount(names) != 4 || ippGetCount(levels) != 4)
+		return;
+	for (i = 0; i < 4; i++) {
+		const char *name = ippGetString(names, i, NULL);
+		int level = ippGetInteger(levels, i);
+
+		if (!name || level < 0 || level > 100)
+			return;
+		for (color = 0; color < G_N_ELEMENTS(colors); color++) {
+			if (g_ascii_strcasecmp(name, colors[color]))
+				continue;
+			s->cups_ink[color] = level;
+			found |= 1U << color;
+		}
+	}
+	s->cups_ink_valid = found == (1U << G_N_ELEMENTS(colors)) - 1;
+}
+
 static void read_cups(struct monitor_snapshot *s)
 {
 	http_t *http;
@@ -404,7 +461,8 @@ static void read_cups(struct monitor_snapshot *s)
 	char uri[1024];
 	unsigned int i;
 	const char *attributes[] = { "printer-state", "printer-state-message",
-		"printer-state-reasons", "device-uri" };
+		"printer-state-reasons", "device-uri", "printer-type",
+		"printer-commands", "printer-is-accepting-jobs", "marker-colors", "marker-levels" };
 
 	/* This application follows local queues and never prompts from a worker. */
 	cupsSetPasswordCB2(no_password, NULL);
@@ -427,6 +485,10 @@ static void read_cups(struct monitor_snapshot *s)
 	response = cupsDoRequest(http, request, "/");
 	s->cups_valid = response && ippGetStatusCode(response) <= IPP_STATUS_OK_EVENTS_COMPLETE;
 	if (s->cups_valid) {
+		read_cups_ink(response, s);
+		s->maintenance_commands = maintenance_commands(response);
+		s->queue_accepting_jobs = ippGetBoolean(ippFindAttribute(response,
+					"printer-is-accepting-jobs", IPP_TAG_BOOLEAN), 0);
 		s->queue_state = ippGetInteger(ippFindAttribute(response, "printer-state", IPP_TAG_ENUM), 0);
 		g_strlcpy(s->queue_message, attribute_string(response, "printer-state-message"), sizeof(s->queue_message));
 		attr = ippFindAttribute(response, "printer-state-reasons", IPP_TAG_KEYWORD);
@@ -439,12 +501,14 @@ static void read_cups(struct monitor_snapshot *s)
 				g_strlcat(s->queue_reasons, ", ", sizeof(s->queue_reasons));
 			g_strlcat(s->queue_reasons, reason, sizeof(s->queue_reasons));
 		}
+		monitor_uri_host(attribute_string(response, "device-uri"),
+				 s->queue_host, sizeof(s->queue_host));
 		if (!s->target.host[0])
-			monitor_uri_host(attribute_string(response, "device-uri"),
-					 s->target.host, sizeof(s->target.host));
+			g_strlcpy(s->target.host, s->queue_host, sizeof(s->target.host));
 	}
 	ippDelete(response);
 	read_jobs(http, uri, s);
+	read_ink_job(http, s);
 close:
 	httpClose(http);
 }

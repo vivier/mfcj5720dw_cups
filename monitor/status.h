@@ -26,6 +26,7 @@ struct monitor_queue {
 struct monitor_job {
 	int id;
 	int state;
+	gint64 completed_at;
 	char title[MONITOR_TEXT];
 };
 
@@ -39,6 +40,7 @@ struct monitor_target {
 	char queue[256];
 	char host[256];
 	char community[256];
+	int ink_job_id;
 };
 
 struct monitor_snapshot {
@@ -46,11 +48,18 @@ struct monitor_snapshot {
 	gint64 timestamp;
 	gboolean online;
 	gboolean ink_valid;
+	gboolean cups_ink_valid;
 	gboolean errors_valid;
 	gboolean alerts_valid;
 	gboolean cups_valid;
+	gboolean queue_accepting_jobs;
+	unsigned int maintenance_commands;
 	gboolean jobs_valid;
+	gboolean ink_job_valid;
+	struct monitor_job ink_job;
 	unsigned int ink[4];
+	unsigned int cups_ink[4];
+	char queue_host[256];
 	uint32_t errors;
 	int device_status;
 	int printer_status;

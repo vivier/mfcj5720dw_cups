@@ -280,6 +280,13 @@ After installation, `man rastertomfcj5720dw`, `man mfcj5720dw_ink` and
 
 ## Maintenance
 
+The [desktop monitor](monitor/README.md#maintenance) provides these operations
+in a separate window opened with **Maintenance**: choose the print heads and
+cleaning strength, or print a nozzle check. The monitor automatically updates
+CUPS supply information when it differs from the printer's ink levels. Select
+the CUPS queue and press **Apply** first. Cleaning requests show a confirmation
+with the queue, intensity and ink group.
+
 The driver advertises `Clean`, `PrintSelfTestPage`, `ReportLevels` and two
 cleaning extensions as CUPS commands. All cleaning commands take exactly one
 ink selection: `all`, `black` or `color`.
@@ -305,7 +312,7 @@ GNOME's head-cleaning action submits `Clean all`. An existing queue must use
 the updated PPD to expose that action; updating the installed model PPD alone
 does not update the queue's private copy. Re-select the driver for that queue,
 or use `sudo lpadmin -p PRINTER -m Brother/mfcj5720dw.ppd` and review its defaults.
-The other ink selections and strengths are available through command jobs;
+The other ink selections and strengths are available in the monitor or through command jobs;
 GNOME does not add buttons for these extensions. For example:
 
 ```sh

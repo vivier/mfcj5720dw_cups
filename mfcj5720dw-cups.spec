@@ -72,7 +72,9 @@ Requires:       xdg-utils
 %description monitor
 GTK application displaying physical printer status, detailed faults, ink levels
 and local CUPS jobs. Includes a system tray icon, desktop notifications and
-optional login startup.
+optional login startup. A maintenance window offers head cleaning at three
+strengths for black, color or all heads, and an internal nozzle-check sheet.
+CUPS ink levels are synchronized automatically through the selected queue.
 Network monitoring uses SNMP queries independently of print jobs. Optional
 scan-to-PC support registers this computer on the printer and receives its
 scan-button requests. Documents are acquired using the separately installed

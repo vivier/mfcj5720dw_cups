@@ -3,6 +3,7 @@
 #include "poll.h"
 #include "scan_ui.h"
 #include "tray.h"
+#include "maintenance_ui.h"
 
 #include <gtk/gtk.h>
 #include <cups/ipp.h>
@@ -33,8 +34,8 @@ struct monitor_app {
 	GtkCheckButton *notifications;
 	GtkCheckButton *background;
 	GtkCheckButton *autostart;
-	GtkButton *refresh;
 	struct scan_panel *scan_panel;
+	struct maintenance_panel *maintenance_panel;
 	struct scan_settings scan_settings;
 	struct monitor_target target;
 	struct monitor_snapshot *previous;
@@ -179,6 +180,9 @@ static void send_changes(struct monitor_app *app, const struct monitor_snapshot 
 	if (!old || !s->jobs_valid || !old->jobs_valid)
 		return;
 	for (i = 0; i < s->job_count; i++) {
+		/* Automatic supply queries are not document-delivery notifications. */
+		if (s->jobs[i].id == s->target.ink_job_id || s->jobs[i].id == old->target.ink_job_id)
+			continue;
 		for (j = 0; j < old->job_count; j++) {
 			if (monitor_job_finished(&old->jobs[j], &s->jobs[i])) {
 				char id[64];
@@ -290,7 +294,6 @@ static void poll_done(GObject *source, GAsyncResult *result, gpointer data)
 
 	(void)source;
 	app->polling = FALSE;
-	gtk_widget_set_sensitive(GTK_WIDGET(app->refresh), TRUE);
 	if (request->revision != app->revision) {
 		g_free(snapshot);
 		refresh(app);
@@ -301,6 +304,9 @@ static void poll_done(GObject *source, GAsyncResult *result, gpointer data)
 	app->initialized = TRUE;
 	send_changes(app, snapshot);
 	show_snapshot(app, snapshot);
+	maintenance_panel_follow(app->maintenance_panel, snapshot->target.queue,
+				 snapshot->maintenance_commands, snapshot->queue_accepting_jobs);
+	maintenance_panel_update_ink(app->maintenance_panel, snapshot);
 	scan_panel_follow(app->scan_panel, snapshot->target.host, &app->scan_settings);
 	g_free(app->previous);
 	app->previous = snapshot;
@@ -315,9 +321,9 @@ static gboolean refresh(gpointer data)
 	if (app->polling)
 		return G_SOURCE_CONTINUE;
 	app->polling = TRUE;
-	gtk_widget_set_sensitive(GTK_WIDGET(app->refresh), FALSE);
 	request = g_new0(struct poll_request, 1);
 	request->target = app->target;
+	request->target.ink_job_id = maintenance_panel_ink_job(app->maintenance_panel);
 	request->revision = app->revision;
 	task = g_task_new(app->application, NULL, poll_done, app);
 	g_task_set_task_data(task, request, g_free);
@@ -370,13 +376,8 @@ static void apply_settings(GtkButton *button, gpointer data)
 	app->problem_reported = FALSE;
 	g_clear_pointer(&app->previous, g_free);
 	scan_panel_follow(app->scan_panel, app->target.host, &app->scan_settings);
+	maintenance_panel_follow(app->maintenance_panel, app->target.queue, 0, FALSE);
 	refresh(app);
-}
-
-static void refresh_clicked(GtkButton *button, gpointer data)
-{
-	(void)button;
-	refresh(data);
 }
 
 static void quit_clicked(GtkButton *button, gpointer data)
@@ -427,6 +428,8 @@ static void create_window(struct monitor_app *app)
 	GtkBox *settings = GTK_BOX(gtk_box_new(GTK_ORIENTATION_VERTICAL, 8));
 	GtkWidget *expander = gtk_expander_new(_("Printer and notifications"));
 	GtkWidget *button, *row;
+	GtkButton *maintenance;
+	GtkLabel *levels_status;
 	GtkCssProvider *css = gtk_css_provider_new();
 	const char *colors[] = { "black-ink", "cyan-ink", "magenta-ink", "yellow-ink" };
 	const char *names[] = { N_("Black"), N_("Cyan"), N_("Magenta"), N_("Yellow") };
@@ -456,6 +459,9 @@ static void create_window(struct monitor_app *app)
 		gtk_widget_add_css_class(GTK_WIDGET(app->ink[i]), colors[i]);
 		gtk_box_append(box, GTK_WIDGET(app->ink[i]));
 	}
+	levels_status = label(box, "", "dim-label");
+	gtk_label_set_selectable(levels_status, TRUE);
+	gtk_widget_set_visible(GTK_WIDGET(levels_status), FALSE);
 	gtk_css_provider_load_from_string(css,
 		"progressbar trough, progressbar progress { min-height: 10px; }"
 		"progressbar text { color: inherit; }"
@@ -498,9 +504,9 @@ static void create_window(struct monitor_app *app)
 	button = gtk_button_new_with_label(_("Apply"));
 	g_signal_connect(button, "clicked", G_CALLBACK(apply_settings), app);
 	gtk_box_append(GTK_BOX(row), button);
-	app->refresh = GTK_BUTTON(gtk_button_new_with_label(_("Refresh")));
-	g_signal_connect(app->refresh, "clicked", G_CALLBACK(refresh_clicked), app);
-	gtk_box_append(GTK_BOX(row), GTK_WIDGET(app->refresh));
+	maintenance = GTK_BUTTON(gtk_button_new_with_label(_("Maintenance")));
+	gtk_box_append(GTK_BOX(row), GTK_WIDGET(maintenance));
+	app->maintenance_panel = maintenance_panel_new(app->window, maintenance, levels_status);
 	button = gtk_button_new_with_label(_("Quit monitor"));
 	g_signal_connect(button, "clicked", G_CALLBACK(quit_clicked), app);
 	gtk_box_append(GTK_BOX(row), button);
@@ -548,6 +554,7 @@ static void select_action(GSimpleAction *action, GVariant *parameter, gpointer d
 	app->revision++;
 	app->failures = 0;
 	app->problem_reported = FALSE;
+	maintenance_panel_follow(app->maintenance_panel, app->target.queue, 0, FALSE);
 	refresh(app);
 }
 
@@ -655,6 +662,8 @@ int main(int argc, char **argv)
 	}
 	result = g_application_run(G_APPLICATION(app.application), argc, argv);
 	monitor_tray_free(app.tray);
+	maintenance_panel_free(app.maintenance_panel);
+	app.maintenance_panel = NULL;
 	scan_panel_free(app.scan_panel);
 	g_object_unref(app.application);
 	g_strfreev(app.queue_names);

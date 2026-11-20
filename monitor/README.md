@@ -5,7 +5,9 @@ It complements CUPS/GNOME with independent network polling, four separate ink
 bars, the printer's display message, detailed faults and desktop notifications.
 It reads local CUPS queue state and up to 20 recent jobs owned by the current
 user. It also supports scans started from the printer's **Scan to PC** menu.
-It performs no printing, maintenance operation or queue modification.
+Its Maintenance window submits head-cleaning and nozzle-check jobs through the
+selected local CUPS queue. Ink-level synchronization runs automatically when
+needed. The monitor preserves queue configuration and defaults.
 
 Build with `make -C monitor`, or build the whole project normally. Dependencies
 are GTK 4 (4.12 or newer), GLib, libdbusmenu-glib, Net-SNMP, libcups, gettext,
@@ -108,14 +110,65 @@ PC address alone does not create that forwarding rule. The address override is
 for such routed setups. See [SCANNING.md](SCANNING.md) for the wire protocol,
 security boundary and validation scope.
 
+## Maintenance
+
+Click **Maintenance** in the main window to open the maintenance window and
+use the operations advertised by the selected print queue.
+Choose **All print heads**, **Black** or **Colors**, then **Normal
+cleaning**, **Strong cleaning** or **Strongest cleaning**. **Clean print heads…**
+is on the same row as the head and strength selectors and shows the queue,
+strength and ink group before confirmation. Stronger cleaning
+uses more ink; the default confirmation button is Cancel.
+
+**Print nozzle check** prints one internal print-quality sheet.
+Status, ink bars and CUPS jobs refresh automatically every five seconds; no
+refresh buttons are needed. The monitor compares the printer's ink readings
+with CUPS supply information and submits a paperless `ReportLevels` job only
+when the CUPS levels differ or are unavailable. Percentages use the same
+rounding as the driver. The selected queue must be idle, accept jobs and support
+this command. The printer must respond with valid ink levels, and its monitored
+address must match the address derived from the queue.
+
+At most one ink update is tracked at a time, with at least five minutes between
+attempts for the selected queue, including after failure or a lost reply.
+Ordinary five-second polls create no jobs when the levels already match.
+Automatic supply queries do not generate document-delivery notifications.
+The time below the bars records matching current levels or confirmed command
+completion. Pending, failed, cancelled or unconfirmed jobs do not display a
+successful update. The monitor queries that job directly, independently of the
+bounded job history.
+
+Under **Printer and notifications**, select a local CUPS queue using the
+Brother MFC-J5720DW CUPS driver and press **Apply**. An IP address alone is
+not sufficient for maintenance. Commands go to that queue's configured device,
+including when a different address is used for status monitoring. Controls are
+disabled when CUPS is unavailable, the queue rejects jobs or a command is not
+advertised. Capabilities are checked again immediately before submission.
+
+Each action creates one `application/vnd.cups-command` job, with one copy and
+no change to printing defaults. Cleaning and nozzle-check submissions display
+their job ID; follow them in the CUPS job list.
+Acceptance or delivery does not mean the physical cleaning has finished; use
+the printer state and its panel to follow that operation. A paused queue can
+retain the job until resumed. Cleaning and nozzle-check submissions are never
+retried automatically: check CUPS before sending an unconfirmed operation again.
+
+The UI stays responsive while CUPS is contacted. Closing the maintenance window
+keeps the monitor running; opening it again retains the cleaning selections.
+Hiding the main window also hides maintenance. Quitting cancels an open confirmation dialog
+or waits for an in-flight CUPS submission; it does not cancel a job already
+accepted by CUPS or wait for the printer's physical operation to finish.
+Alignment remains available on the printer's own maintenance menu.
+
 ## Status interpretation
 
 Each poll uses a Net-SNMP session with a 1.5-second timeout and no retry, followed
 by localization and bounded alert-table requests if the printer responds. CUPS uses a separate
 local connection with a timeout. All network operations run in a worker thread;
 only one poll can run at once. Changing the selection discards any older result.
-Status polling issues only read requests. SNMPv2c is unencrypted, including its
-community. Enabling scan reception separately performs SNMPv1 SET requests for
+Status polling issues only read requests; the GUI separately submits paperless
+CUPS jobs when supply information needs updating. SNMPv2c is unencrypted,
+including its community. Enabling scan reception separately performs SNMPv1 SET requests for
 temporary scan destinations, using Brother's `internal` registration community.
 
 | Information | OID |

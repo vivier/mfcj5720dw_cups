@@ -8,7 +8,9 @@ mfcj5720dw-monitor \- monitor a Brother MFC-J5720DW network printer
 Display physical printer status, diagnostic messages, four ink levels and
 recent jobs belonging to the current user in a local CUPS queue.
 Poll the printer and CUPS every five seconds without blocking the window.
-The monitor sends no print data or maintenance commands.
+The Maintenance window submits head-cleaning and nozzle-check jobs through
+the selected local CUPS queue. Ink-level synchronization runs automatically
+when needed.
 Optional scan-to-PC reception registers temporary destinations with SNMP writes
 and acquires documents through Brother's separately installed brscan4 SANE backend.
 .PP
@@ -58,6 +60,42 @@ A successful query can still report a printer fault or unsupported diagnostics.
 .TP
 .B \-\-help
 Show command-line help.
+.SH MAINTENANCE
+Click Maintenance to open a separate window to clean all print heads, black only or colors only,
+using normal, strong or strongest cleaning. Clean print heads shows the
+selected queue, intensity and ink group before confirmation. Stronger
+cleaning consumes more ink. Cancel is the default confirmation button.
+.PP
+Print nozzle check prints one internal print-quality sheet.
+Status, ink bars and CUPS jobs refresh automatically every five seconds.
+If CUPS supply levels differ from the printer's readings or are unavailable,
+the monitor submits a paperless ReportLevels job. The queue must be idle,
+accept jobs and support the command. The monitored address must match the
+address derived from the queue, and printer ink readings must be valid.
+Attempts are separated by at least five minutes, including after failure.
+Only one ink update is tracked at a time. Matching levels create no jobs.
+Automatic supply queries do not generate document-delivery notifications.
+The time below the ink bars records matching current levels or confirmed
+command completion. Pending, failed, cancelled or unconfirmed jobs do not
+display a successful update. The job is queried directly, independently of
+the bounded job history.
+.PP
+Select a local CUPS queue under Printer and notifications and press Apply.
+An IP address alone is insufficient. Commands use the selected queue's device,
+including when the address used for status monitoring has been overridden.
+Only advertised commands are enabled, and the queue must accept jobs.
+Capabilities are rechecked before submission. Use the Brother MFC-J5720DW CUPS
+driver to expose all operations.
+.PP
+Each action submits one application/vnd.cups-command job with one copy.
+Queue defaults are preserved. Cleaning and nozzle-check job IDs are displayed; acceptance or delivery
+does not prove physical maintenance completion. A paused queue retains jobs
+until resumed. Check the job list before retrying an unconfirmed submission.
+Closing the maintenance window keeps the monitor running and retains the
+cleaning selections. Hiding the main window also hides maintenance.
+Quitting dismisses an open confirmation or waits for an in-flight submission;
+it does not cancel accepted jobs or wait for physical maintenance completion.
+Use the printer's own maintenance menu for alignment.
 .SH SCAN TO PC
 Install Brother's 64-bit brscan4 scanner backend and configure this model with
 brsaneconfig4, using a unique scanner name and the printer's literal IPv4
