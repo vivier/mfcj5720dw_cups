@@ -9,7 +9,7 @@
 %global driverdatadir %{_datadir}/mfcj5720dw
 
 Name:           mfcj5720dw-cups
-Version:        0.3.0
+Version:        0.4.0
 Release:        1%{?dist}
 Summary:        Direct CUPS Raster driver for the Brother MFC-J5720DW
 License:        GPL-3.0-or-later AND GPL-2.0-or-later AND LicenseRef-Brother-Data
@@ -150,6 +150,14 @@ exit 0
 %{_mandir}/man1/mfcj5720dw-monitor.1*
 
 %changelog
+* Fri Nov 20 2026 Laurent Vivier <laurent@vivier.eu> - 0.4.0-1
+- Receive printer-initiated scans as PDF, JPEG, searchable PDF or email attachments.
+- Honor the printer's duplex choice and document the separate brscan4 scanner setup.
+- Add a system tray icon and tabbed settings with Cancel and Confirm actions.
+- Expose head cleaning and nozzle checks in a dedicated maintenance window.
+- Synchronize CUPS ink levels automatically and simplify the status display.
+- Show whole ink percentages and disable scan fields when reception is unchecked.
+
 * Thu Nov 19 2026 Laurent Vivier <laurent@vivier.eu> - 0.3.0-1
 - Add an optional GTK status monitor with notifications and French translation.
 - Package the monitor separately and decode printer-localized text, including HP Roman-8.
