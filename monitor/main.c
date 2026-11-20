@@ -274,7 +274,7 @@ static void show_snapshot(struct monitor_app *app, const struct monitor_snapshot
 		char text[32];
 
 		if (s->ink_valid)
-			g_snprintf(text, sizeof(text), "%.1f %%", s->ink[i] / 100.0);
+			g_snprintf(text, sizeof(text), "%.0f %%", s->ink[i] / 100.0);
 		else
 			g_strlcpy(text, _("Unavailable"), sizeof(text));
 		gtk_progress_bar_set_fraction(app->ink[i], s->ink_valid ? s->ink[i] / 10000.0 : 0);
