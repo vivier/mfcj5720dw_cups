@@ -28,8 +28,6 @@ struct monitor_app {
 	GtkLabel *status;
 	GtkLabel *details;
 	GtkLabel *updated;
-	GtkLabel *cups;
-	GtkLabel *jobs;
 	GtkProgressBar *ink[4];
 	GtkLabel *ink_value[4];
 	GtkCheckButton *notifications;
@@ -233,12 +231,10 @@ static void update_queues(struct monitor_app *app, const struct monitor_snapshot
 
 static void show_snapshot(struct monitor_app *app, const struct monitor_snapshot *s)
 {
-	g_autoptr(GString) jobs = g_string_new(NULL);
 	g_autoptr(GDateTime) now = g_date_time_new_from_unix_local(s->timestamp / G_USEC_PER_SEC);
 	g_autofree char *time = g_date_time_format(now, "%X");
 	g_autofree char *updated = g_strdup_printf(_("Last update: %s — %s"), time,
 						 s->target.host[0] ? s->target.host : _("No address"));
-	g_autofree char *cups = NULL;
 	unsigned int i;
 
 	update_queues(app, s);
@@ -257,24 +253,6 @@ static void show_snapshot(struct monitor_app *app, const struct monitor_snapshot
 		gtk_label_set_text(app->ink_value[i], text);
 		gtk_widget_set_sensitive(GTK_WIDGET(app->ink[i]), s->ink_valid);
 	}
-	if (!s->target.queue[0])
-		cups = g_strdup(_("No print queue selected"));
-	else if (!s->cups_valid)
-		cups = g_strdup(_("CUPS queue is unavailable"));
-	else
-		cups = g_strdup_printf("%s — %s\n%s%s%s", s->target.queue,
-			s->queue_state == IPP_PSTATE_IDLE ? _("Idle") :
-			s->queue_state == IPP_PSTATE_PROCESSING ? _("Processing") :
-			s->queue_state == IPP_PSTATE_STOPPED ? _("Paused") : _("Unknown"),
-			s->queue_message, s->queue_message[0] ? "\n" : "", s->queue_reasons);
-	gtk_label_set_text(app->cups, cups);
-	for (i = 0; i < s->job_count; i++)
-		g_string_append_printf(jobs, "#%d  %s — %s\n", s->jobs[i].id,
-				       s->jobs[i].title[0] ? s->jobs[i].title : _("Untitled document"),
-				       monitor_job_state(s->jobs[i].state));
-	if (!jobs->len)
-		g_string_append(jobs, s->jobs_valid ? _("No recent jobs") : _("Job list unavailable"));
-	gtk_label_set_text(app->jobs, jobs->str);
 }
 
 static void poll_worker(GTask *task, gpointer source, gpointer task_data,
@@ -439,11 +417,13 @@ static void create_window(struct monitor_app *app)
 
 	app->window = GTK_WINDOW(gtk_application_window_new(app->application));
 	gtk_window_set_title(app->window, _("Brother MFC-J5720DW — Status monitor"));
-	gtk_window_set_default_size(app->window, 620, 760);
+	gtk_window_set_default_size(app->window, 620, -1);
 	gtk_window_set_child(app->window, GTK_WIDGET(layout));
 	gtk_box_append(layout, scroll);
 	gtk_widget_set_vexpand(scroll, TRUE);
 	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll), GTK_WIDGET(box));
+	gtk_scrolled_window_set_propagate_natural_height(GTK_SCROLLED_WINDOW(scroll), TRUE);
+	gtk_scrolled_window_set_max_content_height(GTK_SCROLLED_WINDOW(scroll), 640);
 	gtk_widget_set_margin_start(GTK_WIDGET(box), 24);
 	gtk_widget_set_margin_end(GTK_WIDGET(box), 24);
 	gtk_widget_set_margin_top(GTK_WIDGET(box), 20);
@@ -490,13 +470,6 @@ static void create_window(struct monitor_app *app)
 	gtk_style_context_add_provider_for_display(gtk_widget_get_display(GTK_WIDGET(box)),
 		GTK_STYLE_PROVIDER(css), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 	g_object_unref(css);
-	label(box, _("CUPS queue"), "title-3");
-	app->cups = label(box, "", NULL);
-	app->jobs = label(box, "", NULL);
-	gtk_label_set_selectable(app->cups, TRUE);
-	gtk_label_set_selectable(app->jobs, TRUE);
-	label(box, _("“Sent to printer” means CUPS finished sending the job; "
-		     "it does not confirm that all sheets have been printed."), "dim-label");
 	app->scan_panel = scan_panel_new(box, app->application, &app->scan_settings, &app->notify_enabled);
 	gtk_box_append(box, expander);
 	gtk_expander_set_child(GTK_EXPANDER(expander), GTK_WIDGET(settings));

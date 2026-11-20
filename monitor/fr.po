@@ -16,12 +16,6 @@ msgstr "Noir"
 msgid "Brother MFC-J5720DW — Status monitor"
 msgstr "Brother MFC-J5720DW — Moniteur d’état"
 
-msgid "CUPS queue"
-msgstr "File d’impression CUPS"
-
-msgid "CUPS queue is unavailable"
-msgstr "La file CUPS est indisponible"
-
 msgid "Canceled"
 msgstr "Annulé"
 
@@ -59,9 +53,6 @@ msgstr "Erreur de version du micrologiciel"
 msgid "Held"
 msgstr "Suspendu"
 
-msgid "Idle"
-msgstr "Au repos"
-
 msgid "Ink absorber is almost full"
 msgstr "L’absorbeur d’encre est presque plein"
 
@@ -98,9 +89,6 @@ msgstr "Le bac à papier est absent"
 msgid "Invalid arguments; use --help."
 msgstr "Arguments incorrects ; utilisez --help."
 
-msgid "Job list unavailable"
-msgstr "Liste des travaux indisponible"
-
 msgid "Keep monitoring when the window is closed"
 msgstr "Continuer la surveillance après fermeture de la fenêtre"
 
@@ -122,12 +110,6 @@ msgstr "Aucune réponse SNMP. Vérifiez l’adresse, le réseau et les paramètr
 
 msgid "No address"
 msgstr "Aucune adresse"
-
-msgid "No print queue selected"
-msgstr "Aucune file d’impression sélectionnée"
-
-msgid "No recent jobs"
-msgstr "Aucun travail récent"
 
 msgid "Notify about errors and job delivery"
 msgstr "Notifier les erreurs et l’envoi des travaux"
@@ -158,9 +140,6 @@ msgstr "Le niveau de papier est faible"
 
 msgid "Paper jam"
 msgstr "Bourrage papier"
-
-msgid "Paused"
-msgstr "En pause"
 
 msgid "Preventive maintenance is overdue"
 msgstr "Une maintenance préventive est nécessaire"
@@ -297,9 +276,6 @@ msgstr "Indisponible"
 msgid "Unknown"
 msgstr "Inconnu"
 
-msgid "Untitled document"
-msgstr "Document sans titre"
-
 msgid "Unrecognized printer error"
 msgstr "Erreur d’imprimante non reconnue"
 
@@ -318,9 +294,6 @@ msgstr "Jaune"
 
 msgid "— Brother MFC-J5720DW status monitor"
 msgstr "— moniteur d’état Brother MFC-J5720DW"
-
-msgid "“Sent to printer” means CUPS finished sending the job; it does not confirm that all sheets have been printed."
-msgstr "« Envoyé à l’imprimante » signifie que CUPS a fini l’envoi du travail ; cela ne confirme pas que toutes les feuilles sont imprimées."
 
 msgid "Choose an absolute folder path for scanned documents."
 msgstr "Choisissez un chemin de dossier absolu pour les documents numérisés."

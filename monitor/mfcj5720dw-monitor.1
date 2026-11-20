@@ -5,8 +5,8 @@ mfcj5720dw-monitor \- monitor a Brother MFC-J5720DW network printer
 .B mfcj5720dw-monitor
 .RI [ options ]
 .SH DESCRIPTION
-Display physical printer status, diagnostic messages, four ink levels and
-recent jobs belonging to the current user in a local CUPS queue.
+Display physical printer status, diagnostic messages and four ink levels.
+View and manage the print queue in GNOME's printer settings.
 Poll the printer and CUPS every five seconds without blocking the window.
 The Maintenance window submits head-cleaning and nozzle-check jobs through
 the selected local CUPS queue. Ink-level synchronization runs automatically
@@ -67,7 +67,7 @@ selected queue, intensity and ink group before confirmation. Stronger
 cleaning consumes more ink. Cancel is the default confirmation button.
 .PP
 Print nozzle check prints one internal print-quality sheet.
-Status, ink bars and CUPS jobs refresh automatically every five seconds.
+Printer status and ink bars refresh automatically every five seconds.
 If CUPS supply levels differ from the printer's readings or are unavailable,
 the monitor submits a paperless ReportLevels job. The queue must be idle,
 accept jobs and support the command. The monitored address must match the

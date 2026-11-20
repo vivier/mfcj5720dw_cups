@@ -453,11 +453,9 @@ static void read_cups(struct monitor_snapshot *s)
 {
 	http_t *http;
 	ipp_t *request, *response;
-	ipp_attribute_t *attr;
 	char uri[1024];
-	unsigned int i;
 	const char *attributes[] = { "printer-state", "printer-state-message",
-		"printer-state-reasons", "device-uri", "printer-type",
+		"device-uri", "printer-type",
 		"printer-commands", "printer-is-accepting-jobs", "marker-colors", "marker-levels" };
 
 	/* This application follows local queues and never prompts from a worker. */
@@ -487,16 +485,6 @@ static void read_cups(struct monitor_snapshot *s)
 					"printer-is-accepting-jobs", IPP_TAG_BOOLEAN), 0);
 		s->queue_state = ippGetInteger(ippFindAttribute(response, "printer-state", IPP_TAG_ENUM), 0);
 		g_strlcpy(s->queue_message, attribute_string(response, "printer-state-message"), sizeof(s->queue_message));
-		attr = ippFindAttribute(response, "printer-state-reasons", IPP_TAG_KEYWORD);
-		for (i = 0; i < (unsigned int)ippGetCount(attr); i++) {
-			const char *reason = ippGetString(attr, i, NULL);
-
-			if (!strcmp(reason, "none"))
-				continue;
-			if (s->queue_reasons[0])
-				g_strlcat(s->queue_reasons, ", ", sizeof(s->queue_reasons));
-			g_strlcat(s->queue_reasons, reason, sizeof(s->queue_reasons));
-		}
 		monitor_uri_host(attribute_string(response, "device-uri"),
 				 s->queue_host, sizeof(s->queue_host));
 		if (!s->target.host[0])

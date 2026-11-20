@@ -4,7 +4,8 @@
 It complements CUPS/GNOME with independent network polling, four vertical ink
 bars, the printer's display message, detailed faults and desktop notifications.
 It reads local CUPS queue state and up to 20 recent jobs owned by the current
-user. It also supports scans started from the printer's **Scan to PC** menu.
+user for notifications. View and manage the print queue in GNOME's printer
+settings. It also supports scans started from the printer's **Scan to PC** menu.
 Its Maintenance window submits head-cleaning and nozzle-check jobs through the
 selected local CUPS queue. Ink-level synchronization runs automatically when
 needed. The monitor preserves queue configuration and defaults.
@@ -121,7 +122,7 @@ strength and ink group before confirmation. Stronger cleaning
 uses more ink; the default confirmation button is Cancel.
 
 **Print nozzle check** prints one internal print-quality sheet.
-Status, ink bars and CUPS jobs refresh automatically every five seconds; no
+Printer status and ink bars refresh automatically every five seconds; no
 refresh buttons are needed. The monitor compares the printer's ink readings
 with CUPS supply information and submits a paperless `ReportLevels` job only
 when the CUPS levels differ or are unavailable. Percentages use the same
@@ -218,7 +219,7 @@ New faults and recovery are reported on transitions. Connectivity alerts require
 two unsuccessful polls. A CUPS job is reported delivered only after observing
 its transition from an active state to the explicit completed state. Cancellation
 and failure are distinct. Disappearance from history never implies success.
-All displayed CUPS completion messages mean **sent to printer**, not verified
+CUPS completion notifications mean **sent to printer**, not verified
 physical output. The initial history does not generate delivery notifications.
 
 Maintenance-related display text is shown as returned by the printer. There is

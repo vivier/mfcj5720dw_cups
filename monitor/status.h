@@ -67,7 +67,6 @@ struct monitor_snapshot {
 	char display[MONITOR_TEXT];
 	char network_error[MONITOR_TEXT];
 	char queue_message[MONITOR_TEXT];
-	char queue_reasons[MONITOR_TEXT];
 	struct monitor_queue queues[MONITOR_MAX_QUEUES];
 	unsigned int queue_count;
 	struct monitor_job jobs[MONITOR_MAX_JOBS];

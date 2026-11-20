@@ -12,7 +12,7 @@ and status queries. It includes annotated captures and public references,
 and distinguishes code-derived behavior, physical tests and remaining unknowns.
 
 An optional [desktop status monitor](monitor/README.md) displays physical
-printer status, ink levels and CUPS jobs, with a system tray icon, notifications
+printer status and ink levels, with a system tray icon, notifications
 and English/French interfaces. It is provided in a separate
 `mfcj5720dw-cups-monitor` RPM.
 
