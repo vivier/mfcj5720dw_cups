@@ -192,7 +192,7 @@ The proposed display name is the system hostname followed by the login name,
 separated by ` de ` (for example `quad de laurent`). The complete string is
 truncated to its first 15 characters, without shortening either part separately.
 A saved name
-overrides this default. Applying an empty or spaces-only name restores,
+overrides this default. Confirming an empty or spaces-only name restores,
 displays and saves the default, without resetting other preferences.
 Spaces, dots, hyphens and underscores are also accepted in manually chosen names.
 Brother's [DeviceSelector instructions](https://support.brother.com/g/b/faqend.aspx?c=us_ot&faqid=faq00003187_003&lang=en&pfs=1&prod=mfcj5720dw_us_eu_as)

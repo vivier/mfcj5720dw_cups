@@ -8,8 +8,8 @@
 struct maintenance_panel;
 struct monitor_snapshot;
 
-struct maintenance_panel *maintenance_panel_new(GtkWindow *parent, GtkButton *open,
-						GtkLabel *levels_status);
+struct maintenance_panel *maintenance_panel_new(GtkWindow *parent, GtkLabel *levels_status);
+void maintenance_panel_present(struct maintenance_panel *panel);
 void maintenance_panel_follow(struct maintenance_panel *panel, const char *queue,
 			      unsigned int commands, gboolean accepting_jobs);
 int maintenance_panel_ink_job(struct maintenance_panel *panel);

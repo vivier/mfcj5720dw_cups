@@ -100,7 +100,8 @@ queue defaults after replacing it.
 ## Desktop status monitor
 
 Launch **Brother MFC-J5720DW Monitor** from the application menu, or run
-`mfcj5720dw-monitor`. Select the local CUPS queue, then press **Apply**.
+`mfcj5720dw-monitor`. Open **Settings → Printers** from its main menu,
+select the local CUPS queue, then press **Confirm**.
 The printer address is derived from JetDirect, LPD or IPP/IPPS queues.
 For DNS-SD service URIs, USB queues or queues pointing to a print server,
 enter the physical printer's network address explicitly. SNMPv2c read queries
@@ -116,27 +117,35 @@ HP Roman-8 for French messages such as `Prêt`.
 
 Closing the window keeps monitoring active by default, with an icon in the
 system tray. Activate the icon or choose **Show monitor** from its menu to
-reopen the existing window. **Quit monitor** in the window or tray menu stops
-the monitor and removes the icon. GNOME requires the AppIndicator extension;
+reopen the existing window. The tray menu also opens **Settings** directly.
+**Quit** in the main menu or **Quit monitor** in the tray menu stops the
+monitor and removes the icon. GNOME requires the AppIndicator extension;
 see the [installation instructions](monitor/README.md). The RPM recommends
 the extension on GNOME but does not enable it automatically. Launching the
 application again also reopens its existing window. To start
-silently at login, enable **Start monitoring when I log in** and press **Apply**.
-Login startup is disabled by default. The monitor sends no print data or
-maintenance commands. Status queries are read-only; enabling scan reception
+silently at login, enable **Start monitoring when I log in** under
+**Settings → Notifications** and press **Confirm**. Login startup is disabled
+by default. **Maintenance** in the main menu opens head cleaning and nozzle
+checks. The monitor also synchronizes CUPS ink levels automatically when needed.
+Status queries are read-only; enabling scan reception
 also registers temporary destinations with SNMP writes. See
 [monitor/README.md](monitor/README.md) and `man mfcj5720dw-monitor` for details
 and limitations.
 
-Enable **Scan to this PC** to register this computer in the printer's File,
+Enable reception under **Settings → Scan to this PC** to register this computer in the printer's File,
 Image, OCR and Email menus. File saves a multipage PDF; Image saves JPEG pages;
 OCR saves and opens a searchable PDF; Email opens a draft with a PDF attachment
 in the configured desktop mail application. It does not send mail automatically.
 The printer selects the glass or loaded feeder, and its duplex setting controls
 one-sided, long-edge or short-edge acquisition. Resolutions from 100 to 2400 dpi
 are offered, with 300 dpi as the default. Select the output folder using the GTK
-folder chooser, then press **Apply**. Temporary PNG pages are deleted after
+folder chooser, then press **Confirm**. Temporary PNG pages are deleted after
 processing, including failures and cancellation.
+
+The Settings window groups **Printers**, **Notifications** and **Scan to this PC**
+in three tabs. **Confirm** saves all tabs together; **Cancel**, Escape or closing
+the window discards pending edits. The main menu also provides **About** and
+**Close This Window**.
 
 Scanning requires Brother's separately installed **64-bit brscan4 SANE backend**,
 configured for this printer's IPv4 address. The monitor RPM supplies scanimage,
@@ -281,10 +290,10 @@ After installation, `man rastertomfcj5720dw`, `man mfcj5720dw_ink` and
 ## Maintenance
 
 The [desktop monitor](monitor/README.md#maintenance) provides these operations
-in a separate window opened with **Maintenance**: choose the print heads and
+in a separate window opened from the main menu's **Maintenance** entry: choose the print heads and
 cleaning strength, or print a nozzle check. The monitor automatically updates
 CUPS supply information when it differs from the printer's ink levels. Select
-the CUPS queue and press **Apply** first. Cleaning requests show a confirmation
+the CUPS queue under **Settings → Printers** and press **Confirm** first. Cleaning requests show a confirmation
 with the queue, intensity and ink group.
 
 The driver advertises `Clean`, `PrintSelfTestPage`, `ReportLevels` and two

@@ -23,9 +23,25 @@ The initial job list does not generate notifications for old completed jobs.
 The monitor can remain running when its window is closed. A system tray icon
 remains visible while it runs, including when started with --background.
 Activate the icon or choose Show monitor from its menu to reopen the window.
-Use Quit monitor in the window or tray menu to stop it and remove the icon.
+Settings in the tray menu opens the same settings window, including when the
+main window is hidden.
+Use Quit in the main menu or Quit monitor in the tray menu to stop it and remove the icon.
 Login startup is an explicit preference.
-Use Apply to save preferences and the selected printer.
+The main window shows the selected printer and resolved address in read-only form.
+Its header-bar menu contains Maintenance, Settings, About, Close This Window and Quit.
+Settings opens a single window with Printers, Notifications and Scan to this PC
+tabs. Switching tabs preserves pending edits. Confirm validates all tabs before
+saving their values together, then closes the window. Invalid fields reveal
+their tab; invalid values or failed saves leave active settings unchanged.
+Cancel, Escape and closing Settings discard edits in all tabs. Hiding the main
+window also discards an open draft. Closing Settings does not stop scan
+reception or cancel acquisition; use Cancel scan to cancel acquisition.
+Printer and scan changes require an idle scanner. Notification-only changes
+can be saved during acquisition.
+Close This Window honors the background-monitoring preference just like the
+window's close button; Quit always stops the monitor.
+About displays the package version, copyright, GPL-3.0-or-later license and
+project website using GTK's standard dialog.
 .PP
 The desktop must provide a StatusNotifierItem host. GNOME requires the
 AppIndicator and KStatusNotifierItem Support extension (Fedora package
@@ -48,7 +64,7 @@ printer's address explicitly. The printer must be reachable over the network.
 .TP
 .BR \-\-community " " \fICOMMUNITY\fR
 SNMP read community (default: public). SNMPv2c queries use UDP port 161.
-The community is saved in a private user settings file when Apply is used.
+The community is saved in a private user settings file when Confirm is used.
 .TP
 .B \-\-background
 Start monitoring without showing the window.
@@ -61,7 +77,7 @@ A successful query can still report a printer fault or unsupported diagnostics.
 .B \-\-help
 Show command-line help.
 .SH MAINTENANCE
-Click Maintenance to open a separate window to clean all print heads, black only or colors only,
+Choose Maintenance from the main menu to open a separate window to clean all print heads, black only or colors only,
 using normal, strong or strongest cleaning. Clean print heads shows the
 selected queue, intensity and ink group before confirmation. Stronger
 cleaning consumes more ink. Cancel is the default confirmation button.
@@ -80,7 +96,7 @@ levels. Ink synchronization shows a temporary progress message, cleared on
 confirmed completion, or an error if the job fails, is cancelled or cannot be
 confirmed. The job is queried directly, independently of the bounded job history.
 .PP
-Select a local CUPS queue under Printer and notifications and press Apply.
+Select a local CUPS queue under Settings, Printers and press Confirm.
 An IP address alone is insufficient. Commands use the selected queue's device,
 including when the address used for status monitoring has been overridden.
 Only advertised commands are enabled, and the queue must accept jobs.
@@ -102,15 +118,15 @@ brsaneconfig4, using a unique scanner name and the printer's literal IPv4
 address (ip=, not nodename=). The monitor matches this configuration to SANE's
 device list. It does not require the separate brscan-skey program.
 .PP
-Expand Scan to this PC, enable reception and set the PC name, output folder,
-resolution and OCR languages. Press Apply, then choose this PC from
+Open Settings, Scan to this PC, enable reception and set the PC name, output folder,
+resolution and OCR languages. Press Confirm, then choose this PC from
 the printer's File, Image, OCR or Email menu.
 Click the output folder to open the GTK folder chooser. Select a folder, then
-press Apply to save it. Cancelling the chooser keeps the previous folder.
+press Confirm to save it. Cancelling the chooser keeps the previous folder.
 The proposed PC name combines the system hostname and login name, separated by
 " de " (for example "quad de laurent"). The complete string is truncated to its
 first 15 characters; unsupported characters become underscores. Saved names are
-preserved. Clear the name and press Apply to restore, display and save the
+preserved. Clear the name and press Confirm to restore, display and save the
 default; a name containing only spaces has the same effect. Other settings
 are preserved. Custom names may also contain spaces and dots.
 .PP

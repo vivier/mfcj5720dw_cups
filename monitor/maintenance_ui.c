@@ -20,7 +20,6 @@ struct maintenance_panel {
 	GtkDropDown *inks;
 	GtkButton *clean;
 	GtkButton *nozzles;
-	GtkButton *open;
 	GCancellable *dialog_cancel;
 	char *queue;
 	char *pending_queue;
@@ -206,11 +205,8 @@ static GtkButton *action_button(struct maintenance_panel *panel, const char *tit
 	return button;
 }
 
-static void open_clicked(GtkButton *button, gpointer data)
+void maintenance_panel_present(struct maintenance_panel *panel)
 {
-	struct maintenance_panel *panel = data;
-
-	(void)button;
 	gtk_window_present(panel->window);
 }
 
@@ -225,8 +221,7 @@ static void parent_visibility_changed(GObject *parent, GParamSpec *property, gpo
 	}
 }
 
-struct maintenance_panel *maintenance_panel_new(GtkWindow *parent, GtkButton *open,
-						GtkLabel *levels_status)
+struct maintenance_panel *maintenance_panel_new(GtkWindow *parent, GtkLabel *levels_status)
 {
 	struct maintenance_panel *panel = g_new0(struct maintenance_panel, 1);
 	GtkWidget *scroll = gtk_scrolled_window_new();
@@ -248,7 +243,6 @@ struct maintenance_panel *maintenance_panel_new(GtkWindow *parent, GtkButton *op
 	gtk_window_set_hide_on_close(panel->window, TRUE);
 	gtk_window_set_default_size(panel->window, 640, -1);
 	gtk_window_set_child(panel->window, scroll);
-	panel->open = g_object_ref(open);
 	panel->levels_status = g_object_ref(levels_status);
 	panel->dialog_cancel = g_cancellable_new();
 	panel->box = GTK_BOX(g_object_ref_sink(gtk_box_new(GTK_ORIENTATION_VERTICAL, 8)));
@@ -288,7 +282,6 @@ struct maintenance_panel *maintenance_panel_new(GtkWindow *parent, GtkButton *op
 	panel->status = panel_label(panel->box, "");
 	gtk_label_set_selectable(panel->status, TRUE);
 	gtk_widget_set_visible(GTK_WIDGET(panel->status), FALSE);
-	g_signal_connect(panel->open, "clicked", G_CALLBACK(open_clicked), panel);
 	g_signal_connect(panel->strength, "notify::selected", G_CALLBACK(selection_changed), panel);
 	g_signal_connect(panel->parent, "notify::visible", G_CALLBACK(parent_visibility_changed), panel);
 	maintenance_panel_follow(panel, "", 0, FALSE);
@@ -315,7 +308,7 @@ void maintenance_panel_follow(struct maintenance_panel *panel, const char *queue
 	panel->commands = commands;
 	panel->accepting_jobs = accepting_jobs;
 	if (!queue || !*queue)
-		text = g_strdup(_("Select a CUPS queue under Printer and notifications, then press Apply to use maintenance."));
+		text = g_strdup(_("Select a CUPS queue in Settings → Printers, then confirm to use maintenance."));
 	else if (!commands)
 		text = g_strdup_printf(_("Maintenance is unavailable for %s. Check CUPS and select the Brother MFC-J5720DW CUPS driver."), queue);
 	else if (!accepting_jobs)
@@ -414,7 +407,6 @@ void maintenance_panel_free(struct maintenance_panel *panel)
 	g_signal_handlers_disconnect_by_data(panel->strength, panel);
 	g_signal_handlers_disconnect_by_data(panel->clean, panel);
 	g_signal_handlers_disconnect_by_data(panel->nozzles, panel);
-	g_signal_handlers_disconnect_by_data(panel->open, panel);
 	g_signal_handlers_disconnect_by_data(panel->parent, panel);
 	gtk_window_destroy(panel->window);
 	g_object_unref(panel->dialog_cancel);
@@ -422,7 +414,6 @@ void maintenance_panel_free(struct maintenance_panel *panel)
 	g_object_unref(panel->window);
 	g_object_unref(panel->parent);
 	g_object_unref(panel->levels_status);
-	g_object_unref(panel->open);
 	g_free(panel->pending_queue);
 	g_free(panel->queue);
 	g_free(panel);

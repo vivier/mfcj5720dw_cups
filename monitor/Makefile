@@ -3,6 +3,7 @@ BUILD ?= ../build/monitor
 PREFIX ?= /usr
 LOCALEDIR ?= $(PREFIX)/share/locale
 PKG_CONFIG ?= pkg-config
+VERSION = $(shell sed -n 's/^Version:[[:space:]]*//p' ../mfcj5720dw-cups.spec)
 GTK_CFLAGS = $(shell $(PKG_CONFIG) --cflags gtk4)
 GTK_LIBS = $(shell $(PKG_CONFIG) --libs gtk4)
 MENU_CFLAGS = $(shell $(PKG_CONFIG) --cflags dbusmenu-glib-0.4)
@@ -11,12 +12,15 @@ SNMP_CFLAGS = $(shell $(PKG_CONFIG) --cflags netsnmp)
 SNMP_LIBS = $(shell $(PKG_CONFIG) --libs netsnmp)
 CFLAGS = -std=gnu11 -O2 -g -fPIE -Wall -Wextra -Werror -Wstrict-prototypes -Wmissing-prototypes
 CPPFLAGS += -DLOCALEDIR='"$(LOCALEDIR)"'
+CPPFLAGS += -DMONITOR_VERSION='"$(VERSION)"'
 OBJECTS = $(addprefix $(BUILD)/,main.o poll.o status.o tray.o maintenance.o maintenance_ui.o ink.o scan_protocol.o scan_service.o scan_job.o scan_control.o scan_ui.o)
 HEADERS = $(wildcard *.h)
 APP_ID = io.github.vivier.mfcj5720dw.monitor
 
 .PHONY: all install check clean distclean
 all: $(BUILD)/mfcj5720dw-monitor $(BUILD)/fr.mo
+
+$(BUILD)/main.o: ../mfcj5720dw-cups.spec
 
 $(BUILD)/%.o: %.c $(HEADERS) Makefile
 	mkdir -p $(BUILD)

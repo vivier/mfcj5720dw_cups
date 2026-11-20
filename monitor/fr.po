@@ -4,8 +4,8 @@
 msgid ""
 msgstr "Project-Id-Version: mfcj5720dw-monitor 0.3.0\nReport-Msgid-Bugs-To: \nPO-Revision-Date: 2026-11-19 12:00+0100\nLast-Translator: Laurent Vivier\nLanguage-Team: French\nLanguage: fr\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\n"
 
-msgid "Apply"
-msgstr "Appliquer"
+msgid "Confirm"
+msgstr "Valider"
 
 msgid "Automatic, or an IP address / host name"
 msgstr "Automatique, ou adresse IP / nom d’hôte"
@@ -93,8 +93,8 @@ msgid "Keep monitoring when the window is closed"
 msgstr "Continuer la surveillance après fermeture de la fenêtre"
 
 #, c-format
-msgid "Last update: %s — %s"
-msgstr "Dernière actualisation : %s — %s"
+msgid "Last update: %s"
+msgstr "Dernière actualisation : %s"
 
 msgid "Loaded paper does not match the job"
 msgstr "Le papier chargé ne correspond pas au travail"
@@ -158,9 +158,6 @@ msgstr "Adresse IP ou nom d’hôte de l’imprimante"
 
 msgid "Printer address (optional for a network queue)"
 msgstr "Adresse de l’imprimante (facultative pour une file réseau)"
-
-msgid "Printer and notifications"
-msgstr "Imprimante et notifications"
 
 msgid "Printer cannot access its log"
 msgstr "L’imprimante ne peut pas accéder à son journal"
@@ -414,8 +411,8 @@ msgstr "Adresse du PC (facultative ; automatique en réseau local)"
 msgid "File: PDF. Image: JPEG. OCR: searchable PDF. Email: open a draft with a PDF attachment."
 msgstr "Fichier : PDF. Image : JPEG. OCR : PDF avec texte recherchable. E-mail : ouvrir un brouillon avec le PDF en pièce jointe."
 
-msgid "Use Apply below. Keep the monitor running to receive scans. Allow UDP port 54925 from the printer in the PC firewall."
-msgstr "Utilisez Appliquer ci-dessous. Laissez le moniteur actif pour recevoir les numérisations. Autorisez le port UDP 54925 depuis l’imprimante dans le pare-feu du PC."
+msgid "Keep the monitor running to receive scans. Allow UDP port 54925 from the printer in the PC firewall."
+msgstr "Gardez le moniteur lancé pour recevoir les numérisations. Autorisez le port UDP 54925 depuis l’imprimante dans le pare-feu du PC."
 
 msgid "Cancel scan"
 msgstr "Annuler la numérisation"
@@ -576,8 +573,8 @@ msgstr "Imprimer le contrôle des buses"
 msgid "The nozzle check prints one sheet."
 msgstr "Le contrôle des buses imprime une feuille."
 
-msgid "Select a CUPS queue under Printer and notifications, then press Apply to use maintenance."
-msgstr "Sélectionnez une file CUPS dans Imprimante et notifications, puis cliquez sur Appliquer pour utiliser la maintenance."
+msgid "Select a CUPS queue in Settings → Printers, then confirm to use maintenance."
+msgstr "Sélectionnez une file CUPS dans Paramètres → Imprimantes, puis validez pour utiliser la maintenance."
 
 #, c-format
 msgid "Maintenance is unavailable for %s. Check CUPS and select the Brother MFC-J5720DW CUPS driver."
@@ -590,3 +587,40 @@ msgstr "File d’impression : %s — n’accepte pas de travaux"
 #, c-format
 msgid "Print queue: %s"
 msgstr "File d’impression : %s"
+
+msgid "No printer selected"
+msgstr "Aucune imprimante sélectionnée"
+
+#, c-format
+msgid "Unable to restore login startup: %s. "
+msgstr "Impossible de rétablir le démarrage à la connexion : %s. "
+
+msgid "Settings"
+msgstr "Paramètres"
+
+msgid "Printers"
+msgstr "Imprimantes"
+
+msgid "Notifications"
+msgstr "Notifications"
+
+msgid "About"
+msgstr "À propos"
+
+msgid "Close This Window"
+msgstr "Fermer cette fenêtre"
+
+msgid "Quit"
+msgstr "Quitter"
+
+msgid "Main menu"
+msgstr "Menu principal"
+
+msgid "Development tools"
+msgstr "Outils de développement"
+
+msgid "Project website"
+msgstr "Site du projet"
+
+msgid "Printer status, ink levels, maintenance and scan-to-PC for the Brother MFC-J5720DW."
+msgstr "État de l’imprimante, niveaux d’encre, maintenance et numérisation vers le PC pour la Brother MFC-J5720DW."

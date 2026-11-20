@@ -25,14 +25,37 @@ driver does not acquire a GTK dependency. `make WITH_MONITOR=0` builds only the
 driver. Source, manual and Makefile are together in this directory; native
 artifacts go to `../build/monitor`.
 
-Launch **Brother MFC-J5720DW Monitor**, choose a queue or enter the physical
-printer's IP address, and press **Apply**. The settings section also controls
-notifications, monitoring after closing the window, and optional login startup.
+Launch **Brother MFC-J5720DW Monitor**. Its header-bar menu contains
+**Maintenance**, **Settings**, **About**, **Close This Window** and **Quit**. The main window
+displays the selected printer and resolved address, its status and four ink
+levels.
+
+**Settings** opens one window with three tabs: **Printers** selects the CUPS
+queue, address and SNMP community; **Notifications** controls notifications,
+background monitoring and login startup; **Scan to this PC** contains scan
+settings and current activity. Switching tabs preserves pending edits.
+
+The shared **Cancel** and **Confirm** buttons apply to all tabs. Confirm
+validates all values before saving them together, then closes the window.
+Invalid fields reveal their tab; invalid values or failed saves leave the
+window open with an error and retain the active settings. Cancel, Escape or
+closing the window discards all pending edits. Hiding the main window also
+discards an open settings draft. Cancelling settings does not stop scan
+reception or cancel acquisition; use **Cancel scan** for that. Printer and
+scan changes require an idle scanner. Notification-only changes can be saved
+during acquisition.
+
+**About** shows the package version, Laurent Vivier's copyright, the
+GPL-3.0-or-later license and the project website in GTK's standard dialog.
 An icon remains in the system tray while the monitor runs, including with
 the window hidden or when started with `--background`. Activate the icon or
 choose **Show monitor** from its menu to reopen the existing window.
-**Quit monitor**, available in both the window and the icon's menu, stops
-polling and scan reception. The icon disappears when the monitor exits.
+The tray menu's **Settings** entry opens the same settings window, including
+when the main window is hidden.
+**Close This Window** follows the same background-monitoring preference as the
+window's close button. **Quit** always stops the monitor, polling and scan
+reception; the tray menu also offers **Quit monitor**. The icon disappears
+when the monitor exits.
 
 The desktop must provide a StatusNotifierItem host. On GNOME, install and
 enable the **AppIndicator and KStatusNotifierItem Support** extension:
@@ -55,8 +78,8 @@ An IPP URI pointing to a print server also needs the physical printer's address.
 The read community defaults to `public` and can be changed in the window.
 `--once` provides a display-independent diagnostic report.
 
-Expand **Scan to this PC**, enable reception, choose the PC name, output folder,
-resolution and OCR languages, then press **Apply**. Choose that PC from
+Open **Settings → Scan to this PC**, enable reception, choose the PC name, output folder,
+resolution and OCR languages, then press **Confirm**. Choose that PC from
 the printer's File, Image, OCR or Email menu. File produces a multipage PDF;
 Image saves JPEG pages and opens the first one; OCR saves only a searchable PDF
 and opens it; Email opens a draft with a PDF attachment. No mail
@@ -66,13 +89,13 @@ are deleted after every job, including failure and cancellation. Image output
 uses JPEG at quality 95. Quitting waits for acquisition cleanup to finish.
 
 Click the current output folder to open GTK's folder chooser, select a folder,
-then press **Apply** to save the choice. Cancelling the chooser keeps the
+then press **Confirm** to save the choice. Cancelling the chooser keeps the
 previous folder. The full path is available in the button's tooltip.
 
 The proposed PC name combines the system hostname and login name with ` de `,
 for example `quad de laurent`. The complete string is truncated to its first
 15 characters, and unsupported characters become underscores. A saved name
-takes precedence. Clear the name and press **Apply** to restore the default;
+takes precedence. Clear the name and press **Confirm** to restore the default;
 a name containing only spaces has the same effect. The restored name appears
 in the field and is saved without changing the other scan settings.
 You can edit it freely using ASCII letters, digits, spaces, dots, hyphens and
@@ -96,7 +119,7 @@ and 2400 × 1200 dpi in the feeder. The backend's 4800 and 9600 dpi choices
 exceed both optical limits and are not offered by the monitor.
 
 Scanning continues when the window is hidden if background
-monitoring is enabled. **Quit monitor** stops reception and cancels acquisition.
+monitoring is enabled. **Quit** stops reception and cancels acquisition.
 The printer may retain the PC entry until its six-minute registration expires.
 
 Allow incoming **UDP 54925 from the printer** in the PC firewall. Status-only
@@ -113,7 +136,7 @@ security boundary and validation scope.
 
 ## Maintenance
 
-Click **Maintenance** in the main window to open the maintenance window and
+Choose **Maintenance** from the main menu to open the maintenance window and
 use the operations advertised by the selected print queue.
 Choose **All print heads**, **Black** or **Colors**, then **Normal
 cleaning**, **Strong cleaning** or **Strongest cleaning**. **Clean print heads…**
@@ -140,8 +163,8 @@ confirmed completion, or an error if the job fails, is cancelled or cannot be
 confirmed. The monitor queries that job directly, independently of the bounded
 job history.
 
-Under **Printer and notifications**, select a local CUPS queue using the
-Brother MFC-J5720DW CUPS driver and press **Apply**. An IP address alone is
+In **Settings → Printers**, select a local CUPS queue using the
+Brother MFC-J5720DW CUPS driver and press **Confirm**. An IP address alone is
 not sufficient for maintenance. Commands go to that queue's configured device,
 including when a different address is used for status monitoring. Controls are
 disabled when CUPS is unavailable, the queue rejects jobs or a command is not

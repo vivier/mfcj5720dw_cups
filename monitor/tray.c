@@ -220,6 +220,7 @@ struct monitor_tray *monitor_tray_new(GtkApplication *application,
 	}
 	root = dbusmenu_menuitem_new();
 	add_menu_item(tray, root, _("Show monitor"), "show");
+	add_menu_item(tray, root, _("Settings"), "settings");
 	add_menu_item(tray, root, _("Quit monitor"), "quit");
 	tray->menu = dbusmenu_server_new(MENU_PATH);
 	dbusmenu_server_set_root(tray->menu, root);

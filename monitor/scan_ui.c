@@ -245,7 +245,6 @@ struct scan_panel *scan_panel_new(GtkBox *parent, GtkApplication *application,
 				 const gboolean *notify_enabled)
 {
 	struct scan_panel *panel = g_new0(struct scan_panel, 1);
-	GtkWidget *expander = gtk_expander_new(_("Scan to this PC"));
 	GtkBox *box = GTK_BOX(gtk_box_new(GTK_ORIENTATION_VERTICAL, 8));
 	GtkBox *row = GTK_BOX(gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12));
 	g_auto(GStrv) resolutions = g_new0(char *, scan_resolution_count + 1);
@@ -261,9 +260,7 @@ struct scan_panel *scan_panel_new(GtkBox *parent, GtkApplication *application,
 
 	panel->application = application;
 	panel->notify_enabled = notify_enabled;
-	gtk_box_append(parent, expander);
-	gtk_expander_set_child(GTK_EXPANDER(expander), GTK_WIDGET(box));
-	gtk_expander_set_expanded(GTK_EXPANDER(expander), settings->enabled);
+	gtk_box_append(parent, GTK_WIDGET(box));
 	panel->enabled = GTK_CHECK_BUTTON(gtk_check_button_new_with_label(_("Receive scans started on the printer")));
 	gtk_check_button_set_active(panel->enabled, settings->enabled);
 	gtk_box_append(box, GTK_WIDGET(panel->enabled));
@@ -293,7 +290,7 @@ struct scan_panel *scan_panel_new(GtkBox *parent, GtkApplication *application,
 	panel->address = scan_entry(box, _("PC address (optional; automatic on a local network)"), settings->address, 15);
 	hint = scan_label(box, _("File: PDF. Image: JPEG. OCR: searchable PDF. Email: open a draft with a PDF attachment."));
 	gtk_widget_add_css_class(GTK_WIDGET(hint), "dim-label");
-	hint = scan_label(box, _("Use Apply below. Keep the monitor running to receive scans. Allow UDP port 54925 from the printer in the PC firewall."));
+	hint = scan_label(box, _("Keep the monitor running to receive scans. Allow UDP port 54925 from the printer in the PC firewall."));
 	gtk_widget_add_css_class(GTK_WIDGET(hint), "dim-label");
 	panel->cancel = GTK_BUTTON(gtk_button_new_with_label(_("Cancel scan")));
 	gtk_widget_set_sensitive(GTK_WIDGET(panel->cancel), FALSE);
@@ -307,16 +304,39 @@ struct scan_panel *scan_panel_new(GtkBox *parent, GtkApplication *application,
 	return panel;
 }
 
+void scan_panel_reset(struct scan_panel *panel, const struct scan_settings *settings)
+{
+	guint resolution = GTK_INVALID_LIST_POSITION;
+	size_t i;
+
+	/* Discard a late folder-chooser reply along with the other draft values. */
+	g_cancellable_cancel(panel->directory_cancel);
+	g_clear_object(&panel->directory_cancel);
+	panel->directory_cancel = g_cancellable_new();
+	gtk_widget_set_sensitive(GTK_WIDGET(panel->directory), TRUE);
+	gtk_check_button_set_active(panel->enabled, settings->enabled);
+	gtk_check_button_set_active(panel->grayscale, settings->grayscale);
+	gtk_editable_set_text(GTK_EDITABLE(panel->name), settings->name);
+	gtk_editable_set_text(GTK_EDITABLE(panel->languages), settings->languages);
+	gtk_editable_set_text(GTK_EDITABLE(panel->address), settings->address);
+	set_scan_directory(panel->directory, settings->directory);
+	for (i = 0; i < scan_resolution_count; i++) {
+		if (scan_resolutions[i] == settings->resolution)
+			resolution = i;
+	}
+	gtk_drop_down_set_selected(panel->resolution, resolution);
+}
+
+gboolean scan_panel_busy(struct scan_panel *panel)
+{
+	return scan_service_busy(panel->service);
+}
+
 gboolean scan_panel_read(struct scan_panel *panel, struct scan_settings *settings, GError **error)
 {
 	guint resolution_index = gtk_drop_down_get_selected(panel->resolution);
 	const char *directory = g_object_get_data(G_OBJECT(panel->directory), "scan-directory");
 
-	if (scan_service_busy(panel->service)) {
-		g_set_error_literal(error, G_IO_ERROR, G_IO_ERROR_BUSY,
-			_("Wait for the current scan to finish, or cancel it before changing settings."));
-		return FALSE;
-	}
 	settings->enabled = gtk_check_button_get_active(panel->enabled);
 	if (strlen(directory) >= sizeof(settings->directory)) {
 		g_set_error_literal(error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
