@@ -331,14 +331,10 @@ int maintenance_panel_ink_job(struct maintenance_panel *panel)
 	return panel && !panel->closing ? panel->ink_job_id : 0;
 }
 
-static void show_ink_time(struct maintenance_panel *panel, gint64 timestamp)
+static void clear_ink_status(struct maintenance_panel *panel)
 {
-	g_autoptr(GDateTime) completed = g_date_time_new_from_unix_local(timestamp / G_USEC_PER_SEC);
-	g_autofree char *moment = g_date_time_format(completed, "%X");
-	g_autofree char *message = g_strdup_printf(_("Ink levels updated at %s"), moment);
-
-	gtk_label_set_text(panel->levels_status, message);
-	gtk_widget_set_visible(GTK_WIDGET(panel->levels_status), TRUE);
+	gtk_label_set_text(panel->levels_status, "");
+	gtk_widget_set_visible(GTK_WIDGET(panel->levels_status), FALSE);
 }
 
 static void synchronize_ink(struct maintenance_panel *panel, const struct monitor_snapshot *snapshot)
@@ -357,7 +353,7 @@ static void synchronize_ink(struct maintenance_panel *panel, const struct monito
 		matches &= percent == snapshot->cups_ink[i];
 	}
 	if (matches) {
-		show_ink_time(panel, snapshot->timestamp);
+		clear_ink_status(panel);
 		return;
 	}
 	now = g_get_monotonic_time();
@@ -387,8 +383,7 @@ void maintenance_panel_update_ink(struct maintenance_panel *panel,
 	if (!snapshot->ink_job_valid) {
 		message = g_strdup(_("Unable to confirm the ink-level update."));
 	} else if (snapshot->ink_job.state == IPP_JSTATE_COMPLETED) {
-		show_ink_time(panel, snapshot->ink_job.completed_at > 0 ?
-			      snapshot->ink_job.completed_at : snapshot->timestamp);
+		clear_ink_status(panel);
 	} else if (snapshot->ink_job.state == IPP_JSTATE_CANCELED) {
 		message = g_strdup(_("Ink-level update cancelled."));
 	} else if (snapshot->ink_job.state == IPP_JSTATE_ABORTED) {

@@ -31,6 +31,7 @@ struct monitor_app {
 	GtkLabel *cups;
 	GtkLabel *jobs;
 	GtkProgressBar *ink[4];
+	GtkLabel *ink_value[4];
 	GtkCheckButton *notifications;
 	GtkCheckButton *background;
 	GtkCheckButton *autostart;
@@ -235,7 +236,7 @@ static void show_snapshot(struct monitor_app *app, const struct monitor_snapshot
 	g_autoptr(GString) jobs = g_string_new(NULL);
 	g_autoptr(GDateTime) now = g_date_time_new_from_unix_local(s->timestamp / G_USEC_PER_SEC);
 	g_autofree char *time = g_date_time_format(now, "%X");
-	g_autofree char *updated = g_strdup_printf(_("Last check: %s — %s"), time,
+	g_autofree char *updated = g_strdup_printf(_("Last update: %s — %s"), time,
 						 s->target.host[0] ? s->target.host : _("No address"));
 	g_autofree char *cups = NULL;
 	unsigned int i;
@@ -253,6 +254,7 @@ static void show_snapshot(struct monitor_app *app, const struct monitor_snapshot
 			g_strlcpy(text, _("Unavailable"), sizeof(text));
 		gtk_progress_bar_set_fraction(app->ink[i], s->ink_valid ? s->ink[i] / 10000.0 : 0);
 		gtk_progress_bar_set_text(app->ink[i], text);
+		gtk_label_set_text(app->ink_value[i], text);
 		gtk_widget_set_sensitive(GTK_WIDGET(app->ink[i]), s->ink_valid);
 	}
 	if (!s->target.queue[0])
@@ -452,19 +454,35 @@ static void create_window(struct monitor_app *app)
 	gtk_label_set_selectable(app->details, TRUE);
 	app->updated = label(box, "", "dim-label");
 	label(box, _("Ink levels"), "title-3");
+	row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 16);
+	gtk_box_set_homogeneous(GTK_BOX(row), TRUE);
+	gtk_box_append(box, row);
 	for (i = 0; i < 4; i++) {
-		label(box, _(names[i]), NULL);
+		GtkBox *column = GTK_BOX(gtk_box_new(GTK_ORIENTATION_VERTICAL, 8));
+		GtkLabel *name;
+
+		gtk_box_append(GTK_BOX(row), GTK_WIDGET(column));
+		name = label(column, _(names[i]), NULL);
+		gtk_label_set_xalign(name, 0.5);
 		app->ink[i] = GTK_PROGRESS_BAR(gtk_progress_bar_new());
-		gtk_progress_bar_set_show_text(app->ink[i], TRUE);
+		gtk_orientable_set_orientation(GTK_ORIENTABLE(app->ink[i]), GTK_ORIENTATION_VERTICAL);
+		gtk_progress_bar_set_inverted(app->ink[i], TRUE);
+		gtk_widget_set_halign(GTK_WIDGET(app->ink[i]), GTK_ALIGN_CENTER);
+		gtk_widget_add_css_class(GTK_WIDGET(app->ink[i]), "ink-level");
 		gtk_widget_add_css_class(GTK_WIDGET(app->ink[i]), colors[i]);
-		gtk_box_append(box, GTK_WIDGET(app->ink[i]));
+		gtk_box_append(column, GTK_WIDGET(app->ink[i]));
+		app->ink_value[i] = label(column, "", NULL);
+		gtk_label_set_xalign(app->ink_value[i], 0.5);
+		gtk_accessible_update_relation(GTK_ACCESSIBLE(app->ink[i]),
+			GTK_ACCESSIBLE_RELATION_LABELLED_BY, name, NULL,
+			GTK_ACCESSIBLE_RELATION_DESCRIBED_BY, app->ink_value[i], NULL, -1);
 	}
 	levels_status = label(box, "", "dim-label");
 	gtk_label_set_selectable(levels_status, TRUE);
 	gtk_widget_set_visible(GTK_WIDGET(levels_status), FALSE);
 	gtk_css_provider_load_from_string(css,
-		"progressbar trough, progressbar progress { min-height: 10px; }"
-		"progressbar text { color: inherit; }"
+		".ink-level trough { min-width: 36px; min-height: 150px; }"
+		".ink-level progress { min-width: 36px; min-height: 0; }"
 		".black-ink progress { background: #333333; }"
 		".cyan-ink progress { background: #00a4cc; }"
 		".magenta-ink progress { background: #c52a87; }"

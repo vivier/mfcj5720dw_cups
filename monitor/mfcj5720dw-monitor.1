@@ -75,10 +75,10 @@ address derived from the queue, and printer ink readings must be valid.
 Attempts are separated by at least five minutes, including after failure.
 Only one ink update is tracked at a time. Matching levels create no jobs.
 Automatic supply queries do not generate document-delivery notifications.
-The time below the ink bars records matching current levels or confirmed
-command completion. Pending, failed, cancelled or unconfirmed jobs do not
-display a successful update. The job is queried directly, independently of
-the bounded job history.
+One last-update time covers the displayed printer information, including ink
+levels. Ink synchronization shows a temporary progress message, cleared on
+confirmed completion, or an error if the job fails, is cancelled or cannot be
+confirmed. The job is queried directly, independently of the bounded job history.
 .PP
 Select a local CUPS queue under Printer and notifications and press Apply.
 An IP address alone is insufficient. Commands use the selected queue's device,

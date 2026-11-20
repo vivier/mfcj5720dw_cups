@@ -26,7 +26,6 @@ struct monitor_queue {
 struct monitor_job {
 	int id;
 	int state;
-	gint64 completed_at;
 	char title[MONITOR_TEXT];
 };
 

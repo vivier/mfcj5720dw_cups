@@ -399,9 +399,8 @@ out:
 
 static void read_ink_job(http_t *http, struct monitor_snapshot *s)
 {
-	const char *wanted[] = { "job-state", "date-time-at-completed" };
+	const char *wanted[] = { "job-state" };
 	ipp_t *request, *response;
-	const ipp_uchar_t *completed;
 	char uri[128];
 
 	if (s->target.ink_job_id <= 0)
@@ -419,9 +418,6 @@ static void read_ink_job(http_t *http, struct monitor_snapshot *s)
 		s->ink_job.state = ippGetInteger(ippFindAttribute(response, "job-state", IPP_TAG_ENUM), 0);
 		s->ink_job_valid = s->ink_job.state >= IPP_JSTATE_PENDING &&
 			s->ink_job.state <= IPP_JSTATE_COMPLETED;
-		completed = ippGetDate(ippFindAttribute(response, "date-time-at-completed", IPP_TAG_DATE), 0);
-		if (completed)
-			s->ink_job.completed_at = (gint64)ippDateToTime(completed) * G_USEC_PER_SEC;
 	}
 	ippDelete(response);
 }

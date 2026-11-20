@@ -1,7 +1,7 @@
 # Printer status monitor
 
 `mfcj5720dw-monitor` is a GTK 4 application with English and French interfaces.
-It complements CUPS/GNOME with independent network polling, four separate ink
+It complements CUPS/GNOME with independent network polling, four vertical ink
 bars, the printer's display message, detailed faults and desktop notifications.
 It reads local CUPS queue state and up to 20 recent jobs owned by the current
 user. It also supports scans started from the printer's **Scan to PC** menu.
@@ -133,10 +133,11 @@ At most one ink update is tracked at a time, with at least five minutes between
 attempts for the selected queue, including after failure or a lost reply.
 Ordinary five-second polls create no jobs when the levels already match.
 Automatic supply queries do not generate document-delivery notifications.
-The time below the bars records matching current levels or confirmed command
-completion. Pending, failed, cancelled or unconfirmed jobs do not display a
-successful update. The monitor queries that job directly, independently of the
-bounded job history.
+One last-update time covers the displayed printer information, including ink
+levels. Ink synchronization shows a temporary progress message, cleared on
+confirmed completion, or an error if the job fails, is cancelled or cannot be
+confirmed. The monitor queries that job directly, independently of the bounded
+job history.
 
 Under **Printer and notifications**, select a local CUPS queue using the
 Brother MFC-J5720DW CUPS driver and press **Apply**. An IP address alone is

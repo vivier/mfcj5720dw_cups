@@ -105,8 +105,8 @@ msgid "Keep monitoring when the window is closed"
 msgstr "Continuer la surveillance après fermeture de la fenêtre"
 
 #, c-format
-msgid "Last check: %s — %s"
-msgstr "Dernière vérification : %s — %s"
+msgid "Last update: %s — %s"
+msgstr "Dernière actualisation : %s — %s"
 
 msgid "Loaded paper does not match the job"
 msgstr "Le papier chargé ne correspond pas au travail"
@@ -556,10 +556,6 @@ msgstr "Demande d’actualisation des niveaux d’encre CUPS…"
 
 msgid "Updating ink levels…"
 msgstr "Actualisation des niveaux d’encre en cours…"
-
-#, c-format
-msgid "Ink levels updated at %s"
-msgstr "Niveaux d’encre actualisés à %s"
 
 msgid "Unable to confirm the ink-level update."
 msgstr "Impossible de confirmer l’actualisation des niveaux d’encre."
