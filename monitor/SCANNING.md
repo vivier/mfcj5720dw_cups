@@ -8,9 +8,11 @@ uses Brother's separately installed 64-bit `brscan4` SANE backend for acquisitio
 
 ## Scanner setup
 
-Install the **64-bit Scanner driver (brscan4)** from Brother's
-[MFC-J5720DW Linux RPM downloads](https://support.brother.com/g/b/downloadlist.aspx?c=us&lang=en&prod=mfcj5720dw_us_eu_as&os=127).
-The monitor RPM installs `scanimage`, Tesseract and its English/French language
+Install the **64-bit Scanner driver (brscan4)** from Brother's downloads for
+this model: [RPM for Fedora](https://support.brother.com/g/b/downloadlist.aspx?c=us&lang=en&prod=mfcj5720dw_us_eu_as&os=127)
+or [DEB for Debian](https://support.brother.com/g/b/downloadlist.aspx?c=us&lang=en&prod=mfcj5720dw_us_eu_as&os=128).
+On Debian, install the downloaded `brscan4` DEB with `sudo apt install ./brscan4*.deb`.
+The monitor package installs `scanimage`, Tesseract and its English/French language
 packs, but does not bundle Brother's scanner library. The scanner driver is
 optional for status monitoring and printing. The separate **Scan-key-tool**
 (`brscan-skey`) is not needed: the monitor implements that function.

@@ -1,0 +1,8 @@
+usr/lib/cups/filter/rastertomfcj5720dw
+usr/lib/cups/filter/mfcj5720dw_ink
+usr/lib/cups/filter/commandtomfcj5720dw
+usr/share/cups/model/Brother/mfcj5720dw.ppd
+usr/share/mfcj5720dw/lut/*.BCM
+usr/share/man/man1/rastertomfcj5720dw.1
+usr/share/man/man1/mfcj5720dw_ink.1
+usr/share/man/man1/commandtomfcj5720dw.1

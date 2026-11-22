@@ -38,7 +38,16 @@ DIST_FILES = .gitattributes .gitignore COPYRIGHT LICENSE PROVENANCE.md README.md
 	$(wildcard encoder/*.c encoder/*.h) \
 	lut/Makefile lut/.gitignore $(wildcard lut/*.py lut/*.xml lut/cubes/*.xml lut/curves/*.xml)
 
-.PHONY: all profiles ppd check-static check-man check-encoder-interfaces install rpm srpm rpm-sources clean distclean
+DEB_TOPDIR = $(abspath $(BUILD)/deb)
+DEB_VERSION = $(shell sed -n 's/^Version:[[:space:]]*//p' $(RPM_SPEC))
+DEB_SOURCE_DIR = $(DEB_TOPDIR)/mfcj5720dw-cups-$(DEB_VERSION)
+DEBIAN_FILES = debian/changelog debian/control debian/copyright debian/rules \
+	debian/source/format debian/mfcj5720dw-cups.install \
+	debian/mfcj5720dw-cups-monitor.install debian/mfcj5720dw-cups.docs \
+	debian/mfcj5720dw-cups.prerm
+DIST_FILES += $(DEBIAN_FILES)
+
+.PHONY: all profiles ppd check-static check-man check-encoder-interfaces install rpm srpm rpm-sources clean distclean deb deb-source deb-sources
 all: $(BUILD)/rastertomfcj5720dw $(BUILD)/mfcj5720dw_ink $(BUILD)/commandtomfcj5720dw $(PPD) profiles
 
 ifeq ($(WITH_MONITOR),1)
@@ -122,6 +131,27 @@ rpm: rpm-sources
 srpm: rpm-sources
 	$(RPMBUILD) -bs --define '_topdir $(RPM_TOPDIR)' \
 		--define '_srcrpmdir $(RPM_SRPMDIR)' "$(RPM_TOPDIR)/SPECS/$(RPM_SPEC)"
+
+# Stage a separate source tree: dpkg's clean step must not remove build/deb.
+deb-sources:
+	@test -n "$(DEB_VERSION)"
+	@test "$$(dpkg-parsechangelog -S Source)" = mfcj5720dw-cups
+	@test "$$(dpkg-parsechangelog -S Version | sed 's/-[^-]*$$//')" = "$(DEB_VERSION)" || \
+		{ echo 'Debian changelog and RPM spec upstream versions differ.' >&2; exit 1; }
+	mkdir -p "$(DEB_TOPDIR)"
+	$(RM) -r -- "$(DEB_SOURCE_DIR)"
+	tar --sort=name --owner=0 --group=0 --numeric-owner \
+		--transform="s,^,mfcj5720dw-cups-$(DEB_VERSION)/," \
+		-czf "$(DEB_TOPDIR)/mfcj5720dw-cups_$(DEB_VERSION).orig.tar.gz" \
+		$(filter-out $(DEBIAN_FILES),$(DIST_FILES))
+	tar -xzf "$(DEB_TOPDIR)/mfcj5720dw-cups_$(DEB_VERSION).orig.tar.gz" -C "$(DEB_TOPDIR)"
+	cp --parents --preserve=mode,timestamps $(DEBIAN_FILES) "$(DEB_SOURCE_DIR)/"
+
+deb: deb-sources
+	+cd "$(DEB_SOURCE_DIR)" && dpkg-buildpackage -us -uc
+
+deb-source: deb-sources
+	cd "$(DEB_TOPDIR)" && dpkg-source -b "$(DEB_SOURCE_DIR)"
 
 clean:
 	$(RM) -r -- "$(BUILD)" ppd

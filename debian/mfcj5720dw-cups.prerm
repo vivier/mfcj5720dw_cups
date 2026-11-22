@@ -1,0 +1,34 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Laurent Vivier
+set -e
+
+# An upgrade, failed upgrade or deconfiguration must preserve printer queues.
+if [ "$1" = remove ]; then
+	for queue_ppd in /etc/cups/ppd/*.ppd; do
+		[ -f "$queue_ppd" ] || continue
+
+		# cupsFilter2 overrides all cupsFilter entries when present.
+		filter_attribute=cupsFilter
+		if LC_ALL=C grep -q '^\*cupsFilter2:' "$queue_ppd"; then
+			filter_attribute=cupsFilter2
+		fi
+		filter_program='(/usr/lib/cups/filter/)?(rastertomfcj5720dw|mfcj5720dw_ink|commandtomfcj5720dw)'
+		if ! LC_ALL=C grep -Eq "^\*$filter_attribute:[[:space:]]*\"[^\"]*[[:space:]]$filter_program[[:space:]]*\"[[:space:]]*$" "$queue_ppd"; then
+			continue
+		fi
+
+		queue_name=${queue_ppd##*/}
+		queue_name=${queue_name%%.ppd}
+		# Pin the local socket; client settings must not select a remote server.
+		if ! timeout 30 /usr/sbin/lpadmin -h /run/cups/cups.sock -U root -x "$queue_name" < /dev/null; then
+			printf 'Cannot remove CUPS queue %s; start local CUPS and retry removing mfcj5720dw-cups.\n' "$queue_name" >&2
+			exit 1
+		fi
+		printf 'Removed CUPS queue %s (Brother MFC-J5720DW CUPS).\n' "$queue_name"
+	done
+fi
+
+#DEBHELPER#
+
+exit 0

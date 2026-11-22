@@ -4,3 +4,14 @@ __pycache__/
 *.pyc
 *.swp
 cscope.out
+
+# Debian helper output from direct dpkg-buildpackage builds.
+/debian/.debhelper/
+/debian/debhelper-build-stamp
+/debian/files
+/debian/*.debhelper
+/debian/*.debhelper.log
+/debian/*.substvars
+/debian/tmp/
+/debian/mfcj5720dw-cups/
+/debian/mfcj5720dw-cups-monitor/

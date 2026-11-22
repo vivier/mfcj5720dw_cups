@@ -2,6 +2,8 @@
 
 **Fedora RPMs: [lvivier/mfcj5720dw on COPR](https://copr.fedorainfracloud.org/coprs/lvivier/mfcj5720dw/)**
 
+**Debian 13: [build and install native DEB packages](#build-debian-packages-debian-13)**
+
 An independent native CUPS driver for the Brother MFC-J5720DW, developed by
 reverse engineering the original Brother printing pipeline. It converts
 CUPS Raster directly into printer data and retrieves ink levels and factory
@@ -195,7 +197,7 @@ The official Brother **brscan4 0.4.11-2 scanner RPM for x86_64** is available at
 
 <https://download.brother.com/welcome/dlf105203/brscan4-0.4.11-2.x86_64.rpm>
 
-Install it with:
+On Fedora, install it with:
 
 ```sh
 sudo dnf install https://download.brother.com/welcome/dlf105203/brscan4-0.4.11-2.x86_64.rpm
@@ -321,7 +323,57 @@ Final RPM removal deletes local CUPS queues using any of this driver's
 filters. Upgrades and reinstalls preserve the queues and their settings.
 Removing only the monitor package preserves all printer queues.
 
-## Install without RPM
+## Build Debian packages (Debian 13)
+
+The Debian packaging targets **Debian 13 (trixie)**. The driver and optional
+monitor are separate packages, with the same names as their RPM counterparts.
+The build uses the native architecture; the encoder supports `amd64` and `i386`.
+The monitor requires GTK 4.12 or newer. Debian 12 is not supported by this
+packaging. COPR provides Fedora RPMs, not Debian packages.
+
+Install the build tools and the dependencies declared in `debian/control`:
+
+```sh
+sudo apt-get update
+sudo apt-get install build-essential debhelper
+sudo apt-get build-dep .
+make deb
+```
+
+`make deb` builds the binary packages and the unsigned source package in
+`build/deb/`. The build runs `make check-static`; it does not contact a printer.
+`make deb-source` creates only the source package (`.dsc`, `.orig.tar.gz` and
+`.debian.tar.xz`) and needs `dpkg-dev`, without the compilation dependencies.
+`make deb-sources` prepares the upstream archive and a separate source tree.
+Debian's debug-symbol packages may also be produced by debhelper.
+
+On an amd64 system, install the driver, then optionally the monitor:
+
+```sh
+sudo apt install ./build/deb/mfcj5720dw-cups_*_amd64.deb
+sudo apt install ./build/deb/mfcj5720dw-cups-monitor_*_amd64.deb
+```
+
+Use the same printer setup and driver selection as for the Fedora packages.
+Removing the driver deletes local queues using its filters. Upgrades and
+reinstalls preserve the queues; removing only the monitor also preserves them.
+On GNOME, install `gnome-shell-extension-appindicator` with APT and enable it
+as described in the [monitor instructions](monitor/README.md).
+For scanning, install Brother's **64-bit brscan4 DEB**, not the RPM; see
+[scanner setup](monitor/SCANNING.md#scanner-setup).
+
+For a new upstream version, update both the RPM spec's `Version` and
+`debian/changelog`. The Debian revision is independent of the RPM release.
+The packaging targets check that their upstream versions agree.
+A source package can be rebuilt without this checkout:
+
+```sh
+dpkg-source -x mfcj5720dw-cups_0.4.0-1.dsc
+cd mfcj5720dw-cups-0.4.0
+dpkg-buildpackage -us -uc -b
+```
+
+## Install without a package
 
 ```sh
 sudo make install

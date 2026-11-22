@@ -1,0 +1,21 @@
+#!/usr/bin/make -f
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Laurent Vivier
+
+# The Makefiles retain the validated x87 arithmetic and compiler settings.
+# In particular, do not add fortification to the encoder's unoptimized build.
+export DEB_BUILD_MAINT_OPTIONS = hardening=-all
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	dh_auto_build -- LDFLAGS=
+
+override_dh_auto_test:
+	$(MAKE) check-static LDFLAGS=
+
+override_dh_auto_install:
+	dh_auto_install --destdir=debian/tmp -- LDFLAGS= PREFIX=/usr \
+		CUPSFILTERDIR=/usr/lib/cups/filter \
+		PPDDIR=/usr/share/cups/model/Brother DATADIR=/usr/share/mfcj5720dw

@@ -1,0 +1,68 @@
+Source: mfcj5720dw-cups
+Section: text
+Priority: optional
+Maintainer: Laurent Vivier <laurent@vivier.eu>
+Build-Depends:
+ debhelper-compat (= 13),
+ cups-client,
+ cups-ppdc,
+ desktop-file-utils,
+ file,
+ gettext,
+ groff-base,
+ libcups2-dev,
+ libdbusmenu-glib-dev,
+ libgtk-4-dev (>= 4.12),
+ libjpeg62-turbo-dev,
+ libsnmp-dev,
+ pkgconf,
+ python3 (>= 3.11),
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://github.com/vivier/mfcj5720dw_cups
+Vcs-Git: https://github.com/vivier/mfcj5720dw_cups.git
+Vcs-Browser: https://github.com/vivier/mfcj5720dw_cups
+
+Package: mfcj5720dw-cups
+Architecture: amd64 i386
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+ cups,
+ cups-client,
+ cups-filters,
+ ghostscript,
+Suggests: mfcj5720dw-cups-monitor
+Description: native CUPS driver for the Brother MFC-J5720DW
+ Independent CUPS Raster filter with a generated PPD, color calibration
+ profiles, ink-level reporting, head cleaning and an internal nozzle check.
+ The encoder is linked directly into the filter; no Brother LPR executable
+ or wrapper is needed. The amd64 build needs no 32-bit compatibility libraries.
+ .
+ Select Brother MFC-J5720DW CUPS when adding the printer. Removing this package
+ deletes local CUPS queues using its filters. Upgrades preserve those queues.
+
+Package: mfcj5720dw-cups-monitor
+Section: utils
+Architecture: amd64 i386
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+ mfcj5720dw-cups (= ${binary:Version}),
+ sane-utils,
+ tesseract-ocr,
+ tesseract-ocr-eng,
+ tesseract-ocr-fra,
+ xdg-utils,
+Suggests:
+ brscan4,
+ gnome-shell-extension-appindicator,
+Description: desktop status monitor for the Brother MFC-J5720DW
+ GTK application displaying printer status, detailed faults and ink levels,
+ with a tray icon, notifications, English/French interfaces and optional
+ login startup. A maintenance window offers head cleaning and nozzle checks.
+ .
+ Optional scan-to-PC support receives requests from the printer's front panel
+ and saves PDF, JPEG or searchable PDF files, or opens an email draft with a
+ PDF attachment. Scanning requires Brother's separately installed 64-bit
+ brscan4 SANE backend; printing and status monitoring work without it.

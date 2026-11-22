@@ -14,13 +14,13 @@ Build with `make -C monitor`, or build the whole project normally. Dependencies
 are GTK 4 (4.12 or newer), GLib, libdbusmenu-glib, Net-SNMP, libcups, gettext,
 a C compiler and make.
 The runtime also needs iconv's HP Roman-8 conversion module (Fedora's
-`glibc-gconv-extra`, required by the monitor RPM).
+`glibc-gconv-extra`, required by the monitor RPM; Debian 13 supplies it in `libc6`).
 Scanning uses `scanimage` with Brother's separately installed 64-bit `brscan4`
 backend, configured for the printer's IPv4 address. Follow the
 [scanner setup instructions](SCANNING.md#scanner-setup); `brscan-skey` is not
 needed. Tesseract with the selected language packs provides OCR; `xdg-email`
 opens the default mail composer.
-The RPM build produces an optional `mfcj5720dw-cups-monitor` subpackage. The core
+RPM and Debian builds produce an optional `mfcj5720dw-cups-monitor` package. The core
 driver does not acquire a GTK dependency. `make WITH_MONITOR=0` builds only the
 driver. Source, manual and Makefile are together in this directory; native
 artifacts go to `../build/monitor`.
@@ -60,8 +60,21 @@ when the monitor exits.
 The desktop must provide a StatusNotifierItem host. On GNOME, install and
 enable the **AppIndicator and KStatusNotifierItem Support** extension:
 
+On Fedora:
+
 ```sh
 sudo dnf install gnome-shell-extension-appindicator
+```
+
+On Debian 13:
+
+```sh
+sudo apt install gnome-shell-extension-appindicator
+```
+
+Then enable it for your GNOME session:
+
+```sh
 gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com
 ```
 
@@ -70,7 +83,8 @@ before enabling it. With this extension, a single click opens the menu and a
 double-click opens the monitor directly. Other desktops may use a single
 click for activation. Without a tray host, monitoring still works; reopen the
 window from the application menu. The monitor RPM recommends the extension
-when GNOME Shell is installed, but does not enable extensions automatically.
+when GNOME Shell is installed; the Debian package suggests it to avoid installing
+GNOME on other desktops. Neither package enables extensions automatically.
 
 Printer addresses from JetDirect, LPD and IPP/IPPS queues are recognized.
 DNS-SD service URIs and USB queues require a network address override.
