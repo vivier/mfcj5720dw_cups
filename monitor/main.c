@@ -664,7 +664,9 @@ static void create_window(struct monitor_app *app)
 	GtkCssProvider *css = gtk_css_provider_new();
 	const char *colors[] = { "black-ink", "cyan-ink", "magenta-ink", "yellow-ink" };
 	const char *names[] = { N_("Black"), N_("Cyan"), N_("Magenta"), N_("Yellow") };
-	unsigned int i;
+	/* Match the printer's M, C, Y, BK display; data stays in K, C, M, Y order. */
+	const unsigned int display_order[] = { 2, 1, 3, 0 };
+	unsigned int position;
 
 	app->window = GTK_WINDOW(gtk_application_window_new(app->application));
 	gtk_window_set_title(app->window, _("Brother MFC-J5720DW — Status monitor"));
@@ -691,7 +693,8 @@ static void create_window(struct monitor_app *app)
 	row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 16);
 	gtk_box_set_homogeneous(GTK_BOX(row), TRUE);
 	gtk_box_append(box, row);
-	for (i = 0; i < 4; i++) {
+	for (position = 0; position < G_N_ELEMENTS(display_order); position++) {
+		unsigned int i = display_order[position];
 		GtkBox *column = GTK_BOX(gtk_box_new(GTK_ORIENTATION_VERTICAL, 8));
 		GtkLabel *name;
 
