@@ -47,7 +47,11 @@ DEBIAN_FILES = debian/changelog debian/control debian/copyright debian/rules \
 	debian/mfcj5720dw-cups.prerm
 DIST_FILES += $(DEBIAN_FILES)
 
-.PHONY: all profiles ppd check-static check-man check-encoder-interfaces install rpm srpm rpm-sources clean distclean deb deb-source deb-sources
+PPA_SERIES ?= noble
+PPA_REVISION ?= 1
+PPA_TOPDIR = $(abspath $(BUILD)/ppa/$(PPA_SERIES))
+
+.PHONY: all profiles ppd check-static check-man check-encoder-interfaces install rpm srpm rpm-sources clean distclean deb deb-source deb-sources ppa-source
 all: $(BUILD)/rastertomfcj5720dw $(BUILD)/mfcj5720dw_ink $(BUILD)/commandtomfcj5720dw $(PPD) profiles
 
 ifeq ($(WITH_MONITOR),1)
@@ -152,6 +156,22 @@ deb: deb-sources
 
 deb-source: deb-sources
 	cd "$(DEB_TOPDIR)" && dpkg-source -b "$(DEB_SOURCE_DIR)"
+
+# Only the staged changelog is changed; the Debian source tree stays intact.
+# Signing and uploading are separate, explicit maintainer actions.
+ppa-source:
+	@case "$(PPA_SERIES)" in ''|*[!a-z0-9]*) \
+		echo 'PPA_SERIES must be an Ubuntu release codename.' >&2; exit 1;; esac
+	@test "$(PPA_REVISION)" -gt 0 || \
+		{ echo 'PPA_REVISION must be a positive integer.' >&2; exit 1; }
+	$(MAKE) deb-sources DEB_TOPDIR="$(PPA_TOPDIR)"
+	cd "$(PPA_TOPDIR)/mfcj5720dw-cups-$(DEB_VERSION)" && \
+		dch --maintmaint --force-distribution --force-bad-version \
+			--distribution "$(PPA_SERIES)" \
+			--newversion "$$(dpkg-parsechangelog -S Version)~$(PPA_SERIES)$(PPA_REVISION)" \
+			"Build for the Ubuntu $(PPA_SERIES) PPA."
+	cd "$(PPA_TOPDIR)/mfcj5720dw-cups-$(DEB_VERSION)" && \
+		dpkg-buildpackage -S -sa -us -uc -d -nc
 
 clean:
 	$(RM) -r -- "$(BUILD)" ppd
